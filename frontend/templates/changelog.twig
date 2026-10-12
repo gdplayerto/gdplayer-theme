@@ -40,9 +40,6 @@
                                         <span class="text-bold text-success">Added</span> horizontal Host Stability Rank ribbon bar with hover tooltips and host logos on the Video List page (<code>includes/templates/backend/videos/list.twig</code>).
                                     </li>
                                     <li>
-                                        <span class="text-bold text-success">Added</span> <code>HostHealth</code> service (<code>includes/classes/Service/HostHealth.php</code>) that tracks unreachable upstream identities (DNS/connection failures or repeatedly empty extraction) and short-circuits them to 404 for a TTL once a failure threshold is reached, wired into <code>Core</code>, <code>SourceHelper</code>, and <code>poster.php</code>.
-                                    </li>
-                                    <li>
                                         <span class="text-bold text-success">Added</span> automatic Nginx configuration generation (<code>ServerConfigManager::ensure()</code>, <code>ensureNginxConfigFile()</code>) that lazily writes <code>resources/nginx/site.d/nginx.conf</code> on the first request or during migration, using an <code>InstanceCache</code> staleness signature and file locking so the in-sync path performs no file I/O.
                                     </li>
                                     <li>
@@ -65,12 +62,6 @@
                                     </li>
                                     <li>
                                         <span class="text-bold text-success">Added</span> slug-based and alternative hash-based direct streaming URL routing (<code>direct/mp4/{slug}</code>, <code>direct/hls/{slug}</code>, <code>direct/mpd/{slug}</code>) in <code>includes/views/frontend/direct.php</code> and <code>includes/views/backend/videos/edit.php</code>.
-                                    </li>
-                                    <li>
-                                        <span class="text-bold text-success">Added</span> optional Redis instance injection support to <code>CircuitBreaker</code> static methods (<code>isAvailable</code>, <code>recordFailure</code>, <code>recordSuccess</code>) for compatibility with long-running application runtimes (Swoole, RoadRunner, background workers).
-                                    </li>
-                                    <li>
-                                        <span class="text-bold text-success">Added</span> Circuit Breaker protection to <code>Maxmind::getMaxmindIPInfo</code> to prevent repeated lookups and fall back smoothly when IP info is missing or unavailable.
                                     </li>
                                     <li>
                                         <span class="text-bold text-success">Added</span> modular script-bundle widget templates <code>default-frontend-scripts.twig</code> and <code>default-backend-scripts.twig</code> (<code>includes/templates/widget/</code>) extracted from inline footer <code>&lt;script&gt;</code> lists, enabling per-theme overriding of frontend and backend script bundles.
@@ -119,9 +110,6 @@
                                     </li>
                                     <li>
                                         <span class="text-bold text-success">Improved</span> Replaced Phpfastcache array-based tag sets (<code>addTags</code>) with versioned cache keys in <code>Model.php</code> (<code>get</code>, <code>getOne</code>, <code>getNumRows</code>, <code>getTotalRows</code>, <code>getWhereIn</code>), reducing Redis memory overhead and avoiding Tag Garbage Collection issues.
-                                    </li>
-                                    <li>
-                                        <span class="text-bold text-success">Improved</span> Updated circuit breaker cooldown to 60 seconds and failure threshold to 5 across services.
                                     </li>
                                     <li>
                                         <span class="text-bold text-success">Improved</span> Optimized <code>CloudflareProxy</code> settings caching to avoid redundant database reads during high concurrency.
@@ -212,9 +200,6 @@
                                     </li>
                                     <li>
                                         <span class="text-bold text-primary">Fixed</span> Fixed Google Drive HLS playback handling in <code>Master</code> by setting the browser <code>User-Agent</code> for <code>isGoogleHls()</code> hosts instead of forcing an inline <code>Content-Disposition</code> redirect, and renamed the <code>isDownloadable</code> property to <code>isDownload</code>.
-                                    </li>
-                                    <li>
-                                        <span class="text-bold text-primary">Fixed</span> Fixed <code>poster.php</code> to short-circuit to the placeholder when a host is marked down, add a connection timeout, and record connectivity failures/successes via <code>HostHealth</code> while ignoring self-inflicted <code>CURLE_WRITE_ERROR</code> aborts.
                                     </li>
                                     <li>
                                         <span class="text-bold text-primary">Fixed</span> Fixed stale <code>.pid</code> files not being removed on stop by guarding <code>isRunning()</code>/<code>stopPid()</code> against PID reuse.
