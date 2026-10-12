@@ -196,11 +196,11 @@ return (new Config())
             'imports_order' => ['class', 'function', 'const']
         ],
         'global_namespace_import' => [
-            'import_classes' => false,
+            'import_classes' => true,
             'import_constants' => false,
             'import_functions' => false,
         ],
-        'fully_qualified_strict_types' => true,
+        'fully_qualified_strict_types' => ['import_symbols' => true],
         'single_import_per_statement' => [
             'group_to_single_imports' => false
         ],
