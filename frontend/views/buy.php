@@ -14,11 +14,12 @@
 
 declare(strict_types=1);
 
+use GDPlayer\Helper\Stream;
 use GDPlayer\Presentation\HTML;
 use GDPlayer\Presentation\Views;
 
 session_write_close();
-if (GDPlayer\Helper\Stream::isCurrentHostLoadBalancer()) {
+if (Stream::isCurrentHostLoadBalancer()) {
     Views::loadPage403();
     return;
 }

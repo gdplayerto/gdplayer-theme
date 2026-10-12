@@ -15,14 +15,16 @@
 declare(strict_types=1);
 
 use GDPlayer\Config\Config;
+use GDPlayer\Helper\Validation;
 use GDPlayer\Presentation\HTML;
 use GDPlayer\Presentation\Views;
+use GDPlayer\Service\Login;
 
 session_write_close();
 
 $config = new Config();
-$enableGsharer = GDPlayer\Helper\Validation::validateBoolean($config->get('enable_gsharer'));
-$isAdmin = GDPlayer\Service\Login::isCurrentUserAdmin();
+$enableGsharer = Validation::validateBoolean($config->get('enable_gsharer'));
+$isAdmin = Login::isCurrentUserAdmin();
 if (!$enableGsharer && !$isAdmin) {
     Views::loadPage403();
     return;
