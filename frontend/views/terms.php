@@ -18,7 +18,7 @@ use GDPlayer\Presentation\HTML;
 use GDPlayer\Presentation\Views;
 
 session_write_close();
-if (isLoadBalancer()) {
+if (GDPlayer\Helper\Stream::isCurrentHostLoadBalancer()) {
     Views::loadPage403();
     return;
 }

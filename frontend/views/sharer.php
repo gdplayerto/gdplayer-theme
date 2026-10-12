@@ -21,7 +21,9 @@ use GDPlayer\Presentation\Views;
 session_write_close();
 
 $config = new Config();
-if (!validateBoolean($config->get('enable_gsharer')) && !isAdmin()) {
+$enableGsharer = GDPlayer\Helper\Validation::validateBoolean($config->get('enable_gsharer'));
+$isAdmin = GDPlayer\Service\Login::isCurrentUserAdmin();
+if (!$enableGsharer && !$isAdmin) {
     Views::loadPage403();
     return;
 }
