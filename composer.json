@@ -1,66 +1,66 @@
 {
-    "name": "gdplayerto/gdplayer-theme-v1",
-    "description": "GDPlayer Theme v1",
-    "version": "0.0.2",
-    "type": "project",
-    "homepage": "https://gdplayer.to",
-    "license": "Apache-2.0",
-    "authors": [
-        {
-            "name": "GDPlayer Developer",
-            "homepage": "https://github.com/gdplayerto",
-            "email": "gdplayerdev@protonmail.com",
-            "role": "Developer"
-        }
-    ],
-    "support": {
-        "email": "gdplayerdev@protonmail.com",
-        "telegram": "https://t.me/gdplayerto"
-    },
-    "funding": [
-        {
-            "type": "ko-fi",
-            "url": "https://ko-fi.com/gdplayerdev"
-        }
-    ],
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "require": {
-        "php": ">=8.1.0"
-    },
-    "replace": {
-        "symfony/polyfill-php80": "*",
-        "symfony/polyfill-php81": "*",
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-intl": "*",
-        "symfony/polyfill-mbstring": "*"
-    },
-    "config": {
-        "process-timeout": 0,
-        "platform-check": true,
-        "optimize-autoloader": true,
-        "classmap-authoritative": false
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "composer dump-autoload -o"
-        ],
-        "post-update-cmd": [
-            "composer dump-autoload -o"
-        ],
-        "php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose",
-        "phpcs": "phpcs frontend/views > logs/phpcs_errors.log",
-        "phpstan": "phpstan analyse --level=8 --memory-limit 2G --no-progress > logs/phpstan_errors_lvl8.log",
-        "dev": [
-            "composer php-cs-fixer",
-            "composer dump-autoload -o --dev",
-            "composer phpstan",
-            "composer phpcs"
-        ]
-    },
-    "require-dev": {
-        "phpstan/phpstan": "^2.1",
-        "friendsofphp/php-cs-fixer": "^3.90",
-        "squizlabs/php_codesniffer": "^4.0"
-    }
+	"name": "gdplayerto/gdplayer-theme-v1",
+	"description": "GDPlayer Theme v1",
+	"version": "0.0.2",
+	"type": "project",
+	"homepage": "https://gdplayer.to",
+	"license": "Apache-2.0",
+	"authors": [
+		{
+			"name": "GDPlayer Developer",
+			"homepage": "https://github.com/gdplayerto",
+			"email": "gdplayerdev@protonmail.com",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"email": "gdplayerdev@protonmail.com",
+		"telegram": "https://t.me/gdplayerto"
+	},
+	"funding": [
+		{
+			"type": "ko-fi",
+			"url": "https://ko-fi.com/gdplayerdev"
+		}
+	],
+	"minimum-stability": "stable",
+	"prefer-stable": true,
+	"require": {
+		"php": ">=8.1.0"
+	},
+	"replace": {
+		"symfony/polyfill-php80": "*",
+		"symfony/polyfill-php81": "*",
+		"symfony/polyfill-ctype": "*",
+		"symfony/polyfill-intl": "*",
+		"symfony/polyfill-mbstring": "*"
+	},
+	"config": {
+		"process-timeout": 0,
+		"platform-check": true,
+		"optimize-autoloader": true,
+		"classmap-authoritative": false
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"composer dump-autoload -o"
+		],
+		"post-update-cmd": [
+			"composer dump-autoload -o"
+		],
+		"php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose",
+		"phpcs": "phpcs frontend/views > logs/phpcs_errors.log",
+		"phpstan": "@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --level=8 --memory-limit 2G --no-progress > logs/phpstan_errors_lvl8.log",
+		"dev": [
+			"composer php-cs-fixer",
+			"composer dump-autoload -o --dev",
+			"composer phpstan",
+			"composer phpcs"
+		]
+	},
+	"require-dev": {
+		"phpstan/phpstan": "^2.3",
+		"friendsofphp/php-cs-fixer": "^3.90",
+		"squizlabs/php_codesniffer": "^4.0"
+	}
 }
