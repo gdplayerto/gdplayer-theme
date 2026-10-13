@@ -40,4 +40,4 @@ Priority chain:
 
 ## No Custom AJAX Endpoints
 
-Theme ini tidak menambahkan endpoint AJAX baru. Semua AJAX tetap melalui controller utama di `includes/classes/Ajax/`.
+Theme ini tidak menambahkan endpoint AJAX baru. Semua AJAX tetap melalui controller utama di `src/Ajax/`.
