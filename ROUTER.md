@@ -35,9 +35,9 @@ Theme hanya menyediakan override halaman frontend. Routing utama tetap melalui `
 Priority chain:
 1. Plugin routes → PluginRouteRegistry::resolve() (tb_plugin_routes, fallback plugin.json)
 2. Active theme → {theme}/frontend/views/{page}.php
-3. Core fallback → includes/views/frontend/{page}.php
+3. Core fallback → controller `src/Modules/<Modul>/Controllers/*` (view core lama sudah pensiun 2026-10-15)
 ```
 
 ## No Custom AJAX Endpoints
 
-Theme ini tidak menambahkan endpoint AJAX baru. Semua AJAX tetap melalui controller utama di `src/Ajax/`.
+Theme ini tidak menambahkan endpoint AJAX baru. Semua AJAX dilayani controller modul `src/Modules/<Modul>/Controllers/*AjaxController.php` (kelas lama `src/Ajax/*` = dead code, tidak dipakai).

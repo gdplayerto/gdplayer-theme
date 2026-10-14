@@ -21,7 +21,7 @@ use GDPlayer\Presentation\Views;
 session_write_close();
 if (StreamConfig::isCurrentHostLoadBalancer()) {
     Views::loadPage403();
-    exit;
+    return; // F6.3: hentikan render tanpa mematikan proses (dulu exit)
 }
 
 echo HTML::renderTemplate(__DIR__ . '/../templates/changelog.twig', [
