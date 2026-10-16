@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [dev0.0.2, main]
+    branches: ['dev*', 'main']
   pull_request:
-    branches: [dev0.0.2, main]
+    branches: ['dev*', 'main']
   workflow_dispatch:
 
 jobs:
@@ -36,12 +36,12 @@ jobs:
 
       - name: PHPStan
         if: always()
-        run: test -x vendor/bin/phpstan && vendor/bin/phpstan analyse --level=8 --no-progress || echo "phpstan not available, skipping"
+        run: vendor/bin/phpstan analyse --level=8 --memory-limit 2G --no-progress
 
       - name: PHP-CS-Fixer
         if: always()
-        run: test -x vendor/bin/php-cs-fixer && vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php || echo "php-cs-fixer not available, skipping"
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php
 
       - name: PHPCS
         if: always()
-        run: test -x vendor/bin/phpcs && vendor/bin/phpcs frontend/views || echo "phpcs not available, skipping"
+        run: vendor/bin/phpcs frontend/views
