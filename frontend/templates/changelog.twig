@@ -16,16 +16,28 @@
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
                             <li class="mb-3">
-                                <strong>Oct 15, 2026 (v4.8.8)</strong>
+                                <strong>Oct 16, 2026 (v4.8.8)</strong>
                                 <ol>
                                     <li>
                                         <span class="text-bold text-success">Improved</span> internal code modernization and stability.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Improved</span> response header emission for long-running runtimes (Swoole, RoadRunner), writing headers, status and cookies through each runtime's own response mechanism.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Improved</span> endpoint loading order: the active theme now takes precedence over plugin and core views.
                                     </li>
                                     <li>
                                         <span class="text-bold text-primary">Fixed</span> a deadlock that could prevent saving the license key.
                                     </li>
                                     <li>
                                         <span class="text-bold text-primary">Fixed</span> database migration when updating tables that already exist (the id column and primary key are now added correctly).
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-primary">Fixed</span> theme-provided pages being shadowed by built-in core pages (e.g. the active theme's sitemap is now used).
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-primary">Fixed</span> video import ordering so records keep their CSV import order in the list and dashboard.
                                     </li>
                                 </ol>
                             </li>

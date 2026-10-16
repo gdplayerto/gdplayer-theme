@@ -14,9 +14,11 @@
 
 declare(strict_types=1);
 
+use GDPlayer\Http\ResponseEmitter;
+
 session_write_close();
 
-header('Content-Type: application/xml; charset=UTF-8');
+ResponseEmitter::setHeader('Content-Type', 'application/xml; charset=UTF-8');
 
 $content = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>

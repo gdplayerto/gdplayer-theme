@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.0.2] - 2026-10-02
+## [0.0.2] - 2026-10-16
 
 ### Added
 - Added GitHub Actions CI workflow for static analysis and linting (`phpstan`, `php-cs-fixer`, `phpcs`, `php-lint`).
@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated changelog page template (`changelog.twig`) with comprehensive release notes for GDPlayer v4.8.7, Swoole Proxy v0.0.8, and RoadRunner Proxy v0.0.5.
 
 ### Changed
+- Frontend sitemap view emits its `Content-Type` header through the core emitter (dual-sink, long-running compatible).
 - Synchronized frontend changelog templates with latest core and plugin release entries.
 - Bumped frontend CSS to v0.0.2, added download-page template, and synced patch version release notes.
 - Added `nosnippet` attributes to homepage sections and updated Cloudflare WARP proxy documentation.
