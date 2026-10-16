@@ -23,7 +23,7 @@ iframe {
 }
 
 option:disabled {
-    background: red;
+    background: #d32f2f;
     color: #fff;
 }
 
@@ -774,18 +774,18 @@ option:disabled {
 }
 
 .feature-card.monetize .icon-box {
-    background: rgba(16, 185, 129, 0.1);
-    color: #34d399;
+    background: #d1fae5;
+    color: #047857;
 }
 
 .feature-card.infra .icon-box {
-    background: rgba(245, 158, 11, 0.1);
-    color: #fbbf24;
+    background: #fef3c7;
+    color: #b45309;
 }
 
 .feature-card.security .icon-box {
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .feature-card h5 {

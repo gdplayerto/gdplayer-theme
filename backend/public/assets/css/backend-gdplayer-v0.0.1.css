@@ -23,7 +23,7 @@ iframe {
 }
 
 option:disabled {
-    background: red;
+    background: #d32f2f;
     color: #fff;
 }
 
