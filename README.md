@@ -1,5 +1,10 @@
 # GDPlayer Theme v1
 
+[![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue.svg?logo=php)](https://www.php.net/)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)](https://phpstan.org/)
+[![PHP-CS-Fixer](https://img.shields.io/badge/PHP--CS--Fixer-clean-brightgreen.svg)](https://cs.symfony.com/)
+[![PHPCS](https://img.shields.io/badge/PHPCS-PSR--12-blue.svg)](https://github.com/PHPCSStandards/PHP_CodeSniffer)
+
 Official GDPlayer Theme v1 for the **GDPlayer** application.
 
 ---
