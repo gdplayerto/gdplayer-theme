@@ -1,26 +1,24 @@
 <?php
 
-/*
- * File: sitemap.php
- * Project: GDPlayer
- * File Created: Sunday, 6th August 2023 12:41:20 pm
- * Author: GDPlayer Developer (https://t.me/gdplayerto)
- * -----
- * Last Modified: Tuesday, 28th July 2026 10:10:38 pm
- * Modified By: GDPlayer Developer (https://t.me/gdplayerto>)
- * -----
- * Copyright 2020 - 2025 https://github.com/gdplayerto
- */
-
 declare(strict_types=1);
 
-use GDPlayer\Http\ResponseEmitter;
+namespace GDPlayer\Theme\Gdplayer\Frontend;
 
-session_write_close();
+use GDPlayer\Http\HttpFactory;
+use GDPlayer\View\ViewInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-ResponseEmitter::setHeader('Content-Type', 'application/xml; charset=UTF-8');
+/**
+ * Sitemap XML theme gdplayer (response PSR-7, tanpa echo/header langsung).
+ */
+final class SitemapView implements ViewInterface
+{
+    public function render(ServerRequestInterface $request): ResponseInterface
+    {
+        \session_write_close();
 
-$content = <<<'XML'
+        $content = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -64,4 +62,8 @@ $content = <<<'XML'
 </urlset>
 XML;
 
-echo sprintf($content, rtrim(BASE_URL, '/'));
+        return HttpFactory::createResponse(200)
+            ->withHeader('Content-Type', 'application/xml; charset=UTF-8')
+            ->withBody(HttpFactory::createStream(\sprintf($content, \rtrim(BASE_URL, '/'))));
+    }
+}

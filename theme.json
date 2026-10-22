@@ -1,0 +1,20 @@
+{
+    "name": "GDPlayer",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "GDPlayer\\Theme\\Gdplayer\\": "src/"
+        }
+    },
+    "views": {
+        "frontend:index": "GDPlayer\\Theme\\Gdplayer\\Frontend\\HomeView",
+        "frontend:changelog": "GDPlayer\\Theme\\Gdplayer\\Frontend\\ChangelogView",
+        "frontend:dmca": "GDPlayer\\Theme\\Gdplayer\\Frontend\\DmcaView",
+        "frontend:privacy": "GDPlayer\\Theme\\Gdplayer\\Frontend\\PrivacyView",
+        "frontend:terms": "GDPlayer\\Theme\\Gdplayer\\Frontend\\TermsView",
+        "frontend:sharer": "GDPlayer\\Theme\\Gdplayer\\Frontend\\SharerView",
+        "frontend:buy": "GDPlayer\\Theme\\Gdplayer\\Frontend\\BuyView",
+        "frontend:buy-additional-features": "GDPlayer\\Theme\\Gdplayer\\Frontend\\BuyAdditionalFeaturesView",
+        "frontend:sitemap": "GDPlayer\\Theme\\Gdplayer\\Frontend\\SitemapView"
+    }
+}
