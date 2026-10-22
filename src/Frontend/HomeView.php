@@ -10,7 +10,7 @@ use GDPlayer\Presentation\HTML;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman depan theme gdplayer (form generator + widget).
+ * gdplayer theme front page (generator form + widgets).
  */
 final class HomeView extends AbstractPageView
 {

@@ -7,7 +7,7 @@ namespace GDPlayer\Theme\Gdplayer\Frontend;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman BuyAdditionalFeaturesView.
+ * BuyAdditionalFeaturesView page.
  */
 final class BuyAdditionalFeaturesView extends AbstractPageView
 {

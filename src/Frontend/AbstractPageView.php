@@ -12,15 +12,15 @@ use GDPlayer\View\ViewInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Dasar view halaman theme gdplayer: guard load-balancer + render Twig.
+ * Base view for gdplayer theme pages: load-balancer guard + Twig render.
  */
 abstract class AbstractPageView implements ViewInterface
 {
     /**
-     * @param string $template nama file template relatif terhadap `frontend/templates/`
-     * @param array<string, mixed> $data variabel template
-     * @param ServerRequestInterface $request request aktif
-     * @return string HTML hasil render
+     * @param string $template template file name relative to `frontend/templates/`
+     * @param array<string, mixed> $data template variables
+     * @param ServerRequestInterface $request active request
+     * @return string rendered HTML
      */
     protected function renderTemplate(string $template, array $data, ServerRequestInterface $request): string
     {

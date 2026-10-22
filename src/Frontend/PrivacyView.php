@@ -7,7 +7,7 @@ namespace GDPlayer\Theme\Gdplayer\Frontend;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman PrivacyView.
+ * PrivacyView page.
  */
 final class PrivacyView extends AbstractPageView
 {

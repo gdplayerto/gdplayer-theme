@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Sitemap XML theme gdplayer (response PSR-7, tanpa echo/header langsung).
+ * gdplayer theme XML sitemap (PSR-7 response, no direct echo/header).
  */
 final class SitemapView implements ViewInterface
 {

@@ -7,7 +7,7 @@ namespace GDPlayer\Theme\Gdplayer\Frontend;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman ChangelogView.
+ * ChangelogView page.
  */
 final class ChangelogView extends AbstractPageView
 {

@@ -7,7 +7,7 @@ namespace GDPlayer\Theme\Gdplayer\Frontend;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman DmcaView.
+ * DmcaView page.
  */
 final class DmcaView extends AbstractPageView
 {

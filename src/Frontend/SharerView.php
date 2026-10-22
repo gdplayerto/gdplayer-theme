@@ -12,7 +12,7 @@ use GDPlayer\View\ErrorPageView;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman sharer Google Drive: hanya aktif bila fitur diaktifkan atau admin.
+ * Google Drive sharer page: enabled only when the feature is on, or for admins.
  */
 final class SharerView extends AbstractPageView
 {

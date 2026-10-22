@@ -7,7 +7,7 @@ namespace GDPlayer\Theme\Gdplayer\Frontend;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Halaman TermsView.
+ * TermsView page.
  */
 final class TermsView extends AbstractPageView
 {
