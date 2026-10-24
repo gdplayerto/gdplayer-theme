@@ -2,3 +2,10 @@
 !/backend
 !/frontend
 !/src
+/logs/*.log
+
+# Folder logs tooling tetap ada di repo (phpstan/phpcs menulis ke sini); isinya diabaikan.
+!/logs/
+!/logs/.gitkeep
+/coverage-clover.xml
+/.scannerwork/

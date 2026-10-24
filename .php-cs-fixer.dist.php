@@ -7,8 +7,11 @@ use PhpCsFixer\Finder;
 use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
 $finder = Finder::create()
-    ->in(__DIR__)
-    ->exclude(['.github', 'logs', 'vendor'])
+    ->in([
+        __DIR__ . '/src',
+        __DIR__ . '/backend',
+        __DIR__ . '/frontend'
+    ])
     ->name('*.php');
 
 return (new Config())
@@ -126,7 +129,10 @@ return (new Config())
         'date_time_immutable' => true,
         //constant_notation
         'native_constant_invocation' => [
-            'fix_built_in' => true
+            'fix_built_in' => true,
+            // Konstanta khusus POSIX/ext (ada di Linux, tak ada di Windows) dipaksa
+            // ikut prefix supaya hasil linting identik antara dev & runner CI.
+            'include' => ['SIGKILL', 'SIGTERM', 'POSIX_RLIMIT_NOFILE', 'O_RDONLY']
         ],
         'native_function_invocation' => [
             'include' => ['@all'],
@@ -200,7 +206,9 @@ return (new Config())
             'import_constants' => false,
             'import_functions' => false,
         ],
-        'fully_qualified_strict_types' => ['import_symbols' => true],
+        'fully_qualified_strict_types' => [
+            'import_symbols' => true
+        ],
         'single_import_per_statement' => [
             'group_to_single_imports' => false
         ],

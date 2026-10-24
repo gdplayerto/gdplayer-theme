@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<ruleset name="GDPlayer Default Theme">
+<ruleset name="GDPlayer Theme">
     <description>
-        Standar kode tema GDPlayer: PSR-12 (sama seperti proyek utama).
-        Dipakai otomatis oleh `composer phpcs`; cakupannya disamakan dengan `phpstan.neon.dist`
-        (frontend/views).
+        Standar kode GDPlayer (sama dengan root proyek): PSR-12. Dipakai otomatis oleh
+        `composer phpcs` (phpcs mencari phpcs.xml/phpcs.xml.dist di root).
     </description>
 
     <file>src</file>
@@ -11,6 +10,8 @@
     <file>frontend</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/logs/*</exclude-pattern>
+    <exclude-pattern>*/.phpunit.cache/*</exclude-pattern>
 
     <arg name="extensions" value="php"/>
     <arg name="colors"/>

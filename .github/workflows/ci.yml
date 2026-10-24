@@ -16,8 +16,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-          extensions: curl, mbstring, zip, gd, intl, xml
+          php-version: "8.1"
+          extensions: curl, mbstring, zip, gd, intl, xml, sockets
           tools: composer:v2
           coverage: none
 
@@ -31,17 +31,15 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
 
-      - name: Syntax check (php -l)
-        run: find . -name '*.php' -not -path './vendor/*' -not -path './.github/*' -print0 | xargs -0 -n1 php -l
+      - name: Composer validate
+        run: composer validate --no-interaction
 
-      - name: PHPStan (skipped standalone — needs the GDPlayer monolith)
+      - name: Syntax check (php -l)
+        run: find src backend frontend -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: PHPStan
         if: always()
-        run: |
-          if [ ! -f ../../vendor/autoload.php ]; then
-            echo "::warning title=PHPStan skipped::Clone gdplayer so ../../vendor/autoload.php resolves (analysis context = monolith)."
-            exit 0
-          fi
-          vendor/bin/phpstan analyse --level=8 --memory-limit 2G --no-progress
+        run: vendor/bin/phpstan analyse --level=8 --memory-limit 2G --no-progress
 
       - name: PHP-CS-Fixer
         if: always()
@@ -49,4 +47,4 @@ jobs:
 
       - name: PHPCS
         if: always()
-        run: vendor/bin/phpcs frontend/views
+        run: vendor/bin/phpcs

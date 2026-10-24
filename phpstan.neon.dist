@@ -5,6 +5,7 @@ parameters:
         - backend
         - frontend
     bootstrapFiles:
+        - vendor/autoload.php
         - ../../vendor/autoload.php
     treatPhpDocTypesAsCertain: false
     parallel:
