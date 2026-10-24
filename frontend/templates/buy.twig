@@ -151,7 +151,7 @@
                         <i class="fas fa-bolt"></i>
                     </div>
                     <h4>High-Velocity Caching</h4>
-                    <p>Utilize , Memcached, Apcu, SQLite, or file-based caching systems to massively speed up query operations.</p>
+                    <p>Utilize Redis or file-based caching systems to massively speed up query operations.</p>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
@@ -205,14 +205,14 @@
 <section id="pricing" class="pricing-section py-5 text-center">
     <h2 class="section-title">Simple, Direct Licensing</h2>
     <p class="section-subtitle">Get full access to the premium script features. No hidden subscriptions.</p>
-    <div class="row">
-        <div class="col-12 col-md-5 ml-auto">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-4 col-lg-4">
             <div class="pricing-card mt-4 text-white shadow">
                 <h3 class="mb-0 pricing-badge">Single License</h3>
                 <div class="text-uppercase tracking-wider small mb-2">Lifetime Access</div>
                 <div class="my-3">
                     <p class="price-amount">
-                        <span class="price-currency">$</span>99
+                        <span class="price-currency">$</span>149
                     </p>
                     <span class="price-period">4 Domains/Subdomains (Literal)</span>
                 </div>
@@ -237,7 +237,10 @@
                         <i class="fas fa-check-circle"></i> VAST Ads & Anti-Adblock Suite
                     </li>
                     <li>
-                        <i class="fas fa-check-circle"></i> High-Speed Redis/Memcached/SQLite Cache
+                        <i class="fas fa-check-circle"></i> High-Speed Redis/Files Based Cache
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> Worker-Safe Core (No Superglobals, No exit/die)
                     </li>
                     <li>
                         <i class="fas fa-check-circle"></i> Standard Updates
@@ -246,26 +249,75 @@
                         <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
                     </li>
                 </ul>
-                <a href="https://ko-fi.com/s/3f38af940a" target="_blank" class="btn btn-gradient btn-block btn-lg py-3 my-4">
-                    <i class="fas fa-bolt mr-2"></i>Purchase License Now
+                <a href="https://ko-fi.com/s/3f38af940a" target="_blank" rel="noreferrer noopener" class="btn btn-gradient btn-block my-4">
+                    <i class="fab fa-paypal mr-2"></i>Pay with PayPal
                 </a>
-                <a href="https://nowpayments.io/payment/?iid=6072430347&amp;source=button" target="_blank" rel="noreferrer noopener" class="mt-3 d-inline-block"><img src="https://nowpayments.io/images/embeds/payments-button-white.svg" alt="Cryptocurrency &amp; Bitcoin payment" style="max-width:100%"></a>
+                <a href="https://nowpayments.io/payment/?iid=5900732380&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient btn-block">
+                    <i class="fas fa-coins mr-2"></i>Pay with Crypto
+                </a>
             </div>
         </div>
-        <div class="col-12 col-md-5 mr-auto">
+
+        <div class="col-12 col-md-4 col-lg-4">
+            <div class="pricing-card mt-4 text-white shadow">
+                <h3 class="mb-0 pricing-badge">Runtime Edition</h3>
+                <div class="text-uppercase tracking-wider small mb-2">Lifetime Access</div>
+                <div class="my-3">
+                    <p class="price-amount">
+                        <span class="price-currency">$</span>199
+                    </p>
+                    <span class="price-period">4 Domains/Subdomains (Literal)</span>
+                </div>
+                <p class="text-muted small mt-2">Same license as Single, plus one long-running engine of your choice.</p>
+                <ul class="pricing-features">
+                    <li>
+                        <i class="fas fa-check-circle"></i> Everything in Single License
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> Choose One Engine: Swoole or RoadRunner
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> Lifetime Engine Activation
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> 1 Year Engine Updates &amp; Support
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> Native Swoole &amp; RoadRunner Runtime Support
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> Worker-Safe Core (No Superglobals, No exit/die)
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> Save $19 vs. buying the engine separately
+                    </li>
+                    <li>
+                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
+                    </li>
+                </ul>
+                <a href="https://ko-fi.com/s/f27b4d1e47" target="_blank" rel="noreferrer noopener" class="btn btn-gradient btn-block my-4">
+                    <i class="fab fa-paypal mr-2"></i>Pay with PayPal
+                </a>
+                <a href="https://nowpayments.io/payment/?iid=6135751090&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient btn-block">
+                    <i class="fas fa-coins mr-2"></i>Pay with Crypto
+                </a>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-4">
             <div class="pricing-card mt-4 text-white shadow">
                 <h3 class="mb-0 pricing-badge">Enterprise License</h3>
                 <div class="text-uppercase tracking-wider small mb-2">Lifetime Access</div>
                 <div class="my-3">
                     <p class="price-amount">
-                        <span class="price-currency">$</span>1000
+                        <span class="price-currency">$</span>1499
                     </p>
-                    <span class="price-period">Unlimited Domains & Subdomains</span>
+                    <span class="price-period">Unlimited Domains &amp; Subdomains</span>
                 </div>
                 <p class="text-muted small mt-2">Perfect for enterprise / developer.</p>
                 <ul class="pricing-features">
                     <li>
-                        <i class="fas fa-check-circle"></i> Unlimited Domains & Subdomains
+                        <i class="fas fa-check-circle"></i> Unlimited Domains &amp; Subdomains
                     </li>
                     <li>
                         <i class="fas fa-check-circle"></i> 100% Unobfuscated Source Code
@@ -274,10 +326,13 @@
                         <i class="fas fa-check-circle"></i> No License Key / No DRM (Faster Performance)
                     </li>
                     <li>
-                        <i class="fas fa-check-circle"></i> 1 Year Priority Support & Updates
+                        <i class="fas fa-check-circle"></i> All Engine Plugins Included (Swoole + RoadRunner)
                     </li>
                     <li>
                         <i class="fas fa-check-circle"></i> All Additional Hosts Included
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i> 1 Year Priority Support &amp; Updates
                     </li>
                     <li>
                         <i class="fas fa-check-circle"></i> Bypasses Google Drive Quota Limits
@@ -286,10 +341,7 @@
                         <i class="fas fa-check-circle"></i> Complete Access to 45+ File Hosts
                     </li>
                     <li>
-                        <i class="fas fa-check-circle"></i> VAST Ads & Anti-Adblock Suite
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> High-Speed Redis/Memcached/SQLite Cache
+                        <i class="fas fa-check-circle"></i> VAST Ads &amp; Anti-Adblock Suite
                     </li>
                     <li>
                         <i class="fas fa-check-circle"></i> Dedicated Priority Updates
@@ -298,10 +350,12 @@
                         <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
                     </li>
                 </ul>
-                <a href="https://ko-fi.com/s/cb1c4e85bf" target="_blank" class="btn btn-gradient btn-block btn-lg py-3 my-4">
-                    <i class="fas fa-bolt mr-2"></i>Purchase Source Code Now
+                <a href="https://ko-fi.com/s/cb1c4e85bf" target="_blank" rel="noreferrer noopener" class="btn btn-gradient btn-block my-4">
+                    <i class="fab fa-paypal mr-2"></i>Pay with PayPal
                 </a>
-                <a href="https://nowpayments.io/payment/?iid=5564632691&amp;source=button" target="_blank" rel="noreferrer noopener" class="mt-3 d-inline-block"><img src="https://nowpayments.io/images/embeds/payments-button-white.svg" alt="Cryptocurrency &amp; Bitcoin payment" style="max-width:100%"></a>
+                <a href="https://nowpayments.io/payment/?iid=5407728626&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient btn-block">
+                    <i class="fas fa-coins mr-2"></i>Pay with Crypto
+                </a>
             </div>
         </div>
     </div>
@@ -368,6 +422,34 @@
                     <div id="collapse4" class="collapse" aria-labelledby="heading4" data-parent="#accGDPlayer">
                         <div class="card-body text-muted">
                             Your initial purchase includes <strong>1 full year of standard updates and support</strong> absolutely free. After the first year expires, you can optionally pay a renewal fee of $40 to extend your access to new updates and support for another year.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ: runtime engines -->
+                <div class="mb-2 border-0 card rounded">
+                    <div id="headingEngine">
+                        <button class="text-left shadow-none btn-lg btn btn-dark btn-block collapsed" type="button" data-toggle="collapse" data-target="#collapseEngine" aria-expanded="false" aria-controls="collapseEngine">
+                            <i class="fas fa-server mr-2"></i> Do I need Swoole or RoadRunner to run GDPlayer?
+                        </button>
+                    </div>
+                    <div id="collapseEngine" class="collapse" aria-labelledby="headingEngine" data-parent="#accGDPlayer">
+                        <div class="card-body text-muted">
+                            No. GDPlayer runs on standard PHP-FPM out of the box. Swoole and RoadRunner are optional long-running engines that remove per-request bootstrap overhead for high-traffic sites. The core ships a worker-safe pipeline (PSR-7, no superglobals, no exit/die) so either engine can be adopted without patching the codebase. Engines are licensed separately, or bundled in the <strong>Runtime Edition</strong>.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ: pricing -->
+                <div class="mb-2 border-0 card rounded">
+                    <div id="headingPrice">
+                        <button class="text-left shadow-none btn-lg btn btn-dark btn-block collapsed" type="button" data-toggle="collapse" data-target="#collapsePrice" aria-expanded="false" aria-controls="collapsePrice">
+                            <i class="fas fa-tag mr-2"></i> Why did the license price change?
+                        </button>
+                    </div>
+                    <div id="collapsePrice" class="collapse" aria-labelledby="headingPrice" data-parent="#accGDPlayer">
+                        <div class="card-body text-muted">
+                            The Single License is now <strong>$149</strong> (previously $99) because the core was rebuilt around a worker-safe, long-running-ready pipeline plus native Swoole and RoadRunner support. Licenses purchased before the change keep their existing terms and the same <strong>$40/year</strong> renewal fee.
                         </div>
                     </div>
                 </div>
