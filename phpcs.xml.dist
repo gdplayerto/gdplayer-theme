@@ -6,7 +6,9 @@
         (frontend/views).
     </description>
 
-    <file>frontend/views</file>
+    <file>src</file>
+    <file>backend</file>
+    <file>frontend</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>
 

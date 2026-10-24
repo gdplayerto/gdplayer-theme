@@ -1,7 +1,9 @@
 parameters:
     level: 8
     paths:
-        - frontend/views
+        - src
+        - backend
+        - frontend
     bootstrapFiles:
         - ../../vendor/autoload.php
     treatPhpDocTypesAsCertain: false

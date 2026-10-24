@@ -15,7 +15,8 @@ final class TermsView extends AbstractPageView
     {
         return $this->renderTemplate('terms.twig', [
             'title' => 'Terms & Conditions',
-            'description' => 'Terms and conditions that must be met between the website owner and the users of the services provided on this website.',
+            'description' => 'Terms and conditions that must be met between the website owner '
+                . 'and the users of the services provided on this website.',
         ], $request);
     }
 }
