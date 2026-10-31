@@ -1,7 +1,7 @@
 {
     "name": "gdplayerto/gdplayer-theme-v1",
     "description": "GDPlayer Theme v1",
-    "version": "0.0.2",
+    "version": "0.0.1-p1",
     "type": "project",
     "homepage": "https://gdplayer.to",
     "license": "Apache-2.0",
