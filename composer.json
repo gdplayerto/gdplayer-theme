@@ -1,6 +1,6 @@
 {
-    "name": "gdplayerto/gdplayer-theme-v1",
-    "description": "GDPlayer Theme v1",
+    "name": "gdplayerto/gdplayer-theme",
+    "description": "GDPlayer Theme",
     "version": "0.0.1-p1",
     "type": "project",
     "homepage": "https://gdplayer.to",
@@ -40,27 +40,5 @@
         "platform-check": true,
         "optimize-autoloader": true,
         "classmap-authoritative": false
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "composer dump-autoload -o"
-        ],
-        "post-update-cmd": [
-            "composer dump-autoload -o"
-        ],
-        "php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose",
-        "phpcs": "phpcs frontend/views > logs/phpcs_errors.log",
-        "phpstan": "phpstan analyse --level=8 --memory-limit 2G --no-progress > logs/phpstan_errors_lvl8.log",
-        "dev": [
-            "composer php-cs-fixer",
-            "composer dump-autoload -o --dev",
-            "composer phpstan",
-            "composer phpcs"
-        ]
-    },
-    "require-dev": {
-        "phpstan/phpstan": "^2.1",
-        "friendsofphp/php-cs-fixer": "^3.90",
-        "squizlabs/php_codesniffer": "^4.0"
     }
 }
