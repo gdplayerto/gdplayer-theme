@@ -15,6 +15,26 @@
                 <div id="collapseGdplayer" class="collapse show" aria-labelledby="headingGdplayer" data-parent="#changelogAccordion">
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
+                                    <li class="mb-3">
+                                        <strong>Nov 01, 2026 (v5.0.0)</strong>
+                                        <ol>
+                                            <li>
+                                                <span class="text-bold text-danger">Breaking</span> configuration now comes from the <code>.env</code> file only; a 4.x installation must convert its old config before it boots (see the migration table in <code>CHANGELOG.md</code>).
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-danger">Breaking</span> class files moved from <code>includes/classes/</code> to <code>src/</code> (namespaces unchanged) and the legacy <code>includes/</code> folder is gone.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-danger">Breaking</span> plugins and themes must declare their classes in <code>plugin.json</code>/<code>theme.json</code>; <code>Views::includeFile()</code> and per-page PHP view files were removed.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-success">Improved</span> every request path is PSR-7, with no superglobals and no output captured from plugins.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> stream cache responses with a 0-byte body and empty identity are rejected instead of being served.
+                                            </li>
+                                        </ol>
+                                    </li>
                             <li class="mb-3">
                                 <strong>Oct 16, 2026 (v4.8.8)</strong>
                                 <ol>
