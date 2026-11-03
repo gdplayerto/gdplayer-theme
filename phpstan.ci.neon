@@ -1,0 +1,13 @@
+# Konfigurasi CI: subrepo berdiri sendiri, tanpa checkout monolit.
+# `scanFiles` memuat signature kelas core sebagai symbol (tidak dianalisis),
+# konstanta monolit disediakan stubs/. Lokal tetap memakai phpstan.neon.dist
+# (kelas monolit asli). Tanda `!` = ganti list, bukan gabung.
+includes:
+    - phpstan.neon.dist
+
+parameters:
+    bootstrapFiles!:
+        - vendor/autoload.php
+        - stubs/gdplayer-constants.stubs.php
+    scanFiles:
+        - stubs/gdplayer-core.stubs.php
