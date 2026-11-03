@@ -9,3 +9,7 @@
 !/logs/.gitkeep
 /coverage-clover.xml
 /.scannerwork/
+
+# Konfigurasi semgrep harus ikut repo meski /*/ mengabaikan semua direktori.
+!/.semgrep/
+!/.semgrep/**

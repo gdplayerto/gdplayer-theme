@@ -1,0 +1,43 @@
+# Aturan taint Semgrep themes/gdplayer.
+# Jalankan: composer semgrep
+# Source = irisan aturan induk dengan yang benar-benar dipakai repo ini.
+paths:
+  exclude:
+    - vendor/
+    - node_modules/
+    - logs/
+    - .phpunit.cache/
+    - .scannerwork/
+    - cache/
+    - coverage-clover.xml
+
+rules:
+  - id: gdplayer-taint-header
+    mode: taint
+    languages: [php]
+    severity: ERROR
+    message: >-
+      Data request dipakai untuk header/redirect. Whitelist tujuan (path relatif saja), jangan
+      masukkan input ke header mentah.
+    metadata:
+      category: security
+      subcategory: vuln
+      technology: php
+      cwe: "CWE-601: Open Redirect / Header Injection"
+      confidence: HIGH
+      references:
+        - https://cwe.mitre.org/data/definitions/601.html
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ->getRequestTarget()
+    pattern-sanitizers:
+      - pattern-either:
+          - pattern: (int) $X
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: header($H, ...)
+              - pattern: \header($H, ...)
+              - pattern: $RESP->withHeader($NAME, $H)
+              - pattern: \$RESP->withHeader($NAME, $H)
+          - focus-metavariable: $H
