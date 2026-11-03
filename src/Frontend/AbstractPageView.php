@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace GDPlayer\Theme\Gdplayer\Frontend;
 
-use GDPlayer\Helper\StreamConfig;
+use GDPlayer\Helper\Stream\StreamConfig;
 use GDPlayer\Http\HttpResponseException;
 use GDPlayer\Presentation\HTML;
 use GDPlayer\View\ErrorPageView;
