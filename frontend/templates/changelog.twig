@@ -16,7 +16,7 @@
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
                                     <li class="mb-3">
-                                        <strong>Nov 01, 2026 (v5.0.0)</strong>
+                                        <strong>Nov 04, 2026 (v5.0.0)</strong>
                                         <ol>
                                             <li>
                                                 <span class="text-bold text-danger">Breaking</span> configuration now comes from the <code>.env</code> file only; a 4.x installation must convert its old config before it boots (see the migration table in <code>CHANGELOG.md</code>).
@@ -33,6 +33,12 @@
                                             <li>
                                                 <span class="text-bold text-primary">Fixed</span> stream cache responses with a 0-byte body and empty identity are rejected instead of being served.
                                             </li>
+                                        <li>
+                                            <span class="text-bold text-success">Improved</span> plugin and theme sync no longer rebuilds and re-downloads the archive on every background run: the sync endpoint answers a content stamp, so a node pulls the archive only when the folder content actually changed, and the server that owns &lt;code&gt;main_site&lt;/code&gt; no longer zips and downloads its own folders.
+                                        </li>
+                                        <li>
+                                            <span class="text-bold text-primary">Fixed</span> sync overwriting the archive while another server was downloading it (truncated ZIP) and leaving &lt;code&gt;*.lock&lt;/code&gt;/&lt;code&gt;*.part&lt;/code&gt; leftovers in &lt;code&gt;plugins/tmp&lt;/code&gt;/&lt;code&gt;themes/tmp&lt;/code&gt;; archives older than one hour are pruned and a finished download is removed on the receiving server.
+                                        </li>
                                         </ol>
                                     </li>
                             <li class="mb-3">
@@ -585,6 +591,47 @@
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
                             <li class="mb-2">
+                                <strong>Nov 02, 2026 (v0.0.9)</strong>
+                                <ol>
+                                    <li>
+                                        <span class="text-bold text-success">Added</span> <code>GDPlayer\Swoole\Bootstrap\ProxyServer</code> (<code>src/Bootstrap/ProxyServer.php</code>) as the single entry point that wires plugin options, control token, pools and request dispatch; <code>swoole.php</code> is now a thin launcher.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Added</span> <code>GDPlayer\Swoole\Bootstrap\CrashTrap</code> (<code>src/Bootstrap/CrashTrap.php</code>) to log PHP errors, uncaught exceptions and fatal shutdowns (including GCC <code>stack smashing detected</code> output) to <code>tmp/logs/swoole-crash.log</code>.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Added</span> <code>GDPlayer\Swoole\Config\{PluginOptions,PluginUnavailable,PoolConfig,ServerOptions}</code> for plugin enablement checks, pool sizing and worker/max-connection normalisation.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Added</span> <code>GDPlayer\Swoole\Control\{AdminRoute,ControlToken}</code> for the loopback-only <code>/ping</code>, <code>/status</code>, <code>/reload</code>, <code>/stop</code> control endpoints guarded by a 0600 token file.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Added</span> <code>GDPlayer\Swoole\Monitor\{Spawner,Background}</code> to spawn and supervise the daemon instead of running the lifecycle inside the launcher.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Added</span> tests for the new classes (<code>PluginOptionsTest</code>, <code>ServerOptionsTest</code>, <code>AdminRouteTest</code>, <code>ControlTokenTest</code>, <code>CrashTrapTest</code>, <code>SpawnerTest</code>) and for the <code>control</code> endpoint lifecycle (<code>ControlEngineTraitTest</code> with <code>Support\ControlEngineHost</code> + <code>Support\FakeBackground</code>); suite is now 222 tests, SonarQube <code>new_coverage</code> 82.4%.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Changed</span> Reorganised <code>src/</code> into feature folders — <code>Bootstrap/</code>, <code>Cache/</code>, <code>Config/</code>, <code>Control/</code>, <code>Http/</code>, <code>Log/</code>, <code>Monitor/</code>, <code>Pool/</code>, <code>Stream/</code> — and dropped the <code>Swoole</code> prefix from every class name (<code>SwooleHandler</code> -&gt; <code>Http\Handler</code>, <code>SwooleStreamResolver</code> -&gt; <code>Stream\Resolver</code>, and so on). All internal references and tests were updated.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Changed</span> <code>swoole.php</code> and <code>swoole-bg.php</code> no longer define global functions; every helper now lives in a class, so <code>php:S2007</code> is clean.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Changed</span> <code>memory_limit</code> and <code>display_errors</code> are no longer set with <code>ini_set()</code>; the monitor spawns <code>swoole.php -daemonize</code> with <code>-d memory_limit=-1 -d display_errors=0</code> (documented in <code>README.md</code>).
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Changed</span> Removed the dead <code>redis.arrays.*</code> and <code>pconnect</code> configuration entries.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-primary">Fixed</span> <code>SwooleHandler</code> now shares its borrowed Redis connection with <code>InstanceCache</code> and resets it (<code>resetRedis()</code>, <code>resetTagVersions()</code>) before returning the handle to the pool, so a later coroutine cannot inherit the previous request's connection.
+                                    </li>
+                                    <li>
+                                        <span class="text-bold text-success">Improved</span> release archives synced to load balancers are content-addressed (&lt;code&gt;&amp;lt;folder&amp;gt;-&amp;lt;stamp&amp;gt;.zip&lt;/code&gt;) and skip &lt;code&gt;logs/&lt;/code&gt;, &lt;code&gt;node_modules/&lt;/code&gt;, &lt;code&gt;.phpunit.cache/&lt;/code&gt;, &lt;code&gt;.scannerwork/&lt;/code&gt;, &lt;code&gt;*.log&lt;/code&gt; and &lt;code&gt;*.lock&lt;/code&gt; (core &lt;code&gt;ZipBuilder&lt;/code&gt;, GDPlayer 5.0.0). Repo code unchanged.
+                                    </li>
+                                </ol>
+                            </li>
+                            <li class="mb-2">
                                 <strong>Oct 02, 2026 (v0.0.8)</strong>
                                 <ol>
                                     <li>
@@ -860,7 +907,7 @@
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
                             <li class="mb-2">
-                                <strong>Oct 02, 2026 (v0.0.5)</strong>
+                                <strong>Oct 22, 2026 (v0.0.5)</strong>
                                 <ol>
                                     <li>
                                         <span class="text-bold text-success">Added</span> <code>RoadRunnerConfigLoader</code> — per-request settings via a short-TTL Redis cache; admin changes now apply without restarting the worker.
@@ -913,6 +960,36 @@
                                     <li>
                                         <span class="text-bold text-success">Improved</span> Introduced <code>RoadRunnerFunctions</code> helper class and streamlined service control routing.
                                     </li>
+                                <li>
+                                    <span class="text-bold text-success">Added</span> PHPUnit suite (20 tests, 48 assertions) with <code>tests/bootstrap.php</code> sandbox, plus <code>composer test</code> / <code>test:coverage</code>; clover report wired into SonarQube (<code>sonar.php.coverage.reportPaths</code>).
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Added</span> CI runs the unit suite with Xdebug coverage.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Improved</span> SonarQube coverage 0% -&gt; 70.2% (new code 84.6%); runtime-bound classes (worker bootstrap, PDO/Redis/cURL helpers, admin views) are excluded from the coverage metric with documented reasons.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Improved</span> Backend <code>ConfigView</code>/<code>ControlView</code> split into small methods (<code>ConfigRuntime</code> helper) to clear all SonarQube S138/S1142/S3776/S1109 findings (0 issues).
+                                </li>
+                                <li>
+                                    <span class="text-bold text-danger">Removed</span> deprecated <code>views/frontend/*.php</code> reference files (hls, mpd, stream-seg/ts/vid); streaming is served by the core <code>StreamController</code>, nothing loaded these files.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-primary">Fixed</span> Worker selalu dijalankan dengan <code>-d opcache.enable_cli=0</code> (<code>templates/.rr.json.twig</code>). Di build PHP 8.1.0 NTS Windows, OPcache CLI crash (ACCESS_VIOLATION) saat meng-compile <code>spiral/goridge</code> — worker mati seketika dan RoadRunner berhenti dengan <code>static_pool_allocate_workers: WorkerAllocate: EOF</code>.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Improved</span> Forwarded engine alive checks with updated third parameter support in redirect calls.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Improved</span> Upstream Nginx configuration headers.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Improved</span> Shared stop/restart teardown in the control view (one closure instead of two identical blocks), removing the duplicated code reported by static analysis.
+                                </li>
+                                <li>
+                                    <span class="text-bold text-success">Improved</span> release archives synced to load balancers are content-addressed (&lt;code&gt;&amp;lt;folder&amp;gt;-&amp;lt;stamp&amp;gt;.zip&lt;/code&gt;) and skip &lt;code&gt;logs/&lt;/code&gt;, &lt;code&gt;node_modules/&lt;/code&gt;, &lt;code&gt;.phpunit.cache/&lt;/code&gt;, &lt;code&gt;.scannerwork/&lt;/code&gt;, &lt;code&gt;*.log&lt;/code&gt; and &lt;code&gt;*.lock&lt;/code&gt; (core &lt;code&gt;ZipBuilder&lt;/code&gt;, GDPlayer 5.0.0). Repo code unchanged.
+                                </li>
                                 </ol>
                             </li>
                             <li class="mb-2">
