@@ -10,17 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.2] - 2026-11-04
 
 ### Added
-- Added GitHub Actions CI workflow for static analysis and linting (`phpstan`, `php-cs-fixer`, `phpcs`, `php-lint`).
-- Added asset cache configuration `.htaccess` for backend and frontend.
-- Added Swoole Proxy plugin changelog accordion and updated navigation links.
-- Updated changelog page template (`changelog.twig`) with comprehensive release notes for GDPlayer v4.8.7, Swoole Proxy v0.0.8, and RoadRunner Proxy v0.0.5.
+- Added asset cache configuration for the backend and frontend.
+- Added a Swoole Proxy changelog card to the changelog page and updated the navigation links.
+- Added release notes for GDPlayer 5.0.0, Swoole Proxy 0.0.9 and RoadRunner Proxy 0.0.5 to the changelog page.
+- Added sitemap response headers through the core response emitter, so they also work under long-running runtimes.
 
 ### Changed
-- Frontend sitemap view emits its `Content-Type` header through the core emitter (dual-sink, long-running compatible).
-- Synchronized frontend changelog templates with latest core and plugin release entries.
-- Bumped frontend CSS to v0.0.2, added download-page template, and synced patch version release notes.
-- Added `nosnippet` attributes to homepage sections and updated Cloudflare WARP proxy documentation.
-- Frontend `changelog.twig` is synced with the core v5.0.0 entry plus the Swoole Proxy Plugin v0.0.9 and RoadRunner Proxy Plugin v0.0.5 release notes, and now also lists the plugin/theme sync improvement (content-stamp gate, content-addressed archives) and the fixed truncated-archive case.
+- Improved the changelog page: it now mirrors the core and plugin release notes, including the plugin and theme sync improvements.
+- Improved frontend assets: stylesheet version bump, a download page template and patch release notes.
+- Improved homepage sections with search-snippet hints disabled and updated proxy documentation.
 
 ## [0.0.1] - 2026-08-27
 
