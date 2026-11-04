@@ -1,5 +1,6 @@
 /*/
 !/backend
+!/docs/
 !/frontend
 !/src
 /logs/*.log
@@ -13,3 +14,7 @@
 # Konfigurasi semgrep harus ikut repo meski /*/ mengabaikan semua direktori.
 !/.semgrep/
 !/.semgrep/**
+
+# Skrip gate (superglobal/exit) harus ikut repo meski /*/ mengabaikan semua direktori.
+!/scripts/
+!/scripts/**
