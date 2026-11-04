@@ -49,6 +49,10 @@ jobs:
         if: always()
         run: vendor/bin/phpcs
 
+      - name: Gate (superglobal & exit/die)
+        if: always()
+        run: composer gate
+
       - name: Semgrep
         if: always()
         run: |
