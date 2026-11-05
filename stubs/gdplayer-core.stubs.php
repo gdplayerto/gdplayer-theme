@@ -12247,30 +12247,11 @@ trait ProcessTrait
     }
 }
 /**
- * Skrip stealth anti-deteksi untuk halaman Chrome headless.
- *
- * Split out of `CoreTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `CoreTrait` through this trait.
- */
-trait StealthTrait
-{
-    /**
-     * Generates the multi-line JS stealth script.
-     *
-     * @param bool $isDoodstream
-     * @return string
-     */
-    protected static function getStealthScript(bool $isDoodstream): string
-    {
-    }
-}
-/**
  * Headless Chrome process management and DevTools protocol helpers.
  */
 trait CoreTrait
 {
     use \GDPlayer\Service\HeadlessChrome\ProcessTrait;
-    use \GDPlayer\Service\HeadlessChrome\StealthTrait;
     private string $cookies = '';
     private string $referer = '';
     private int $timeout = 30000;
@@ -12283,15 +12264,6 @@ trait CoreTrait
      * @param \ReflectionProperty $propReceived
      */
     private function flushReceivedMessages($connection, \ReflectionProperty $propReceived): void
-    {
-    }
-    /**
-     * Initializes basic page settings and enables required CDP domains.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @return void
-     */
-    private static function initializePage(\HeadlessChromium\Page $page): void
     {
     }
     private function isPageLoadWaitComplete(\HeadlessChromium\Page $page, ?float &$loadTime, float $waitAfterLoadSeconds): bool
@@ -12397,6 +12369,36 @@ trait NetworkTrait
  */
 trait PersistentTrait
 {
+    /**
+     * Initializes basic page settings and enables required CDP domains.
+     *
+     * @param \HeadlessChromium\Page $page
+     * @return void
+     */
+    private static function initializePage(\HeadlessChromium\Page $page): void
+    {
+    }
+    /**
+     * Sync retrieves the response body of loaded captured requests.
+     *
+     * @param \HeadlessChromium\Page $page
+     * @param array<string,int> $capturedRequests
+     * @param array<string,bool> $loadedRequests
+     * @param array<string,mixed> $result
+     * @return void
+     */
+    protected function fetchAjaxResponseBodies(\HeadlessChromium\Page $page, array $capturedRequests, array $loadedRequests, array &$result): void
+    {
+    }
+    /**
+     * Generates the multi-line JS stealth script.
+     *
+     * @param bool $isDoodstream
+     * @return string
+     */
+    protected static function getStealthScript(bool $isDoodstream): string
+    {
+    }
     /**
      * Executes headless Chrome against a URL using a persistent running Chrome instance.
      * Auto-spawns the browser on a specific port if it is dead or unavailable.
