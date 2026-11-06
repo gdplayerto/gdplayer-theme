@@ -75,9 +75,9 @@
 		"php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose",
 		"phpcs": "phpcs src backend frontend > logs/phpcs_errors.log",
 		"semgrep": "semgrep --config .semgrep/gdplayer.yml --metrics=off --error src backend frontend",
-		"phpstan": "@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --level=8 --memory-limit 2G --no-progress > logs/phpstan_errors_lvl8.log",
+		"phpstan": "@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --memory-limit 2G --no-progress > logs/phpstan_errors.log",
 		"check": [
-			"@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --level=8 --memory-limit 2G --no-progress",
+			"@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --memory-limit 2G --no-progress",
 			"@php vendor/bin/phpcs src backend frontend",
 			"@php vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php"
 		],

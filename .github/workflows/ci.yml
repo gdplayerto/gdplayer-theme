@@ -39,7 +39,7 @@ jobs:
 
       - name: PHPStan
         if: always()
-        run: vendor/bin/phpstan analyse -c phpstan.ci.neon --level=8 --memory-limit 2G --no-progress
+        run: vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit 2G --no-progress
 
       - name: PHP-CS-Fixer
         if: always()

@@ -1,5 +1,5 @@
 parameters:
-    level: 8
+    level: 9
     paths:
         - src
         - backend
@@ -8,5 +8,8 @@ parameters:
         - vendor/autoload.php
         - ../../vendor/autoload.php
     treatPhpDocTypesAsCertain: false
+    # tmpDir unik per repo di luar repo: cache antar-repo di %TEMP% bersama bikin
+    # hasil usang ("dirty cache") untuk trait; direktori unik tidak pernah bertabrakan.
+    tmpDir: %env.TEMP%/phpstan-gdplayer-theme
     parallel:
         maximumNumberOfProcesses: 1
