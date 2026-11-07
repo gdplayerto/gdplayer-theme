@@ -31,7 +31,7 @@ final class SharerView extends AbstractPageView
     public function render(ServerRequestInterface $request): string
     {
         $config = new Config();
-        $enableGsharer = Validation::validateBoolean($config->get('enable_gsharer'));
+        $enableGsharer = Validation::isTrue($config->get('enable_gsharer'));
         if (!$enableGsharer && !Login::isCurrentUserAdmin()) {
             throw new HttpResponseException(ErrorPageView::forStatus(403));
         }

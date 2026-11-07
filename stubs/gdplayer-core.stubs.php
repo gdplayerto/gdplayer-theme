@@ -2083,7 +2083,7 @@ trait ExtractTrait
     protected function extractPathId(string $path = '', string $query = ''): void
     {
     }
-    protected function extractQueryId(string $query = ''): bool
+    protected function hasExtractedQueryId(string $query = ''): bool
     {
     }
 }
@@ -3505,7 +3505,7 @@ abstract class MigrateHelper
     protected function tableCollation(): mixed
     {
     }
-    protected function tableExists(): bool
+    protected function hasTable(): bool
     {
     }
     /**
@@ -5087,7 +5087,7 @@ trait FileSystemIo
     private static function ensureDir(string $dir): bool
     {
     }
-    public static function createDir(string $dir): bool
+    public static function hasCreatedDir(string $dir): bool
     {
     }
     public static function createFile(string $file, string $content = '', string $mode = 'w'): int|false
@@ -5106,16 +5106,16 @@ trait FileSystemIo
 final class FileSystem
 {
     use \GDPlayer\Helper\FileSystemIo;
-    public static function copyDirectory(string $source, string $destination): bool
+    public static function hasCopiedDirectory(string $source, string $destination): bool
     {
     }
-    public static function createSymlink(string $target, string $link): bool
+    public static function hasCreatedSymlink(string $target, string $link): bool
     {
     }
-    public static function deleteDirectory(string $dir = ''): bool
+    public static function hasDeletedDirectory(string $dir = ''): bool
     {
     }
-    public static function deleteTemporaryDirectories(): bool
+    public static function hasDeletedTemporaryDirs(): bool
     {
     }
 }
@@ -5510,10 +5510,10 @@ class SecurityHelper
     public static function sanitizeUrl(mixed $url): string
     {
     }
-    public static function validateCorsToken(?string $token = null, ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    public static function isCorsTokenValid(?string $token = null, ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
     {
     }
-    public static function validateRecaptcha(?string $captcha = null): bool
+    public static function isRecaptchaValid(?string $captcha = null): bool
     {
     }
 }
@@ -5748,16 +5748,16 @@ final class Validation
     public static function sanitizeEmail(?string $email = null): string
     {
     }
-    public static function validateBoolean(mixed $data = null): bool
+    public static function isTrue(mixed $data = null): bool
     {
     }
-    public static function validateEmail(?string $email = null): bool
+    public static function isEmail(?string $email = null): bool
     {
     }
     public static function validateIp(?string $ip = null): string|false
     {
     }
-    public static function validateUrl(mixed $url): bool
+    public static function isUrl(mixed $url): bool
     {
     }
 }
@@ -9437,7 +9437,7 @@ trait SettingCacheActionTrait
     protected function clearVideosFiles(): string
     {
     }
-    protected function deleteCacheTmpDir(): bool
+    protected function hasDeletedCacheTmpDir(): bool
     {
     }
     protected function resetHosts(): string
@@ -12834,7 +12834,7 @@ final class Login
     public function tokenValidation(string $token): ?array
     {
     }
-    public static function validateAdminToken(string $token = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    public static function isAdminTokenValid(string $token = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
     {
     }
 }
@@ -13230,7 +13230,7 @@ trait ZipTrait
     protected static function processZipItem(\ZipArchive $zip, int $index, string $destinationPath, array $keepFiles, bool $isUpgrade): void
     {
     }
-    protected static function shouldUpgradePlugin(\ZipArchive $zip, string $destinationPath): bool
+    protected static function isPluginUpgradeNeeded(\ZipArchive $zip, string $destinationPath): bool
     {
     }
     /**
@@ -14082,7 +14082,7 @@ trait DownloadTrait
     protected static function getSyncDownloadUrl(string $themeFolder, string $action = 'ping'): string
     {
     }
-    protected static function shouldUpgradeTheme(\ZipArchive $zip, string $destinationPath): bool
+    protected static function isThemeUpgradeNeeded(\ZipArchive $zip, string $destinationPath): bool
     {
     }
     /**
