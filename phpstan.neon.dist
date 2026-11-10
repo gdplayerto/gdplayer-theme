@@ -8,8 +8,8 @@ parameters:
         - vendor/autoload.php
         - ../../vendor/autoload.php
     treatPhpDocTypesAsCertain: false
-    # tmpDir unik per repo di luar repo: cache antar-repo di %TEMP% bersama bikin
-    # hasil usang ("dirty cache") untuk trait; direktori unik tidak pernah bertabrakan.
-    tmpDir: %env.TEMP%/phpstan-gdplayer-theme
+    # tmpDir unik per repo, relatif agar portabel Windows/Linux. %env.TEMP% tidak
+    # ada di runner Linux (CI gagal "Missing parameter 'env.TEMP'").
+    tmpDir: .phpstan-cache
     parallel:
         maximumNumberOfProcesses: 1
