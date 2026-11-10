@@ -3,6 +3,7 @@
 !/docs/
 !/frontend
 !/src
+!/tests
 /logs/*.log
 
 # Folder logs tooling tetap ada di repo (phpstan/phpcs menulis ke sini); isinya diabaikan.
@@ -21,3 +22,4 @@
 
 # artefak cache tool (dihapus, jangan masuk git)
 .phpunit.cache/
+tests/.sandbox/

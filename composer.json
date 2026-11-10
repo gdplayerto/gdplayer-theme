@@ -69,8 +69,8 @@
 		"post-update-cmd": [
 			"composer dump-autoload -o"
 		],
-		"test": "@php -r \"fwrite(STDERR, 'Belum ada suite PHPUnit di repo ini; lihat docs/UNIT-TEST.md.' . PHP_EOL);\"",
-		"test:coverage": "@php -r \"fwrite(STDERR, 'Belum ada suite PHPUnit di repo ini; lihat docs/UNIT-TEST.md.' . PHP_EOL);\"",
+		"test": "@php -d xdebug.mode=develop vendor/bin/phpunit --configuration phpunit.xml.dist --no-coverage",
+		"test:coverage": "@php -d opcache.enable_cli=0 -d xdebug.mode=coverage vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-clover=coverage-clover.xml",
 		"sonar": "sonar-scanner",
 		"php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose",
 		"phpcs": "phpcs src backend frontend > logs/phpcs_errors.log",
@@ -99,6 +99,8 @@
 		"phpstan/phpstan-strict-rules": "2.1",
 		"phpstan/phpstan-deprecation-rules": "2.0",
 		"spaze/phpstan-disallowed-calls": "4.15",
-		"psr/http-message": "^2.0"
+		"psr/http-message": "^2.0",
+		"nyholm/psr7": "^1.8",
+		"phpunit/phpunit": "10.5.*"
 	}
 }
