@@ -17,9 +17,11 @@
             <directory>src</directory>
         </include>
     </source>
-    <coverage>
-        <report>
-            <clover outputFile="coverage-clover.xml"/>
-        </report>
-    </coverage>
+    <!--
+        Sengaja TANPA elemen <coverage>: satu blok <report> di sini membuat
+        `vendor/bin/phpunit` polos memunculkan runner warning "XDEBUG_MODE=coverage
+        has to be set" setiap kali dijalankan tanpa driver coverage. Laporan clover
+        dibuat oleh `composer test:coverage` (memanggil phpunit langsung dengan
+        opsi coverage clover ke coverage-clover.xml).
+    -->
 </phpunit>

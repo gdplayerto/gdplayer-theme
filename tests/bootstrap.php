@@ -6,8 +6,9 @@ declare(strict_types=1);
  * Bootstrap PHPUnit untuk tema gdplayer.
  *
  * Tema hidup di dalam instalasi GDPlayer (themes/gdplayer): class core dijangkau
- * lewat ../../../vendor + spl_autoload ke ../../../src. Sandbox menjaga log & cache
- * tidak menyentuh instalasi nyata.
+ * lewat ../../../vendor + spl_autoload ke ../../../src. BASE_DIR menunjuk akar
+ * instalasi supaya resources/templates & src/ nyata terpakai saat render view;
+ * sandbox hanya menampung error_log PHP agar tidak mencemari log mesin pengembang.
  */
 
 $sandbox = __DIR__ . '/.sandbox';
@@ -17,10 +18,9 @@ foreach ([$sandbox, $sandbox . '/cache', $sandbox . '/logs'] as $dir) {
     }
 }
 
-// Guard: bila launcher belum jalan (mis. direktori di-run langsung), definisikan
-// konstanta sandbox di sini. Bila sudah ada (launcher lebih dulu), jangan ganggu.
+// Guard: bila launcher sudah mendefinisikan BASE_DIR lebih dulu, jangan ganggu.
 if (!defined('BASE_DIR')) {
-    define('BASE_DIR', $sandbox . \DIRECTORY_SEPARATOR);
+    define('BASE_DIR', \dirname(__DIR__, 3) . \DIRECTORY_SEPARATOR);
 }
 if (!defined('BASE_URL')) {
     define('BASE_URL', 'http://gdplayer.test');
@@ -91,6 +91,24 @@ spl_autoload_register(static function (string $class): void {
         }
     }
 });
+
+// Tes tidak boleh menyentuh MySQL live: semua query diarahkan ke SQLite in-memory
+// yang skemanya identik (tests/Support/sqlite-schema.sql milik proyek utama).
+require_once __DIR__ . '/../../../tests/Support/SqliteConnectionProvider.php';
+\GDPlayer\Database\Conn::setProvider(\GDPlayer\Tests\Support\SqliteConnectionProvider::shared());
+
+// Fixture statis: tema yang diuji adalah active_theme, sehingga elemen layout
+// (nav/header/footer) diambil dari themes/gdplayer, bukan dari tema default.
+\GDPlayer\Tests\Support\SqliteConnectionProvider::shared()->pdoWrite()
+    ->prepare('INSERT INTO `tb_settings` (`key`, `value`) VALUES (?, ?)')
+    ->execute(['active_theme', 'gdplayer']);
+
+// Buang cache lintas-run supaya fixture di atas tidak tertutup cache lama.
+try {
+    \GDPlayer\Service\InstanceCache\InstanceCache::clear();
+} catch (\Throwable) {
+    // cache tidak tersedia: tes tetap jalan tanpa pembersihan
+}
 
 // error_log() dari jalur gagal masuk sandbox, bukan php_errors.log global mesin pengembang.
 ini_set('error_log', $sandbox . '/php_errors.log');
