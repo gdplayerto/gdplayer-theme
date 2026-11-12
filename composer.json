@@ -43,7 +43,6 @@
 		"symfony/polyfill-php80": "*",
 		"symfony/polyfill-php81": "*",
 		"symfony/polyfill-ctype": "*",
-		"symfony/polyfill-intl": "*",
 		"symfony/polyfill-intl-grapheme": "*",
 		"symfony/polyfill-intl-normalizer": "*",
 		"symfony/polyfill-mbstring": "*"
