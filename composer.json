@@ -27,11 +27,12 @@
 	"prefer-stable": true,
 	"require": {
 		"php": ">=8.1.0",
+		"ext-bcmath": "*",
 		"ext-curl": "*",
 		"ext-fileinfo": "*",
 		"ext-filter": "*",
-		"ext-hash": "*",
 		"ext-gd": "*",
+		"ext-hash": "*",
 		"ext-json": "*",
 		"ext-openssl": "*",
 		"ext-pdo_mysql": "*",
@@ -61,7 +62,8 @@
 		"process-timeout": 0,
 		"platform-check": true,
 		"optimize-autoloader": true,
-		"classmap-authoritative": false
+		"classmap-authoritative": false,
+		"sort-packages": true
 	},
 	"scripts": {
 		"post-install-cmd": [
