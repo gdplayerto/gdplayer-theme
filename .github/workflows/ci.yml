@@ -47,7 +47,7 @@ jobs:
 
       - name: PHPCS
         if: always()
-        run: vendor/bin/phpcs
+        run: vendor/bin/phpcs --parallel=8
 
       - name: Gate (superglobal & exit/die)
         if: always()

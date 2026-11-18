@@ -421,4 +421,4 @@ return (new Config())
     ])
     ->setFinder($finder)
     ->setUsingCache(false)
-    ->setParallelConfig(ParallelConfigFactory::sequential());
+    ->setParallelConfig(ParallelConfigFactory::detect(maxProcesses: 8));
