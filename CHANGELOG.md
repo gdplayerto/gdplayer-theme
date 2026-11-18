@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.0.2] - 2026-11-04
+## [0.0.2] - 2026-11-18
 
 ### Added
 - Added asset cache configuration for the backend and frontend.
@@ -17,8 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Improved the changelog page: it now mirrors the core and plugin release notes, including the plugin and theme sync improvements.
+- Improved the additional-features purchase page with a section for the premium plugins.
 - Improved frontend assets: stylesheet version bump, a download page template and patch release notes.
 - Improved homepage sections with search-snippet hints disabled and updated proxy documentation.
+
+### Fixed
+- Fixed the pricing cards and pay buttons not matching the theme layout.
 
 ## [0.0.1] - 2026-08-27
 

@@ -16,97 +16,142 @@
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
                                     <li class="mb-3">
-                                        <strong>Nov 04, 2026 (v5.0.0)</strong>
+                                        <strong>Nov 18, 2026 (v5.0.0)</strong>
                                         <ol>
                                             <li>
-                                                <span class="text-bold text-danger">Breaking</span> change: configuration is now read from a <code>.env</code> file only; an existing 4.8.x installation must convert its old configuration before it boots (mapping table below).
+                                                <span class="text-bold text-danger">Breaking</span> change: all settings now live in one settings file named .env. An existing 4.8.x installation must move its old settings into it before it can start.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-danger">Breaking</span> change: plugins and themes must declare their pages, routes and hooks in their own manifest, and per-page PHP view files are no longer loaded, so 4.x extensions need updating.
+                                                <span class="text-bold text-danger">Breaking</span> change: plugins and themes now have to list their own pages and features in their own settings file. The old one-file-per-page views are no longer loaded, so extras made for 4.x need updating.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-danger">Breaking</span> change: the licence server no longer signs tokens for 4.x builds, so updating to 5.0.0 is mandatory.
+                                                <span class="text-bold text-danger">Breaking</span> change: the licence service no longer accepts 4.x versions, so updating to 5.0.0 is required.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-danger">Breaking</span> change: only <code>Cache-Control</code> is sent any more; the CDN-specific cache headers were dropped, so CDN rules keyed on them must be re-pointed.
+                                                <span class="text-bold text-danger">Breaking</span> change: the site now sends only the standard caching instruction to browsers. The extra caching instructions used by content delivery networks were removed, so any such rules must be changed.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Added</span> content-aware plugin and theme sync: a server downloads the archive only when the folder content actually changed, and the server that owns the main site no longer downloads its own folders.
+                                                <span class="text-bold text-success">Added</span> updates for plugins and themes that download only when the folder content has really changed; the main site no longer downloads its own folders.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Added</span> a plugin enable/disable toggle directly in the plugin list, with the table refreshed after the change.
+                                                <span class="text-bold text-success">Added</span> an on/off switch in the plugin list, and the list refreshes after you use it.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Added</span> a Start-only control while a plugin service is stopped; once it runs, Status, Reload, Restart and Stop unlock.
+                                                <span class="text-bold text-success">Added</span> a Start-only button while a plugin service is stopped. Once it is running, Status, Reload, Restart and Stop become available.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Added</span> per-request state isolation for long-running workers, so parallel requests in one process no longer share data.
+                                                <span class="text-bold text-success">Added</span> separate data for each request on a long-running server, so requests handled at the same time no longer share information.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Added</span> automatic cleanup of plugin and theme transfer archives older than one hour, so finished transfers no longer accumulate on disk.
+                                                <span class="text-bold text-success">Added</span> automatic removal of temporary files from plugin and theme transfers older than one hour, so finished transfers no longer pile up on disk.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> response headers for the Swoole and RoadRunner runtimes: status, headers and cookies are written through each runtime's own response mechanism.
+                                                <span class="text-bold text-success">Added</span> finished pages that can be kept for up to five minutes and handed to visitors who may see the same page; any change on the site clears those kept pages.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> page resolution order: the active theme wins over plugin and core pages.
+                                                <span class="text-bold text-success">Improved</span> replies from the Swoole and RoadRunner servers, which now carry their status, headers and cookies the proper way.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> stream source extraction: Voe captions resolve as soon as they appear instead of waiting a fixed three seconds.
+                                                <span class="text-bold text-success">Improved</span> page choice: if a theme provides a page, the theme's page is used instead of the plugin or built-in one.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> the API description page: it now uses the configured main site address instead of a fixed host.
+                                                <span class="text-bold text-success">Improved</span> captions on Voe, which appear as soon as they are ready instead of after a fixed three-second wait.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> video import: records keep their CSV order in the video list and the dashboard.
+                                                <span class="text-bold text-success">Improved</span> the API description page, which uses the main site address you configured instead of a fixed address.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> sync safety: the archive is written to a temporary file and moved into place, so a download can never pick up a half-written archive.
+                                                <span class="text-bold text-success">Improved</span> video import, so imported videos keep the same order in the video list and on the dashboard.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> disk footprint: about 40 MB of legacy files left the release, and every asset still in use is kept outside the application code.
+                                                <span class="text-bold text-success">Improved</span> update safety: an archive is first written to a temporary file and only then put in place, so a download can never pick up a half-written file.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-success">Improved</span> extension views: the bundled Hello plugin and default theme, and separately distributed extensions, now serve their pages and hooks as self-contained views.
+                                                <span class="text-bold text-success">Improved</span> disk use: about 40 MB of old files left the package, and everything still in use is kept outside the program code.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-danger">Removed</span> the bundled Hello plugin's custom settings page; the core settings page already covers enable/disable.
+                                                <span class="text-bold text-success">Improved</span> extras: the bundled Hello plugin, the default theme and separately distributed extras now carry their own pages and features.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> the general background worker dying during archive cleanup on musl/Alpine builds.
+                                                <span class="text-bold text-success">Improved</span> the ping check, which now answers in about 0.3-0.5 seconds instead of about 1.8 seconds on Windows, because background workers start right away and the check on stopped plugins only runs when needed.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> gzip being inactive for every text asset: the generated server block now enables gzip with a full type list (CSS, JS, JSON, XML, TXT, playlists, SVG, fonts).
+                                                <span class="text-bold text-success">Improved</span> user handling: the signed-in user and the user id are read once per request and cannot change until the request ends, so every part of the site sees the same value.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> DASH manifests served as octet-stream; <code>.mpd</code> now answers <code>application/dash+xml</code>.
+                                                <span class="text-bold text-success">Improved</span> session removal and sign-out: when a session is deleted or a user signs out, that session's permission mark is cancelled, so pages kept for it are no longer handed out.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> page rendering holding the PHP session lock, so parallel requests no longer wait on it.
+                                                <span class="text-bold text-success">Improved</span> Blogger support: the player information is now read without starting a hidden browser.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> plugin API endpoints under <code>/api/v1</code> being unreachable through the router.
+                                                <span class="text-bold text-success">Improved</span> the release package, which is now protected by a different tool.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> a deadlock that could prevent saving the licence key.
+                                                <span class="text-bold text-success">Improved</span> the bundled libraries.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> HTTP 500 on cached stream responses; a cache hit now answers 200.
+                                                <span class="text-bold text-danger">Removed</span> the Hello plugin's own settings page; the main settings page already lets you turn it on and off.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> streaming responses appending the 404 page after the playlist.
+                                                <span class="text-bold text-danger">Removed</span> the Goodstream host, which no longer exists, together with its settings and update entries.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> database migration when updating tables that already exist (the id column and primary key are now added correctly).
+                                                <span class="text-bold text-danger">Removed</span> the Fileupload host, which no longer works.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> the generated server configuration being re-rendered on every request; it is rewritten only when the settings actually change.
+                                                <span class="text-bold text-primary">Fixed</span> the general background worker that stopped unexpectedly during cleanup on some Linux systems (musl/Alpine); it no longer does.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> page resolution so theme-provided pages (for example the theme sitemap) are served by the active theme.
+                                                <span class="text-bold text-primary">Fixed</span> text files such as stylesheets, scripts, feeds, playlists and fonts being sent uncompressed; they are now compressed, so they are smaller and load faster.
                                             </li>
                                             <li>
-                                                <span class="text-bold text-primary">Fixed</span> stream routing when a server engine plugin is active but its reverse-proxy configuration is not installed yet; streams stay on the built-in path.
+                                                <span class="text-bold text-primary">Fixed</span> DASH video description files being sent as an unknown file type; they now arrive as the correct type.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> page building that kept other requests waiting; it no longer does.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the plugin service addresses under the api path that could not be reached; they can now.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> saving the licence key, which could hang; it can no longer.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> a cached stream reply that answered with a server error; it now answers normally.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> stream replies that added the not-found page after the playlist; they no longer do.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> database updates when the tables already exist; the id column and its primary key are now added correctly.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the server settings file being rewritten on every request; it is now rewritten only when the settings really change.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> pages provided by the theme, such as the theme sitemap, which are now served by the active theme.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> stream playback that failed while a server engine plugin was installed but its proxy setup was not ready; the built-in path is used.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> two requests for the same playlist overwriting each other's temporary file; they now wait for each other, and the file is moved into place before the wait ends.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the Swoole and RoadRunner servers keeping the previous request's theme and plugin information; every request now starts clean.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the redirect fallback losing the extra information attached to the address; it is now kept, so the stream ticket is not dropped.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the shortened download link losing part of the address, so the download was refused; the whole address is now passed on.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the Blogger host name and video id being read wrongly; they are now read correctly.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the free proxy list being split only on one kind of space; it now splits on every kind of space.
                                             </li>
                                         </ol>
                                     </li>
@@ -607,7 +652,7 @@
                     <div class="card-body">
                         <ol class="list-unstyled mb-0">
                                     <li class="mb-3">
-                                        <strong>Nov 04, 2026 (v0.0.9)</strong>
+                                        <strong>Nov 18, 2026 (v0.0.9)</strong>
                                         <ol>
                                             <li>
                                                 <span class="text-bold text-success">Added</span> a crash log for the service: PHP errors, uncaught exceptions and fatal shutdowns (including stack smashing reports) are written to a dedicated log file, so a worker that dies leaves evidence behind.
@@ -634,10 +679,22 @@
                                                 <span class="text-bold text-success">Improved</span> distribution: the plugin archive synced to load balancers is now content-addressed (<code>&lt;folder&gt;-&lt;stamp&gt;.zip</code>) and excludes <code>logs/</code>, <code>node_modules/</code>, <code>.phpunit.cache/</code>, <code>.scannerwork/</code>, <code>*.log</code> and <code>*.lock</code> (core <code>ZipBuilder</code>, GDPlayer 5.0.0). Source code unchanged.
                                             </li>
                                             <li>
+                                                <span class="text-bold text-success">Improved</span> request isolation: every request now starts with a clean state, so one visitor's data can no longer carry over to the next.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-success">Improved</span> stream routing: streams now follow the address of the server engine that is actually running, and a busy engine shows a clear message instead of failing silently.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-success">Improved</span> the settings page: it now reminds you to reload the web server after starting the plugin when streams do not work.
+                                            </li>
+                                            <li>
                                                 <span class="text-bold text-primary">Fixed</span> repeated warnings while a stream cache file was finalised twice (an upstream retry after <code>416</code>): the temporary file is now removed only when it still exists.
                                             </li>
                                             <li>
                                                 <span class="text-bold text-primary">Fixed</span> a Redis connection from one request being handed to the next one: the borrowed connection and its cache tags are reset before the handle returns to the pool.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> cached stream responses announcing their file size twice.
                                             </li>
                                         </ol>
                                     </li>
@@ -968,7 +1025,28 @@
                                                 <span class="text-bold text-success">Improved</span> forwarded engine alive checks and upstream proxy headers.
                                             </li>
                                             <li>
+                                                <span class="text-bold text-success">Improved</span> the web server rules are now written with the address and port of the server engine that is actually running.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-success">Improved</span> the stream type sent to players is now chosen to match the client platform.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-success">Improved</span> the service stays alive and reachable when the server runs in a container.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-success">Improved</span> streams follow the address of the active server engine, and a busy engine shows a clear message.
+                                            </li>
+                                            <li>
                                                 <span class="text-bold text-primary">Fixed</span> the worker is always started with the command-line opcache disabled, so builds where that module is unstable no longer kill the worker at start-up.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> cached responses announcing their file size twice; the web server now supplies that information.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> stopping the service no longer reports success while the process is still running.
+                                            </li>
+                                            <li>
+                                                <span class="text-bold text-primary">Fixed</span> the generated web server rules rejecting a valid port.
                                             </li>
                                             <li>
                                                 <span class="text-bold text-danger">Removed</span> deprecated frontend reference files (HLS, MPD, segment and video pages); streaming is served by the core stream path.
