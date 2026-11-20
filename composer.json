@@ -72,18 +72,13 @@
 		"post-update-cmd": [
 			"composer dump-autoload -o"
 		],
-		"test": "@php -d xdebug.mode=off vendor/bin/paratest --configuration phpunit.xml.dist --no-coverage --processes=8",
+		"test": "@php -d xdebug.mode=off vendor/bin/phpunit --configuration phpunit.xml.dist --no-coverage",
 		"test:coverage": "@php -d opcache.enable_cli=0 -d xdebug.mode=coverage vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-clover=coverage-clover.xml",
 		"sonar": "sonar-scanner",
 		"php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose",
 		"phpcs": "phpcs src backend frontend --parallel=8 > logs/phpcs_errors.log",
 		"semgrep": "semgrep --config .semgrep/gdplayer.yml --metrics=off --error src backend frontend",
 		"phpstan": "@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --memory-limit 2G --no-progress > logs/phpstan_errors.log",
-		"check": [
-			"@php -d opcache.enable_cli=0 vendor/phpstan/phpstan/phpstan.phar analyse --memory-limit 2G --no-progress",
-			"@php vendor/bin/phpcs src backend frontend --parallel=8",
-			"@php vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php"
-		],
 		"gate": [
 			"@php scripts/check_superglobals.php",
 			"@php scripts/check_exit.php"
@@ -96,7 +91,6 @@
 		]
 	},
 	"require-dev": {
-		"brianium/paratest": "^7.3",
 		"phpstan/phpstan": "^2.3",
 		"friendsofphp/php-cs-fixer": "^3.90",
 		"squizlabs/php_codesniffer": "^4.0",
