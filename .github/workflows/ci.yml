@@ -37,10 +37,6 @@ jobs:
       - name: Syntax check (php -l)
         run: find src backend frontend -name '*.php' -print0 | xargs -0 -n1 php -l
 
-      - name: PHPStan
-        if: always()
-        run: vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit 2G --no-progress
-
       - name: PHP-CS-Fixer
         if: always()
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php
@@ -48,6 +44,10 @@ jobs:
       - name: PHPCS
         if: always()
         run: vendor/bin/phpcs --parallel=8
+
+      - name: PHPStan
+        if: always()
+        run: vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit 2G --no-progress
 
       - name: Gate (superglobal & exit/die)
         if: always()
