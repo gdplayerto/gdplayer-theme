@@ -1410,25 +1410,6 @@ final class EnvException extends \RuntimeException
 }
 
 /**
- * Process-level bootstrap: error reporting, shutdown guard, extra autoloaders, theme autoload.
- *
- * Moved from includes/bootstrap.php (F1.8). That file is left on disk as legacy
- * and is no longer loaded by composer.
- */
-final class ErrorHandler
-{
-    private static bool $registered = false;
-    /**
-     * Register all bootstrap hooks; safe to call more than once.
-     *
-     * @return void
-     */
-    public static function register(): void
-    {
-    }
-}
-
-/**
  * Application core: one PSR-7 request in, one PSR-7 response out.
  *
  * No `echo`/`header()`/superglobals; delivery to the client is the runtime's Emitter job
