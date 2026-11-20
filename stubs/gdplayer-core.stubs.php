@@ -6990,6 +6990,19 @@ class MiscHelper
     {
     }
     /**
+     * Resolve a Location header value against the URL of the current hop.
+     *
+     * Shared by the PHP cURL transport and the cURL CLI fallback so both follow
+     * redirects to the same absolute target.
+     *
+     * @param string $base   URL of the hop being processed
+     * @param string $target Location header value
+     * @return string absolute redirect target URL
+     */
+    public static function resolveRedirectUrl(string $base, string $target): string
+    {
+    }
+    /**
      * Replace the URL host with the address produced by the system resolver.
      *
      * `Fetcher` pins `CURLOPT_DNS_SERVERS` (DNS_SERVERS in .env), so the container
@@ -9014,7 +9027,6 @@ final class FetcherPool
  *
  * @method list<string> formatHeaders(array<int|string, string> $headers)
  * @method int collectHeader(string $line, array<string, string> $collected)
- * @method static string resolveRedirectUrl(string $base, string $target)
  * @property int $timeout declared by the consuming class (constructor)
  * @property int $connectTimeout declared by the consuming class (constructor)
  */
