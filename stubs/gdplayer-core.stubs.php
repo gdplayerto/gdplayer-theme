@@ -5033,8 +5033,8 @@ enum Dmca : int
 enum UserRole : int
 {
     case Admin = 0;
-    case User = 1;
     case Premium = 2;
+    case User = 1;
     /**
      * Resolve a stored role index, falling back to the plain user role.
      *
@@ -5057,12 +5057,12 @@ enum UserRole : int
  */
 enum UserStatus : int
 {
-    /** Blocked by an admin. */
-    case Inactive = 0;
     /** Confirmed and allowed to log in. */
     case Active = 1;
     /** Signed up, confirmation email sent, waiting for the link to be opened. */
     case AwaitingApproval = 2;
+    /** Blocked by an admin. */
+    case Inactive = 0;
 }
 
 /**
@@ -5070,10 +5070,10 @@ enum UserStatus : int
  */
 enum VideoStatus : int
 {
-    /** Primary source and every alternative are still reachable. */
-    case Good = 0;
     /** No reachable source at all. */
     case Broken = 1;
+    /** Primary source and every alternative are still reachable. */
+    case Good = 0;
     /** Primary source is gone but at least one alternative still works. */
     case Warning = 2;
     /**
@@ -6990,6 +6990,16 @@ class MiscHelper
     {
     }
     /**
+     * Replace the URL host with the address produced by the system resolver.
+     *
+     * `Fetcher` pins `CURLOPT_DNS_SERVERS` (DNS_SERVERS in .env), so the container
+     * service names (e.g. `nginx`) are never resolved by cURL. The system resolver
+     * still knows their address, so the host is swapped for the IP before the request.
+     */
+    public static function resolveHostToIp(string $url = ''): string
+    {
+    }
+    /**
      * Resolve a Location header value against the URL of the current hop.
      *
      * Shared by the PHP cURL transport and the cURL CLI fallback so both follow
@@ -7000,16 +7010,6 @@ class MiscHelper
      * @return string absolute redirect target URL
      */
     public static function resolveRedirectUrl(string $base, string $target): string
-    {
-    }
-    /**
-     * Replace the URL host with the address produced by the system resolver.
-     *
-     * `Fetcher` pins `CURLOPT_DNS_SERVERS` (DNS_SERVERS in .env), so the container
-     * service names (e.g. `nginx`) are never resolved by cURL. The system resolver
-     * still knows their address, so the host is swapped for the IP before the request.
-     */
-    public static function resolveHostToIp(string $url = ''): string
     {
     }
     /**
@@ -18000,9 +18000,9 @@ abstract class Stream
 {
     use \GDPlayer\Stream\Cache\StreamCache;
     use \GDPlayer\Stream\Http\StreamParser;
+    use \GDPlayer\Stream\StreamStateTrait;
     private ?\GDPlayer\Stream\Cache\StreamCacheService $cacheService = null;
     private ?\GDPlayer\Stream\Http\StreamGuardService $guardService = null;
-    private int $lastModified = 0;
     /** Bytes actually written to the tmp cache (0 when the request must not be cached). */
     private int $written = 0;
     public string $cacheFile = '';
@@ -18010,31 +18010,15 @@ abstract class Stream
     public int $cacheTimeout = 0;
     public int $contentLength = 0;
     public int $end = 0;
-    public bool $headersSent = false;
     public string $ip = '';
-    public bool $isApple = false;
-    public bool $isDownload = false;
-    public bool $isLive = false;
-    public bool $isMP4 = false;
-    public bool $isMPD = false;
-    public bool $isMaster = false;
-    /** Suffix range (`bytes=-N`): a tail slice, not the full entity -> never written to cache. */
-    public bool $isSuffixRange = false;
     public string $keyTotalLength = '';
-    public bool $productionMode = false;
     public string $rangeBytes = '';
     public ?\Psr\Http\Message\ServerRequestInterface $request = null;
-    /** @var string[] $requestHeaders */
-    public array $requestHeaders = [];
     public int $responseCode = 0;
     /** @var int[] $responseCodeWithRetry */
     public array $responseCodeWithRetry = [-1, 0, 408, 429, 500, 501, 502, 503, 504];
-    /** @var string[] $responseHeaders */
-    public array $responseHeaders = [];
     public bool $sendContentRange = false;
-    public bool $sendHeaders = true;
     public int $start = 0;
-    public string $title = '';
     public string $tmpCacheFile = '';
     public int $totalLength = 0;
     public string $vUrlHost = '';
@@ -18182,20 +18166,78 @@ abstract class Stream
     {
     }
     /**
+     * Redirect to another load balancer, or answer 404 once the retry budget is spent.
+     *
+     * @return void
+     */
+    public function retryStream(): void
+    {
+    }
+    /**
+     * Stream the media to the client, serving from cache when available.
+     *
+     * @return void
+     */
+    public function stream(): void
+    {
+    }
+}
+
+/**
+ * Request mode flags of a stream request (Sonar php:S1820 for {@see Master}).
+ *
+ * Kept as a mutable value object because the flags are resolved while the request is parsed
+ * (constructor defaults, then `parseDataSources()`); semantics are unchanged from the
+ * individual boolean properties it replaces.
+ */
+final class StreamFlags
+{
+    /** Download page allowed by the settings (dl=1 + enable_download_page). */
+    public bool $isAllowDownload = false;
+    /** `dl=1` in the query string. */
+    public bool $isDownload = false;
+    /** Google Drive HLS source (host-based rule from StreamConfig). */
+    public bool $isGoogleHls = false;
+    /** `gl=1` in the query string (live stream). */
+    public bool $isLive = false;
+    /** Request targets an MP4 label. */
+    public bool $isMP4 = false;
+    /** Request targets the master playlist. */
+    public bool $isMaster = false;
+}
+
+/**
+ * Per-request stream flags and the fluent setters that write them.
+ *
+ * {@see Stream} is above the 20-method/20-field ceiling on its own, and these members are one
+ * responsibility: the mutable state of a single media request.
+ */
+trait StreamStateTrait
+{
+    private int $lastModified = 0;
+    public bool $headersSent = false;
+    public bool $isApple = false;
+    public bool $isDownload = false;
+    public bool $isLive = false;
+    public bool $isMP4 = false;
+    public bool $isMPD = false;
+    public bool $isMaster = false;
+    /** Suffix range (`bytes=-N`): a tail slice, not the full entity -> never written to cache. */
+    public bool $isSuffixRange = false;
+    public bool $productionMode = false;
+    /** @var string[] $requestHeaders */
+    public array $requestHeaders = [];
+    /** @var string[] $responseHeaders */
+    public array $responseHeaders = [];
+    public bool $sendHeaders = true;
+    public string $title = '';
+    /**
      * Set the download flag for the stream.
      *
      * @param bool $isDownload whether the request is a download
      * @return self fluent instance
      */
     public function isDownload(bool $isDownload = false): self
-    {
-    }
-    /**
-     * Redirect to another load balancer, or answer 404 once the retry budget is spent.
-     *
-     * @return void
-     */
-    public function retryStream(): void
     {
     }
     /**
@@ -18232,37 +18274,6 @@ abstract class Stream
     public function setTitle(string $title = 'video.mp4'): self
     {
     }
-    /**
-     * Stream the media to the client, serving from cache when available.
-     *
-     * @return void
-     */
-    public function stream(): void
-    {
-    }
-}
-
-/**
- * Request mode flags of a stream request (Sonar php:S1820 for {@see Master}).
- *
- * Kept as a mutable value object because the flags are resolved while the request is parsed
- * (constructor defaults, then `parseDataSources()`); semantics are unchanged from the
- * individual boolean properties it replaces.
- */
-final class StreamFlags
-{
-    /** Download page allowed by the settings (dl=1 + enable_download_page). */
-    public bool $isAllowDownload = false;
-    /** `dl=1` in the query string. */
-    public bool $isDownload = false;
-    /** Google Drive HLS source (host-based rule from StreamConfig). */
-    public bool $isGoogleHls = false;
-    /** `gl=1` in the query string (live stream). */
-    public bool $isLive = false;
-    /** Request targets an MP4 label. */
-    public bool $isMP4 = false;
-    /** Request targets the master playlist. */
-    public bool $isMaster = false;
 }
 
 namespace GDPlayer\Stream\Cache;
