@@ -2,135 +2,10 @@
 /**
  * Stub signature kelas monolit GDPlayer.
  *
- * Dibuat otomatis dengan `php-stubs/generator` dari `src/` repo monolit;
+ * Dibuat otomatis dengan `scripts/generate_core_stubs.php` dari `src/` repo monolit;
  * jangan diedit tangan. Tujuan: PHPStan subrepo bisa berdiri sendiri tanpa
  * checkout monolit (pola yang sama dengan php-stubs/wordpress-stubs).
  */
-
-namespace GDPlayer\Http\Request;
-
-/**
- * Contract for classes that handle a PSR-7 request and return a response.
- */
-interface RequestHandlerInterface
-{
-    /**
-     * Handle the incoming request.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request incoming request
-     * @return \Psr\Http\Message\ResponseInterface resulting response
-     */
-    public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface;
-}
-namespace GDPlayer\Modules;
-
-/**
- * Shared base for AjaxHelper (legacy) & AbstractAjaxController (new).
- *
- * Removes duplicated identical methods: request normalization + token/user resolution,
- * JSON/DataTables responses, logging, DataTables query extraction, and table validation.
- */
-trait AjaxBaseTrait
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    /**
-     * @param array<int|string, array<string, mixed>> $data
-     * @param int $recordsTotal
-     * @param int $recordsFiltered
-     * @param array<string, mixed> $customData
-     * @return string
-     */
-    protected function createDataTableResponse(array $data = [], int $recordsTotal = 0, int $recordsFiltered = 0, array $customData = []): string
-    {
-    }
-    protected function createDefaultResponse(int $status = 0, string $msg = '', mixed $result = null): string
-    {
-    }
-    /**
-     * @param string $message
-     * @param array<string, mixed> $context
-     */
-    protected function createLog(string $message = 'Admin only access denied', array $context = []): void
-    {
-    }
-    /**
-     * @param array<string,mixed> $get
-     * @param string[] $columns
-     * @param string $defaultOrderBy
-     * @param string $defaultOrderDir
-     * @return array{draw:int,start:int,length:int,search:string,orderBy:string,orderDir:string}
-     */
-    protected function extractDatatablesQry(array $get, array $columns, string $defaultOrderBy = '', string $defaultOrderDir = 'asc'): array
-    {
-    }
-    protected function tableValidation(string $id, string $colId, \GDPlayer\Database\MySQL\Model $table): \GDPlayer\Database\MySQL\Model
-    {
-    }
-}
-namespace GDPlayer\Helper;
-
-/**
- * Base controller for the Ajax endpoints.
- *
- * Normalizes the request, resolves the caller/token and dispatches the
- * requested action, returning a JSON response.
- */
-abstract class AjaxHelper implements \GDPlayer\Http\Request\RequestHandlerInterface
-{
-    use \GDPlayer\Modules\AjaxBaseTrait;
-    protected const MESSAGE_BAD_REQUEST = 'Bad request';
-    protected const MESSAGE_UNAUTHORIZE = 'You are not authorized to access this feature';
-    protected string $action = '';
-    protected \GDPlayer\Config\BinFile $binConfig;
-    protected \GDPlayer\Config\Config $config;
-    /** @var null|array<string,mixed> $currentUser */
-    protected ?array $currentUser = null;
-    /** @var array<string,mixed> $data */
-    protected array $data;
-    protected int $draw = 0;
-    protected mixed $epeMelemek = false;
-    /** @var array<string,\Nyholm\Psr7\UploadedFile|null> $files */
-    protected array $files = [];
-    protected bool $isAdmin = false;
-    protected bool $isAdminShowUserData = false;
-    protected bool $isUserShowTheirData = false;
-    /** @var string[] $listColumns */
-    protected array $listColumns;
-    protected \GDPlayer\Core\Security\Security $security;
-    protected string $token = '';
-    protected function loadAction(object $class): string
-    {
-    }
-    /**
-     * Handle the PSR-7 request and return a JSON response.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request incoming request
-     * @return \Psr\Http\Message\ResponseInterface JSON response
-     */
-    public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Dispatch the list action for the current entity.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    abstract public function response(): string;
-}
 namespace GDPlayer\Ajax;
 
 /**
@@ -140,10 +15,89 @@ namespace GDPlayer\Ajax;
  */
 final class DashboardAjax extends \GDPlayer\Helper\AjaxHelper
 {
+    private \GDPlayer\Model\LoadBalancer $balancer;
+    private string $baseUrl = '';
+    /** @var array<string,string> $createdSql */
+    private array $createdSql = [];
+    private string $filter = 'today';
+    private \GDPlayer\Model\GDriveAuth $gdriveAuth;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private string $slugDownload = '';
+    private string $slugEmbed = '';
+    private \GDPlayer\Model\Stat $stat;
+    private string $userTimezone = 'UTC';
+    private \GDPlayer\Model\VideoSource $vSources;
+    private \GDPlayer\Model\Video $videos;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Bind the request, load the dashboard config and build the date filter SQL.
+     *
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Return the ASN groups ranked by view count.
+     *
+     * @return string DataTables JSON response
+     */
+    protected function popularASN(): string
+    {
+    }
+    /**
+     * Return the browser user agents ranked by view count, parsed into name, device and OS.
+     *
+     * @return string DataTables JSON response
+     */
+    protected function popularBrowsers(): string
+    {
+    }
+    /**
+     * Return the countries ranked by view count.
+     *
+     * @return string DataTables JSON response
+     */
+    protected function popularCountries(): string
+    {
+    }
+    /**
+     * Return the ten most viewed videos for the active date filter.
+     *
+     * @return string DataTables JSON response
+     */
+    protected function popularVideos(): string
+    {
+    }
+    /**
+     * Return the ten most recently added videos, scoped by the viewer's role.
+     *
+     * @return string DataTables JSON response
+     */
+    protected function recentVideos(): string
+    {
+    }
+    /**
+     * Count the video sources hosted on the main server and on every active balancer.
+     *
+     * @return string JSON response mapping server name to source count
+     */
+    protected function serversStatus(): string
+    {
+    }
+    /**
+     * Return the good, broken, warning and total video counters plus server totals.
+     *
+     * @return string JSON response with the counters
+     */
+    protected function videosStatus(): string
+    {
+    }
+    /**
+     * Return a per-day view time series in the user's timezone.
+     *
+     * @return string JSON response with `[timestamp, views]` pairs
+     */
+    protected function views(): string
     {
     }
     /**
@@ -155,6 +109,7 @@ final class DashboardAjax extends \GDPlayer\Helper\AjaxHelper
     {
     }
 }
+
 /**
  * Google Drive account management endpoint (list, add, edit, delete).
  *
@@ -162,345 +117,43 @@ final class DashboardAjax extends \GDPlayer\Helper\AjaxHelper
  */
 final class GDriveAccountAjax extends \GDPlayer\Helper\AjaxHelper
 {
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Google Drive file browser endpoint (list, mirror, delete).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class GDriveFileAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Google Drive mirror management endpoint (list, add, remove).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class GDriveMirrorAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Google Drive mirror queue endpoint (list, enqueue, clear).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class GDriveQueueAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Load balancer management endpoint (list, add, edit, delete).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class LoadBalancerAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Admin-only endpoint for cache clearing and server status metrics.
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class PrivateAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Public (unauthenticated) endpoint for video/poster/subtitle actions.
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class PublicAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * User session management endpoint (list, revoke).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class SessionAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Admin settings endpoint (read, save, license, custom headers).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class SettingAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Subtitle library endpoint (list, upload, convert, delete).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class SubtitleAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * User management endpoint (list, create, edit, delete, password).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-final class UserAjax extends \GDPlayer\Helper\AjaxHelper
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-    /**
-     * Return the DataTables JSON payload for the entity list.
-     *
-     * @return string JSON response
-     */
-    public function list(): string
-    {
-    }
-    /**
-     * Handle the requested action and return its JSON response.
-     *
-     * @return string JSON response
-     */
-    public function response(): string
-    {
-    }
-}
-/**
- * Video management endpoint (list, create, edit, delete, bulk actions).
- *
- * Handles the authenticated Ajax request dispatched by AjaxHelper.
- */
-class VideoAjax extends \GDPlayer\Helper\AjaxHelper
-{
+    private const MESSAGE_DELETE_FAIL = 'The account failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The account has been deleted successfully';
+    private const MESSAGE_STATUS_UPDATE_FAIL = 'The account status failed to update';
+    private const MESSAGE_STATUS_UPDATE_SUCCESS = 'The account status has been successfully updated';
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Model\GDriveMirror $gdMirror;
     /** @var string[] $listColumns */
-    protected array $listColumns = ['id', 'title', 'host', 'slug', 'status', 'dmca', 'has_sub', 'views', 'name', 'created', 'updated', 'poster', 'host_id'];
+    protected array $listColumns = ['id', 'email', 'bypass', 'status', 'created', 'updated'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @return bool
+     * Bind the request and initialise the Drive authorisation and mirror helpers.
+     *
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
     {
     }
+    /**
+     * Delete a Google Drive account together with its stored credentials.
+     *
+     * @return string JSON response
+     */
     protected function delete(): string
     {
     }
-    protected function deleteByHostnames(): string
+    /**
+     * Toggle the download-limit bypass flag of an account.
+     *
+     * @return string JSON response
+     */
+    protected function updateBypass(): string
     {
     }
-    protected function dmcaTakedown(): string
-    {
-    }
-    protected function getAlternatives(): string
-    {
-    }
-    protected function getServer(): string
-    {
-    }
-    protected function removePoster(): string
-    {
-    }
-    protected function rename(): string
-    {
-    }
-    protected function renameMulti(): string
-    {
-    }
+    /**
+     * Toggle the active status of an account, shared by both update actions.
+     *
+     * @return string JSON response
+     */
     protected function updateStatus(): string
     {
     }
@@ -521,17 +174,132 @@ class VideoAjax extends \GDPlayer\Helper\AjaxHelper
     {
     }
 }
+
 /**
- * Video export endpoint (generate and download export files).
+ * Google Drive file browser endpoint (list, mirror, delete).
  *
  * Handles the authenticated Ajax request dispatched by AjaxHelper.
  */
-final class VideoExportAjax extends \GDPlayer\Helper\AjaxHelper
+final class GDriveFileAjax extends \GDPlayer\Helper\AjaxHelper
 {
+    private const MESSAGE_FILE_DELETE_FAIL = 'The file/folder failed to delete';
+    private const MESSAGE_FILE_DELETE_SUCCESS = 'The file/folder has been successfully deleted';
+    private const MESSAGE_FILE_IMPORT_FAIL = 'The file failed to import';
+    private const MESSAGE_FILE_IMPORT_SUCCESS = 'The file has been successfully imported';
+    private const MESSAGE_FILE_UPDATE_FAIL = 'The file/folder failed to update';
+    private const MESSAGE_FILE_UPDATE_SUCCESS = 'The file/folder has been successfully updated';
+    private const MESSAGE_FOLDER_CREATE_FAIL = 'The new file/folder failed to create';
+    private const MESSAGE_FOLDER_CREATE_SUCCESS = 'The new file/folder has been created successfully';
+    private const MESSAGE_MIRROR_FILE_DELETE_FAIL = 'The mirror file failed to delete';
+    private const MESSAGE_MIRROR_FILE_DELETE_SUCCESS = 'The mirror file has been successfully deleted';
+    private const MESSAGE_REMOVE_DUPLICATE_FILES_FAIL = 'Duplicate files failed to remove';
+    private const MESSAGE_REMOVE_DUPLICATE_FILES_SUCCESS = 'Duplicate files have been successfully removed';
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveDuplicate $gdDuplicate;
+    private \GDPlayer\Model\GDriveMirror $gdMirror;
+    private \GDPlayer\Model\Video $videoModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'title', 'description', 'shared', 'modifiedDate'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Wire the Google Drive client and the models used by every action.
+     *
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Add playback URLs, action links and parsed dates to raw Drive rows.
+     *
+     * @param list<array<string,mixed>> $rawDriveFiles
+     * @param string $email
+     * @return list<array<string,mixed>>
+     */
+    protected function createDataList(array $rawDriveFiles = [], string $email = ''): array
+    {
+    }
+    /**
+     * Create a folder under the posted parent and flush the cached file listing.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function createNewFolder(): string
+    {
+    }
+    /**
+     * Delete a Drive file through the API and drop the cached file listing.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Remove the posted mirror row by primary key.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function deleteMirror(): string
+    {
+    }
+    /**
+     * Read the posted file metadata from Drive and store it as a new video row.
+     *
+     * @return string JSON response carrying the new video id and slug
+     */
+    protected function gdriveImport(): string
+    {
+    }
+    /**
+     * List the shared drives visible to the posted account email.
+     *
+     * @return string JSON response holding the shared drive collection
+     */
+    protected function getSharedDrives(): string
+    {
+    }
+    /**
+     * Scan one page of Drive files, deleting byte-identical copies as it goes.
+     *
+     * @return string JSON response with the next page token to continue from
+     */
+    protected function removeDuplicateFiles(): string
+    {
+    }
+    /**
+     * Delete the item when an identical record already exists, otherwise store it as seen.
+     *
+     * @param array<string,mixed> $driveFileItem
+     * @param string $sha1
+     * @param string $sha256
+     * @param string $description
+     * @return bool|string
+     */
+    protected function removeDuplicateFilesByData(array $driveFileItem = [], string $sha1 = '', string $sha256 = '', string $description = ''): bool|string
+    {
+    }
+    /**
+     * Rename a Drive file or folder and drop the cached file listing.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function renameFileFolder(): string
+    {
+    }
+    /**
+     * Grant or revoke the public permission of a Drive file.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function updateStatus(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
     {
     }
     /**
@@ -543,6 +311,913 @@ final class VideoExportAjax extends \GDPlayer\Helper\AjaxHelper
     {
     }
 }
+
+/**
+ * Google Drive mirror management endpoint (list, add, remove).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class GDriveMirrorAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_DELETE_FAIL = 'The backup file failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The backup file has been successfully deleted';
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveMirror $gdMirror;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'gdrive_id', 'mirror_id', 'mirror_email', 'created'];
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Remove the mirror row and the mirrored Drive file behind it.
+     *
+     * @return string ajax status plus message
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Google Drive mirror queue endpoint (list, enqueue, clear).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class GDriveQueueAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_DELETE_FAIL = 'The backup queue failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The backup queue has been successfully deleted';
+    private const MESSAGE_GDRIVE_COPY_FAIL = 'Cannot copy the file! Try again later';
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Model\GDriveQueue $gdQueue;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'gdrive_id'];
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Copy the source file into the first active Drive account and return its view link.
+     *
+     * Accounts are tried in order; the copy fails only after every one reports back nothing.
+     * @return string JSON payload with the new file id and link, or the failure message
+     */
+    protected function copy(): string
+    {
+    }
+    /**
+     * Remove a queue row by id, refusing non-positive ids and logging failed deletes.
+     *
+     * @return string JSON payload with the status message
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Load balancer management endpoint (list, add, edit, delete).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class LoadBalancerAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_DELETE_FAIL = 'The load balancer server failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The load balancer server deleted successfully';
+    private const MESSAGE_UPDATE_FAIL = 'The load balancer server failed to update';
+    private const MESSAGE_UPDATE_SUCCESS = 'The load balancer server has been successfully updated';
+    private \GDPlayer\Model\LoadBalancer $balancerModel;
+    private \GDPlayer\Model\ViewLoadBalancer $viewBalancerModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['name', 'link', 'connections', 'playbacks', 'status', 'created', 'updated', 'public', 'id'];
+    /**
+     * Bind the request and instantiate the load balancer models.
+     *
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete one load balancer server by its `id` request field.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Toggle the enabled/disabled status of one load balancer server.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function updateStatus(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Admin-only endpoint for cache clearing and server status metrics.
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class PrivateAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_CACHE_CLEAR_FAIL = 'The cache failed to clear or does not exist';
+    private const MESSAGE_CACHE_CLEAR_SUCCESS = 'The cache has been cleared successfully';
+    private \GDPlayer\Model\LoadBalancer $balancerModel;
+    private \GDPlayer\Service\System\SystemInfo $systemInfo;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
+    /**
+     * Wire the request into the base Ajax helper and build the models it needs.
+     *
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete the video sources and cached files owned by this load balancer instance.
+     *
+     * @return string JSON response
+     */
+    protected function clearLoadBalancer(): string
+    {
+    }
+    /**
+     * Drop the sources and player cache of a video plus its alternative videos.
+     *
+     * @return string JSON response with a per-store clear summary
+     */
+    protected function clearVideoCache(): string
+    {
+    }
+    /**
+     * Return one group of system metrics, served from the instance cache when warm.
+     *
+     * @return string JSON response
+     */
+    protected function serverStatus(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Public (unauthenticated) endpoint for video/poster/subtitle actions.
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class PublicAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_CACHE_CLEAR_FAIL = 'Failed to clear the cache of the video or the video does not exist';
+    private const MESSAGE_CACHE_CLEAR_SUCCESS = 'The video cache cleared successfully';
+    private const MESSAGE_CREATE_PLAYER_FAIL = 'Insert the video URL first';
+    private const MESSAGE_EMAIL_EXIST = 'The email address is already registered';
+    private const MESSAGE_FEATURE_DISABLE = 'This feature is disabled';
+    private const MESSAGE_GDRIVE_BYPASS_FAIL = 'Cannot bypass the file, try later';
+    private const MESSAGE_GDRIVE_BYPASS_SUCCESS = 'The file has been successfully bypassed';
+    private const MESSAGE_STAT_FAIL = 'Total daily visits have been exceeded';
+    private const MESSAGE_STAT_SUCCESS = 'Total daily visits successfully created';
+    private const MESSAGE_USERNAME_EXIST = 'The username is already registered';
+    private const MESSAGE_VIDEO_SAVE_FAIL = 'The new video failed to save';
+    private const MESSAGE_VIDEO_SAVE_SUCCESS = 'The new video has been saved successfully';
+    private \GDPlayer\Model\LoadBalancer $balancerModel;
+    private \GDPlayer\Core\Core $core;
+    private string $downloadSlug = 'd';
+    private string $embed2Slug = 'r';
+    private string $embedSlug = 'e';
+    private \GDPlayer\External\GoogleDriveRestAPI $gdApi;
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\External\Maxmind $maxmind;
+    private \Sqids\Sqids $sqids;
+    private \GDPlayer\Model\Stat $statModel;
+    private \GDPlayer\Model\StatUA $statUAModel;
+    private \GDPlayer\Model\SubtitleManager $subtitleManager;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\User $userModel;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
+    /**
+     * Initialise every collaborator used by the public actions.
+     *
+     * @param ServerRequestInterface $request Incoming PSR-7 request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Check whether the e-mail address is already registered by another user.
+     *
+     * @param string $email Address to test; falls back to the request input
+     * @return string JSON response
+     */
+    protected function checkEmail(string $email = ''): string
+    {
+    }
+    /**
+     * Check whether the username is already registered by another user.
+     *
+     * @param string $username Name to test; falls back to the request input
+     * @return string JSON response
+     */
+    protected function checkUsername(string $username = ''): string
+    {
+    }
+    /**
+     * Delete the cached sources of every video referenced by the encrypted payload.
+     *
+     * @return string JSON response
+     */
+    protected function clearVideoCache(): string
+    {
+    }
+    /**
+     * Build the encrypted embed, download and request URLs for a video URL.
+     *
+     * @return string JSON response
+     */
+    protected function createPlayer(): string
+    {
+    }
+    /**
+     * Copy a Google Drive file into an authorised account to bypass its download limit.
+     *
+     * @return string JSON response
+     */
+    protected function gdriveBypassLimit(): string
+    {
+    }
+    /**
+     * List the active load balancer mirrors together with the main site.
+     *
+     * @return string JSON response
+     */
+    protected function getLoadBalancerList(): string
+    {
+    }
+    /**
+     * Authorise the request through the per-action allow list, reCAPTCHA or CORS token.
+     *
+     * @return bool True when the request may run
+     */
+    protected function isPublicRequestValid(): bool
+    {
+    }
+    /**
+     * Extract, store and return a single video of a bulk import batch.
+     *
+     * @return string JSON response
+     */
+    protected function saveBulkProcess(): string
+    {
+    }
+    /**
+     * Resolve the video referenced by the encrypted payload and record a view.
+     *
+     * @return string JSON response
+     */
+    protected function statCounter(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * User session management endpoint (list, revoke).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class SessionAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_DELETE_FAIL = 'The session failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The session has been successfully deleted';
+    private \GDPlayer\Model\Session $sessionModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'username', 'ip', 'useragent', 'created', 'expires'];
+    /**
+     * Bind the incoming request and initialise the session model.
+     *
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete the session referenced by the request ID.
+     * Delete the session row referenced by the posted id.
+     *
+     * @return string JSON response
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Admin settings endpoint (read, save, license, custom headers).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class SettingAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_BLACKLIST_FAIL = 'The blacklisted videos failed to deactivate';
+    private const MESSAGE_BLACKLIST_SUCCESS = 'The blacklisted videos have been successfully deactivated';
+    private const MESSAGE_CACHE_CLEAR_FAIL = 'The cache failed to clear';
+    private const MESSAGE_CACHE_CLEAR_SUCCESS = 'The cache has been cleared successfully';
+    private const MESSAGE_DEPENDENCY_FAIL = 'Some php functions and applications are not enabled/installed yet';
+    private const MESSAGE_DEPENDENCY_SUCCESS = 'Supported php functions and applications have been enabled/installed';
+    private const MESSAGE_LICENSE_SAVE_FAIL = 'GDPlayer license failed to save';
+    private const MESSAGE_LICENSE_SAVE_SUCCESS = 'GDPlayer license has been successfully saved';
+    private const MESSAGE_RESET_FAIL = 'The bypassed hosts failed to reset';
+    private const MESSAGE_RESET_SUCCESS = 'The bypassed hosts have been successfully reset';
+    private const MESSAGE_VAST_CREATE_FAIL = 'VAST ad file failed to generate';
+    private const MESSAGE_VAST_CREATE_SUCCESS = 'VAST ad file has been generated successfully';
+    private const MESSAGE_VAST_DELETE_FAIL = 'The VAST ad file failed to delete';
+    private const MESSAGE_VAST_DELETE_SUCCESS = 'The VAST ad file has been successfully deleted';
+    private const TRUNCATE_SOURCES = 'TRUNCATE `tb_videos_sources`;';
+    private const TRUNCATE_TMP = 'TRUNCATE `tmp_videos_sources`;';
+    private \GDPlayer\Service\Background\Background $backgroundService;
+    private \GDPlayer\Service\HeadlessChrome\HeadlessChrome $headlessChrome;
+    private \GDPlayer\Model\TmpVideoSource $tmpVideoSourceModel;
+    private string $uploadsDir = '';
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Clear every cache layer: downloads, browsers, source tables and cache drivers.
+     *
+     * @return string JSON response
+     */
+    protected function clearAllCache(): string
+    {
+    }
+    /**
+     * Clear the cached sources of a single load balancer.
+     *
+     * @return string JSON response
+     */
+    protected function clearLoadBalancer(): string
+    {
+    }
+    /**
+     * Clear the settings cache and the temporary directories.
+     *
+     * @return string JSON response
+     */
+    protected function clearSettingsCache(): string
+    {
+    }
+    /**
+     * Clear cached video sources and the player file-size entries.
+     *
+     * @return string JSON response
+     */
+    protected function clearVideosCache(): string
+    {
+    }
+    /**
+     * Delete the temporary subtitle, image and cache files.
+     *
+     * @return string JSON response
+     */
+    protected function clearVideosFiles(): string
+    {
+    }
+    /**
+     * Generate a custom VAST XML file and register it in the settings.
+     *
+     * @return string JSON response, the public URL of the new VAST file on success
+     */
+    protected function createCustomVast(): string
+    {
+    }
+    /**
+     * Delete a custom VAST file and drop it from the settings list.
+     *
+     * @return string JSON response
+     */
+    protected function deleteCustomVast(): string
+    {
+    }
+    /**
+     * Deactivate the videos whose title matches a blacklisted word.
+     *
+     * @return string JSON response
+     */
+    protected function disableBlacklistedVideos(): string
+    {
+    }
+    /**
+     * Report which optional PHP extensions and binaries are available.
+     *
+     * @return string JSON response carrying the per-dependency result map
+     */
+    protected function getDependencies(): string
+    {
+    }
+    /**
+     * Delete the temporary upload, cache and subtitle directories.
+     *
+     * @return bool true when at least one directory was removed
+     */
+    protected function hasDeletedCacheTmpDir(): bool
+    {
+    }
+    /**
+     * Hide the dependency dialog for the next 30 days.
+     *
+     * @return string JSON response
+     */
+    protected function hideExtDialog(): string
+    {
+    }
+    /**
+     * Restore the default bypassed host list into the settings.
+     *
+     * @return string JSON response
+     */
+    protected function resetHosts(): string
+    {
+    }
+    /**
+     * Persist the GDPlayer license key and refresh the cached license state.
+     *
+     * @return string JSON response
+     */
+    protected function saveLicense(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Subtitle library endpoint (list, upload, convert, delete).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class SubtitleAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_DELETE_FAIL = 'The subtitle file failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The subtitle file has been successfully deleted';
+    private const MESSAGE_FILE_UPLOAD_FAIL = 'The subtitle file failed to upload';
+    private const MESSAGE_FILE_UPLOAD_SUCCESS = 'The subtitle file has been uploaded successfully';
+    private const MESSAGE_MIGRATE_FAIL = 'Migration of those subtitle files failed';
+    private const MESSAGE_MIGRATE_SUCCESS = 'Migration of the subtitle files has been successful';
+    private const MESSAGE_NEW_LOCATION_INVALID = 'The new location is invalid';
+    private const MESSAGE_NOT_FOUND = 'The subtitle was not found';
+    private const MESSAGE_OLD_LOCATION_EMPTY = 'Old location required';
+    private const MESSAGE_RENAME_DUPLICATED = 'The filename is already in use';
+    private const MESSAGE_RENAME_FAIL = 'The subtitle failed to be renamed';
+    private const MESSAGE_RENAME_SUCCESS = 'The subtitle has been successfully renamed';
+    private \GDPlayer\Model\SubtitleManager $subtitleManagerModel;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\ViewSubtitleManager $viewSubtitleManagerModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'file_name', 'language', 'name', 'host', 'created', 'updated'];
+    /**
+     * Bind the request and the subtitle/view-subtitle models.
+     *
+     * @param ServerRequestInterface $request current HTTP request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Build the listing query, optionally filtered by a search term.
+     *
+     * @param string $search prefix matched against file name, language, host and display name
+     * @return ViewSubtitleManager the model carrying the assembled criteria
+     */
+    protected function createSearchQuery(string $search = ''): \GDPlayer\Model\ViewSubtitleManager
+    {
+    }
+    /**
+     * Delete a subtitle row, its file on disk and the related media links.
+     *
+     * @return string JSON response with the deletion status
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * List the distinct subtitle hosts for the admin filter dropdown.
+     *
+     * Admins only.
+     *
+     * @return string JSON response carrying the host list
+     */
+    protected function getHosts(): string
+    {
+    }
+    /**
+     * Move every subtitle of one host to another host.
+     *
+     * Rewrites the `link` column of affected subtitle rows and the `host` column of the manager rows.
+     * Admins only.
+     *
+     * @return string JSON response with the migration status
+     */
+    protected function migrate(): string
+    {
+    }
+    /**
+     * Rename a subtitle file on disk and keep the database links in sync.
+     *
+     * @return string JSON response with the rename status
+     */
+    protected function rename(): string
+    {
+    }
+    /**
+     * Store an uploaded subtitle file and register it in the library.
+     *
+     * @return string JSON response carrying the new subtitle id, language and public URL
+     */
+    protected function uploadSubtitle(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * User management endpoint (list, create, edit, delete, password).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+final class UserAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_DELETE_FAIL = 'The user failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The user has been successfully deleted';
+    private const MESSAGE_EMAIL_EMPTY = 'Email address is required';
+    private const MESSAGE_EMAIL_SEND_FAILED = 'Failed to send confirmation email';
+    private const MESSAGE_EMAIL_SENT = 'The confirmation email has been successfully sent';
+    private const MESSAGE_EMAIL_UPDATE_FAIL = 'The email address failed to update';
+    private const MESSAGE_EMAIL_UPDATE_SUCCESS = 'The email address has been successfully updated. Please re-login';
+    private const MESSAGE_EMAIL_USED = 'The email address is already in use by another user';
+    private const MESSAGE_USERNAME_EMPTY = 'Username is required';
+    private const MESSAGE_USERNAME_UPDATE_FAIL = 'The username failed to update';
+    private const MESSAGE_USERNAME_UPDATE_SUCCESS = 'The username has been successfully updated. Please re-login';
+    private const MESSAGE_USERNAME_USED = 'The username is already in use by another user';
+    private const MESSAGE_USER_ID_EMPTY = 'User ID is required';
+    private const MESSAGE_USER_NOT_EXISTS = 'User ID does not exists';
+    private \GDPlayer\Service\Login $loginService;
+    private \GDPlayer\External\Mailer $mailer;
+    private \GDPlayer\Model\User $userModel;
+    private \GDPlayer\Model\ViewUser $viewUserModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['name', 'user', 'email', 'status', 'created', 'updated', 'role', 'videos', 'id'];
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Attach a prefix LIKE filter on email, username and name when a term is supplied.
+     *
+     * @param string $search search term; empty leaves the model untouched
+     * @return ViewUser the shared view model carrying the criteria
+     */
+    protected function createSearchQuery(string $search = ''): \GDPlayer\Model\ViewUser
+    {
+    }
+    /**
+     * Soft-delete the user referenced by the request id and report the outcome.
+     *
+     * @return string JSON response payload
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Store a new email for the current user after a format and uniqueness check.
+     *
+     * The session is logged out on success so the address is re-verified by login.
+     * @return string JSON response payload
+     */
+    protected function editEmail(): string
+    {
+    }
+    /**
+     * Store a new username for the current user after a non-empty and uniqueness check.
+     *
+     * The session is logged out on success, mirroring the email change flow.
+     * @return string JSON response payload
+     */
+    protected function editUsername(): string
+    {
+    }
+    /**
+     * Resend the confirmation mail to the user referenced by the request id.
+     *
+     * @return string JSON response payload
+     */
+    protected function sendConfirmationEmail(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Video management endpoint (list, create, edit, delete, bulk actions).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ */
+class VideoAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_POSTER_REMOVE_FAIL = 'The poster failed to remove';
+    private const MESSAGE_POSTER_REMOVE_SUCCESS = 'The poster has been successfully removed';
+    private const MESSAGE_VIDEO_DELETE_FAIL = 'The video failed to delete';
+    private const MESSAGE_VIDEO_DELETE_SUCCESS = 'The video has been successfully deleted';
+    private const MESSAGE_VIDEO_NOT_FOUND = 'The video was not found';
+    private const MESSAGE_VIDEO_RENAME_EMPTY = 'The video title is invalid';
+    private const MESSAGE_VIDEO_SAVE_FAIL = 'The new video failed to save';
+    private const MESSAGE_VIDEO_SAVE_SUCCESS = 'The new video has been saved successfully';
+    private const MESSAGE_VIDEO_UPDATE_FAIL = 'The video failed to update';
+    private const MESSAGE_VIDEO_UPDATE_SUCCESS = 'The video has been successfully updated';
+    private const SUBS_ACTION_LIST = ['deleteSubtitle', 'editSubtitle', 'getSubtitles', 'searchSubtitles'];
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\External\Maxmind $maxmind;
+    private \GDPlayer\Ajax\VideoSubtitleAjax $subtitleHandler;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\ViewVideo $viewVideoModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'title', 'host', 'slug', 'status', 'dmca', 'has_sub', 'views', 'name', 'created', 'updated', 'poster', 'host_id'];
+    /**
+     * @param ServerRequestInterface $request
+     * @return bool
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete the video identified by the request ID and report the outcome as a JSON response.
+     *
+     * @return string
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Delete every video whose host matches one of the posted hostnames; admin only.
+     *
+     * @return string
+     */
+    protected function deleteByHostnames(): string
+    {
+    }
+    /**
+     * Set the DMCA takedown flag and last-updated timestamp of the requested video; admin only.
+     *
+     * @return string
+     */
+    protected function dmcaTakedown(): string
+    {
+    }
+    /**
+     * Collect the download URL of the primary record and of every alternative host of the requested video.
+     *
+     * @return string
+     */
+    protected function getAlternatives(): string
+    {
+    }
+    /**
+     * Build the signed load-balancer API URL and payload that starts a video server for a video ID or URL.
+     *
+     * @return string
+     */
+    protected function getServer(): string
+    {
+    }
+    /**
+     * Clear the poster column of the video and unlink the local image unless the stored value is a remote URL.
+     *
+     * @return string
+     */
+    protected function removePoster(): string
+    {
+    }
+    /**
+     * Update the stored title of the requested video after validating the new name and the video ID.
+     *
+     * @return string
+     */
+    protected function rename(): string
+    {
+    }
+    /**
+     * Apply the posted prefix, postfix and replacement rules to every video in the posted ID set.
+     *
+     * @return string
+     */
+    protected function renameMulti(): string
+    {
+    }
+    /**
+     * Derive the video status from the posted sources flag (1 when empty) and persist it.
+     *
+     * @return string
+     */
+    protected function updateStatus(): string
+    {
+    }
+    /**
+     * Return the DataTables JSON payload for the entity list.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
+/**
+ * Video export endpoint (generate and download export files).
+ *
+ * Handles the authenticated Ajax request dispatched by AjaxHelper.
+ *
+ * @phpstan-type ExportRow array{
+ *     id:int,
+ *     title:string,
+ *     slug:string,
+ *     poster:string,
+ *     videos:list<string>,
+ *     subtitles:list<array{url:string,label:string}>
+ * }
+ */
+final class VideoExportAjax extends \GDPlayer\Helper\AjaxHelper
+{
+    private const MESSAGE_VIDEO_EXPORT_FAIL = 'Video list failed to export';
+    private const MESSAGE_VIDEO_EXPORT_SUCCESS = 'The video list has been exported successfully';
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Write the selected videos and their subtitles to a timestamped CSV file and return its download URL.
+     *
+     * @return string
+     */
+    protected function exportAsCSV(): string
+    {
+    }
+    /**
+     * Handle the requested action and return its JSON response.
+     *
+     * @return string JSON response
+     */
+    public function response(): string
+    {
+    }
+}
+
 /**
  * Video import endpoint (batched CSV row import and validation).
  *
@@ -550,10 +1225,40 @@ final class VideoExportAjax extends \GDPlayer\Helper\AjaxHelper
  */
 final class VideoImportAjax extends \GDPlayer\Helper\AjaxHelper
 {
+    private const MESSAGE_VIDEO_IMPORT_FAIL = 'New video list failed to import';
+    private const MESSAGE_VIDEO_IMPORT_SUCCESS = 'The new video list has been successfully imported';
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    // -------------------------------------------------------------------------
+    // Action handlers
+    // -------------------------------------------------------------------------
+    /**
+     * Receives a JSON batch of up to 250 pre-parsed video rows from the frontend,
+     * persists them to the database, and returns the inserted rows for the DataTable.
+     *
+     * POST body (JSON-encoded field "rows"):
+     * [
+     *   {
+     *     "title":     string,
+     *     "videos":    string[],          // [0] = main URL, [1..n] = alternatives
+     *     "subtitles": [{url, label}],    // already fetched/expanded by frontend
+     *     "poster":    string,
+     *     "slug":      string
+     *   },
+     *   ...
+     * ]
+     *
+     * @return string
+     */
+    protected function importVideosBatch(): string
     {
     }
     /**
@@ -565,6 +1270,7 @@ final class VideoImportAjax extends \GDPlayer\Helper\AjaxHelper
     {
     }
 }
+
 /**
  * Video subtitle endpoint (list, edit, upload, delete per video).
  *
@@ -572,11 +1278,53 @@ final class VideoImportAjax extends \GDPlayer\Helper\AjaxHelper
  */
 final class VideoSubtitleAjax extends \GDPlayer\Helper\AjaxHelper
 {
+    private const MESSAGE_SUBTITLE_DELETE_FAIL = 'The subtitle failed to remove';
+    private const MESSAGE_SUBTITLE_DELETE_SUCCESS = 'The subtitle has been successfully removed';
+    private const MESSAGE_SUBTITLE_NOT_FOUND = 'The subtitle was not found';
+    private const MESSAGE_SUBTITLE_UPDATE_FAIL = 'The subtitle file failed to update';
+    private const MESSAGE_SUBTITLE_UPDATE_SUCCESS = 'The subtitle file has been successfully updated';
+    private const MESSAGE_SUBTITLE_UPLOAD_FAIL = 'The subtitle file failed to upload';
+    private const MESSAGE_SUBTITLE_UPLOAD_SUCCESS = 'The subtitle file has been successfully uploaded';
+    private \GDPlayer\Model\SubtitleManager $subtitleManagerModel;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @return string
+     * Wire the subtitle models and hand the request to the Ajax base class.
+     *
+     * @param ServerRequestInterface $request incoming Ajax request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete the posted subtitle row by id.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function deleteSubtitle(): string
+    {
+    }
+    /**
+     * Replace the subtitle link from either an uploaded file or a validated URL.
+     *
+     * @return string JSON response carrying the new subtitle entry
+     */
+    protected function editSubtitle(): string
+    {
+    }
+    /**
+     * List the playable subtitles of a video, decoding legacy links on the way.
+     *
+     * @return string JSON response holding the subtitle list
+     */
+    protected function getSubtitles(): string
+    {
+    }
+    /**
+     * Suggest stored subtitle files matching the query, limited to ten rows.
+     *
+     * @return string JSON response holding the suggestion list
+     */
+    protected function searchSubtitles(): string
     {
     }
     /**
@@ -588,6 +1336,7 @@ final class VideoSubtitleAjax extends \GDPlayer\Helper\AjaxHelper
     {
     }
 }
+
 namespace GDPlayer\Bootstrap;
 
 /**
@@ -601,11 +1350,16 @@ final class Application
 {
     /**
      * Run one request lifecycle, then release all of its state.
+     *
+     * The request is built from the SAPI globals, handled by {@see Kernel}, and
+     * emitted back through {@see SapiEmitter}. An unhandled exception is logged
+     * with its origin and rethrown so the runtime still reports it.
      */
     public static function run(): void
     {
     }
 }
+
 /**
  * Configuration loader from the .env file (replacement for includes/config.php).
  *
@@ -618,6 +1372,15 @@ final class Application
  */
 final class Env
 {
+    /** Keys converted to bool. */
+    private const BOOL_KEYS = ['DB_ATTR_PERSISTENT', 'DB_DEBUG'];
+    /** Keys converted to int. */
+    private const INT_KEYS = ['BUFFER_SIZE', 'SMALL_BUFFER_SIZE', 'MAX_DOWNLOAD_SPEED', 'DB_ATTR_PREFETCH', 'DB_ATTR_TIMEOUT', 'DB_CACHE_TIMEOUT', 'DB_CACHE_TIMEOUT_MIN', 'DB_CACHE_TIMEOUT_SETTINGS', 'DB_CACHE_TIMEOUT_VIDEOS', 'CACHE_TIMEOUT'];
+    /** Keys whose values are JSON and converted to arrays. */
+    private const JSON_KEYS = ['EXTRA_IP', 'DB_MASTER', 'DB_REPLICA', 'REDIS_CONFIG', 'DNS_SERVERS'];
+    /** Keys that must exist and must not be empty. */
+    private const REQUIRED_KEYS = ['BASE_URL', 'SECURE_SALT', 'ADMIN_DIR', 'DB_MASTER'];
+    private static bool $loaded = false;
     /**
      * Read a raw value from the environment.
      *
@@ -638,12 +1401,14 @@ final class Env
     {
     }
 }
+
 /**
  * Failure while loading or validating the `.env` configuration.
  */
 final class EnvException extends \RuntimeException
 {
 }
+
 /**
  * Process-level bootstrap: error reporting, shutdown guard, extra autoloaders, theme autoload.
  *
@@ -652,6 +1417,7 @@ final class EnvException extends \RuntimeException
  */
 final class ErrorHandler
 {
+    private static bool $registered = false;
     /**
      * Register all bootstrap hooks; safe to call more than once.
      *
@@ -661,6 +1427,7 @@ final class ErrorHandler
     {
     }
 }
+
 /**
  * Application core: one PSR-7 request in, one PSR-7 response out.
  *
@@ -673,8 +1440,13 @@ final class ErrorHandler
  */
 final class Kernel
 {
+    /** Site configuration keys read by the front controller. */
+    private const CONFIG_KEYS = ['slug_embed', 'slug_download', 'slug_request', 'main_site', 'disable_validation', 'updated', 'cache_mode', 'nginx_config'];
+    private static ?\GDPlayer\Routing\Router $router = null;
     /**
      * Kernel instance for this process (router reused across requests in a worker).
+     *
+     * @return self booted kernel instance
      */
     public static function create(): self
     {
@@ -682,13 +1454,14 @@ final class Kernel
     /**
      * Handle one request: publish context, dispatch, return the response.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request PSR-7 request from the runtime
-     * @return \Psr\Http\Message\ResponseInterface response ready for the emitter
+     * @param ServerRequestInterface $request PSR-7 request from the runtime
+     * @return ResponseInterface response ready for the emitter
      */
     public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
  * Process-level boot and per-request reset.
  *
@@ -698,6 +1471,7 @@ final class Kernel
  */
 final class Lifecycle
 {
+    private static bool $booted = false;
     /**
      * Process-level setup: runs once per process (FPM: once per request, same effect).
      */
@@ -718,14 +1492,15 @@ final class Lifecycle
      *
      * Only per-request state is cleared. Read-only caches (Twig environment, settings)
      * stay in the process on purpose: rebuilding them every request
-     * would defeat the point of a long-running worker. Versi tag justru HARUS dibuang:
-     * nilai itu berubah karena worker lain (admin, cron), jadi menyimpannya lintas request
-     * membuat worker ini terus memakai key versi lama.
+     * would defeat the point of a long-running worker. The version tag, by contrast, MUST
+     * be dropped: another worker (admin, cron) changes it, so keeping it across requests
+     * would leave this worker pinned to a stale version key.
      */
     public static function reset(): void
     {
     }
 }
+
 namespace GDPlayer\Config;
 
 /**
@@ -780,11 +1555,13 @@ enum App
     {
     }
 }
+
 /**
  * Reader for the bundled JSON data files (host lists, timezones, languages, ...).
  */
 final class BinFile
 {
+    private \GDPlayer\Config\Config $config;
     /**
      * Bind the settings service used to merge dynamic entries.
      */
@@ -838,7 +1615,7 @@ final class BinFile
     {
     }
     /**
-     * @return array<int, mixed>
+     * @return list<array<mixed, mixed>>
      */
     public function getCustomHeaders(): array
     {
@@ -911,6 +1688,7 @@ final class BinFile
     {
     }
 }
+
 /**
  * Application settings repository backed by the tb_settings table.
  *
@@ -919,13 +1697,16 @@ final class BinFile
  */
 final class Config
 {
+    private \GDPlayer\Model\Setting $settingModel;
     /**
-     * Bind the settings model and close the session to avoid write locks.
+     * Bind the settings model used by every read and write.
      */
     public function __construct()
     {
     }
     /**
+     * Expose the application info instead of the internal model.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
@@ -943,30 +1724,42 @@ final class Config
      * Read a single setting value by key.
      *
      * @param null|string $key setting key
-     * @return mixed parsed setting value, or null when the key does not exist
+     * @return string|bool|null parsed setting value, or null when the key does not exist
      */
-    public function get(?string $key): mixed
+    public function get(?string $key): string|bool|null
     {
     }
     /**
-     * @return array<string,mixed>
+     * Read every setting as a parsed key/value map.
+     *
+     * @return array<string,string|bool|null>
      */
     public function getAll(): array
     {
     }
     /**
+     * Build the language code/label list, or resolve one selected entry.
+     *
+     * @param string $selectedValue code or label to resolve; empty returns the whole list
      * @return array<string, string>|array{key: string, value: string}
      */
     public static function getLanguageList(string $selectedValue = ''): array
     {
     }
     /**
+     * Read several settings at once, filling missing keys with null.
+     *
      * @param string[] $keys
-     * @return array<string,mixed>
+     * @return array<string,string|bool|null>
      */
     public function getMulti(array $keys = []): array
     {
     }
+    /**
+     * Return the configured site name, falling back to GDPlayer.
+     *
+     * @return string site name shown in titles and meta tags
+     */
     public static function getSiteName(): string
     {
     }
@@ -980,16 +1773,18 @@ final class Config
     {
     }
     /**
-     * Persist a single setting, inserting it when the key does not exist yet.
+     * Persist a single setting: update the row when it exists, insert it otherwise.
      *
      * @param string $key   setting key
      * @param mixed  $value setting value
-     * @return mixed update/insert result, or false on failure
+     * @return mixed inserted id on insert, true on update, false on failure
      */
     public function save(string $key, mixed $value): mixed
     {
     }
     /**
+     * Persist a batch of settings and redirect with a result alert.
+     *
      * @param array<string,mixed> $data
      * @param string $title
      * @return void
@@ -998,98 +1793,9 @@ final class Config
     {
     }
 }
+
 namespace GDPlayer\Console\Commands;
 
-/**
- * Penyusunan opsi, konteks, dan item unduhan aria2c.
- *
- * Split out of `DownloadAria2cCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DownloadAria2cCommand` through this trait.
- */
-trait DownloadAria2cBuildTrait
-{
-    /**
-     * aria2 log file per host+id.
-     */
-    protected function buildAria2LogFile(string $host, string $hostId): string
-    {
-    }
-    /**
-     * aria2 CLI options (verbatim from the legacy path).
-     *
-     * @param array<string,mixed> $context
-     * @return list<string>
-     */
-    protected function buildAria2Options(array $context, string $inputFilePath, string $aria2LogFile): array
-    {
-    }
-    /**
-     * Build the download context (host, headers, source, referer) from a queue row.
-     *
-     * @param array<string,mixed> $dataVideo
-     * @return array<string,mixed>
-     */
-    protected function buildDownloadContext(array $dataVideo): array
-    {
-    }
-    /**
-     * Download item list (one per source; private URLs skipped).
-     *
-     * @param array<string,mixed> $dataSources
-     * @param list<string>        $headers
-     * @return list<array<string,mixed>>
-     */
-    protected function buildDownloadItems(array $dataSources, string $videoCacheDir, array $headers): array
-    {
-    }
-}
-/**
- * Header, direktori cache, aplikasi aria2c, dan berkas input.
- *
- * Split out of `DownloadAria2cCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DownloadAria2cCommand` through this trait.
- */
-trait DownloadAria2cSupportTrait
-{
-    /**
-     * Prepare the video cache folder + base request headers.
-     *
-     * @param array<string,mixed> $dataVideo
-     * @return list<string>
-     */
-    protected function buildRequestHeaders(array $dataVideo): array
-    {
-    }
-    /**
-     * Convert a legacy-style header list ("Name: value") into a map for the Fetcher.
-     *
-     * @param list<string> $lines legacy-style headers
-     * @return array<string, string> name => value map
-     */
-    protected function headerLinesToMap(array $lines): array
-    {
-    }
-    /**
-     * @param array<string,mixed> $dataVideo
-     */
-    protected function prepareCacheDir(array $dataVideo): string
-    {
-    }
-    /**
-     * Locate the aria2c binary (Windows: `.exe`); '' when absent.
-     */
-    protected function resolveAria2cApp(): string
-    {
-    }
-    /**
-     * Write the aria2 input file (one block per item).
-     *
-     * @param list<array<string,mixed>> $downloadItems
-     */
-    protected function writeInputFile(string $videoCacheDir, array $downloadItems, bool $badHosts): string
-    {
-    }
-}
 /**
  * CLI command `bg_download_aria2c.php` (F8.1).
  *
@@ -1098,8 +1804,6 @@ trait DownloadAria2cSupportTrait
  */
 final class DownloadAria2cCommand
 {
-    use \GDPlayer\Console\Commands\DownloadAria2cBuildTrait;
-    use \GDPlayer\Console\Commands\DownloadAria2cSupportTrait;
     /**
      * Unduh sumber video memakai binari aria2c (pengganti `includes/bg_download_aria2c.php`).
      */
@@ -1107,101 +1811,7 @@ final class DownloadAria2cCommand
     {
     }
 }
-/**
- * Progres, pembatalan, dan finalisasi unduhan.
- *
- * Split out of `DownloadCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DownloadCommand` through this trait.
- */
-trait DownloadCommandProgressTrait
-{
-    /**
-     * Cancel the wave as soon as one tmp file goes missing (triggered by the progress callback):
-     * detach the handle from the multi handle and close the file, exactly the abort block of the legacy path.
-     * The difference: the legacy path re-ran that block on every loop after the first trigger (repeated
-     * fclose) — here only once.
-     *
-     * @param array<int, resource|false> $files tmp file per index
-     * @param array<int, resource|false> $stderrHandles verbose log per index
-     * @param array<int, bool> $downloading "tmp file missing" flag per index
-     * @return int true when the cancel ran
-     */
-    protected function abortDownloads(\GDPlayer\Http\Fetcher\FetcherPool $pool, array &$files, array &$stderrHandles, array &$downloading): int
-    {
-    }
-    /**
-     * Close the handle of every wave result, then move the tmp file to the final file/error file.
-     *
-     * @param array<int|string, \GDPlayer\Http\Fetcher\FetchResult> $poolResults wave results per source index
-     * @param list<array<string, mixed>> $downloadUrls download list (needs 'tmp_file', 'video_file', 'err_file')
-     * @param array<int, resource|false> $files tmp file per index
-     * @param array<int, resource|false> $stderrHandles verbose log per index
-     * @param array<int, float> $progress percentage per source index
-     */
-    protected function finalizeDownloads(array $poolResults, array $downloadUrls, array $files, array $stderrHandles, array $progress): void
-    {
-    }
-    /**
-     * Progress callback (already normalized by `Fetcher`): store the percentage in InstanceCache and
-     * flag downloads whose tmp file is missing so the wave is cancelled.
-     *
-     * @param array<string, mixed> $dataSources source data (shared into InstanceCache)
-     * @param array<int, float> $progress percentage per source index
-     * @param array<int, bool> $downloading "tmp file missing" flag per index
-     * @param array<string, mixed> $urlData download data (needs 'tmp_file')
-     */
-    protected function progressCallback(string $lockKey, int $index, array &$dataSources, array &$progress, array &$downloading, array $urlData): callable
-    {
-    }
-}
-/**
- * Penyusunan URL, header, dan pemindahan file unduhan.
- *
- * Split out of `DownloadCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DownloadCommand` through this trait.
- */
-trait DownloadCommandUrlTrait
-{
-    /**
-     * Download list from sources that passed the private-URL check.
-     *
-     * @param array<int|string, mixed> $sources source list in the source data
-     * @param array<int|string, string> $headers normalized request headers
-     * @return list<array<string, mixed>>
-     */
-    protected function buildDownloadUrls(array $sources, string $videoCacheDir, array $headers): array
-    {
-    }
-    /**
-     * Download request headers: base + Origin/Referer/Cookie from the source data, then normalized.
-     *
-     * @param array<string, mixed> $dataSources source data (needs 'referer' and 'cookies')
-     * @return array<int|string, string>
-     */
-    protected function buildRequestHeaders(string $host, string $userAgent, string $userLanguage, array $dataSources): array
-    {
-    }
-    /**
-     * Fetcher for one download: writes the body to the caller's stream, verbose output to the log file.
-     *
-     * No time limit (timeout 0) like the legacy path; every other setting — interface, DNS,
-     * TLS, keep-alive, rate limit, buffer — comes from the same transport policy
-     * (`Helper\MiscHelper::getCurlDefaultConfig()`), so nothing is hardcoded here.
-     *
-     * @param resource|null $stderr cURL verbose log file
-     */
-    protected function downloadFetcher(string $host, $stderr): \GDPlayer\Http\Fetcher\Fetcher
-    {
-    }
-    /**
-     * Pindahkan berkas sementara ke tujuan akhir, hanya bila berkas sementara ada.
-     *
-     * @param array<string, mixed> $urlData
-     */
-    protected function moveDownloadedFile(array $urlData, string $targetKey): void
-    {
-    }
-}
+
 /**
  * CLI command `bg_download.php` (F8.1).
  *
@@ -1210,8 +1820,6 @@ trait DownloadCommandUrlTrait
  */
 final class DownloadCommand
 {
-    use \GDPlayer\Console\Commands\DownloadCommandProgressTrait;
-    use \GDPlayer\Console\Commands\DownloadCommandUrlTrait;
     /**
      * Run the command.
      *
@@ -1221,6 +1829,7 @@ final class DownloadCommand
     {
     }
 }
+
 /**
  * CLI command `bg_gdrive.php` (F8.1).
  *
@@ -1229,107 +1838,19 @@ final class DownloadCommand
  */
 final class GDriveCommand
 {
+    /**
+     * Run the command.
+     *
+     * Copies every queued Drive file to the mirror accounts, drops the completed queue rows and
+     * removes the pid file.
+     *
+     * @return string stdout message ('' = no message), used by the shim as the exit() argument
+     */
     public function handle(): string
     {
     }
 }
-/**
- * Pemeliharaan disk/runtime dan direktori.
- *
- * Split out of `GeneralCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GeneralCommand` through this trait.
- */
-trait GeneralMaintenanceTrait
-{
-    /**
-     * Clean the cache when free disk space < 10 GB, and drop cache files older than the timeout.
-     *
-     * Age is measured per cache file, never from the directory mtime: writing
-     * `cache/files/<host>/<host_id>/…` does not touch the parent directory, so a
-     * directory check deletes files that are still in use.
-     */
-    protected function cleanupDisk(\GDPlayer\Service\Background\Background $background, \GDPlayer\Config\Config $config): void
-    {
-    }
-    /**
-     * Check the license, active connections, orphaned Chrome processes, and drop expired video sources.
-     */
-    protected function cleanupRuntime(): \GDPlayer\Service\Background\Background
-    {
-    }
-    /**
-     * Pastikan seluruh direktori runtime ada.
-     */
-    protected function ensureDirectories(): void
-    {
-    }
-    /**
-     * Write the uploads folder `.htaccess` (blocks execution of sensitive files).
-     */
-    protected function ensureUploadsHtaccess(): void
-    {
-    }
-    /**
-     * Delete cache files older than `$maxAge` seconds, recursively.
-     *
-     * @param string $dir cache root
-     * @param int $maxAge seconds
-     */
-    protected function pruneCacheDirectory(string $dir, int $maxAge): void
-    {
-    }
-}
-/**
- * Sinkronisasi tema, plugin, dan proxy.
- *
- * Split out of `GeneralCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GeneralCommand` through this trait.
- *
- * Server sumber membalas stamp isi folder; arsip hanya dibangun & diunduh saat stamp
- * berbeda dari yang terakhir dipasang, jadi siklus tanpa perubahan tidak memindahkan byte.
- */
-trait GeneralSyncTrait
-{
-    /** Jumlah percobaan ping+unduh sebelum menyerah (properti: PHP 8.1 tanpa trait const). */
-    private int $maxAttempts = 5;
-    /**
-     * Install a downloaded plugin: reject an unsafe folder, extract, then re-index plugin routes.
-     *
-     * @param array<string, mixed> $pluginRow plugin row (needs 'id' and 'folder')
-     * @param string               $downloaded downloaded archive path
-     */
-    protected function extractPluginDownload(array $pluginRow, string $downloaded): void
-    {
-    }
-    /**
-     * Minta stamp isi folder dari server sumber, dengan backoff 2^n detik.
-     *
-     * @param callable(): (string|false) $ping       permintaan stamp
-     * @param array<string, mixed>       $logContext konteks log
-     * @return string stamp, atau '' bila sudah mutakhir / server ini sumbernya
-     */
-    protected function fetchStamp(callable $ping, array $logContext): string
-    {
-    }
-    /**
-     * Unduh & pasang ulang tema aktif bila isinya berubah.
-     */
-    protected function syncActiveTheme(): void
-    {
-    }
-    /**
-     * Unduh & pasang ulang berkas plugin aktif yang isinya berubah.
-     */
-    protected function syncPlugins(): void
-    {
-    }
-    /**
-     * Refresh the proxy list, then check its health.
-     */
-    protected function updateProxies(): void
-    {
-    }
-}
+
 /**
  * CLI command `bg_general.php` (F8.1).
  *
@@ -1338,13 +1859,8 @@ trait GeneralSyncTrait
  */
 final class GeneralCommand
 {
-    use \GDPlayer\Console\Commands\GeneralMaintenanceTrait;
-    use \GDPlayer\Console\Commands\GeneralSyncTrait;
-    /**
-     * Run the command.
-     *
-     * @return string stdout message ('' = no message), used by the shim as the exit() argument
-     */
+    /** Number of ping+download attempts before giving up. */
+    private int $maxAttempts = 5;
     /**
      * Run all background tasks.
      *
@@ -1355,124 +1871,7 @@ final class GeneralCommand
     {
     }
 }
-/**
- * Query data lama dan perbaikan datanya.
- *
- * Split out of `MigrateCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrateCommand` through this trait.
- */
-trait MigrateDataQueryTrait
-{
-    /**
-     * Tidy legacy data, then delete orphaned rows (settings, gdrive, subtitle, stats).
-     *
-     * @return list<string>
-     */
-    protected function buildDataFixQueries(): array
-    {
-    }
-    /**
-     * Data migration queries; the order is videos -> maxmind -> stats as in the legacy list.
-     *
-     * @return list<string>
-     */
-    protected function buildDataQueries(\PDO $pdoWrite): array
-    {
-    }
-    /**
-     * `tb_videos` data migration (rename + batch procedure) when there are rows to clean up.
-     *
-     * @return list<string>
-     */
-    protected function buildVideoDataQueries(\PDO $pdoWrite): array
-    {
-    }
-}
-/**
- * Query kunci/indeks saat migrasi.
- *
- * Split out of `MigrateCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrateCommand` through this trait.
- */
-trait MigrateKeyQueryTrait
-{
-    /**
-     * Key queries dropped before data moves: foreign keys, indexes, then create/modify table.
-     *
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $groups schema builder per domain
-     * @return list<string>
-     */
-    protected function buildKeyQueries(array $groups): array
-    {
-    }
-    /**
-     * Key queries restored after data moves: indexes then foreign keys.
-     *
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $groups schema builder per domain
-     * @return list<string>
-     */
-    protected function buildKeyRestoreQueries(array $groups): array
-    {
-    }
-}
-/**
- * Query skema: drop, view, maintenance, maxmind.
- *
- * Split out of `MigrateCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrateCommand` through this trait.
- */
-trait MigrateSchemaQueryTrait
-{
-    /**
-     * Drop leftover legacy schema: events, procedures, tables, then views.
-     *
-     * @return list<string>
-     */
-    protected function buildDropQueries(): array
-    {
-    }
-    /**
-     * ANALYZE + CHECK for `tb_*` tables (only drivers that support `SHOW TABLES`).
-     *
-     * @return list<string>
-     */
-    protected function buildMaintenanceQueries(\PDO $pdoWrite): array
-    {
-    }
-    /**
-     * Rebuild `tb_maxmind` (dedupe per ip/prefix).
-     *
-     * @return list<string>
-     */
-    protected function buildMaxmindQueries(): array
-    {
-    }
-    /**
-     * Buat ulang view inti (loadbalancers, subtitle_manager, users, videos).
-     *
-     * @return list<string>
-     */
-    protected function buildViewQueries(): array
-    {
-    }
-}
-/**
- * Query statistik saat migrasi.
- *
- * Split out of `MigrateCommand` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrateCommand` through this trait.
- */
-trait MigrateStatsQueryTrait
-{
-    /**
-     * Migrasi data `tb_stats` (rename + prosedur batch) bila ada ua non-numerik.
-     *
-     * @return list<string>
-     */
-    protected function buildStatsDataQueries(\PDO $pdoWrite): array
-    {
-    }
-}
+
 /**
  * CLI command `migrate.php` (F8.1) — new entry `resources/migrate.php`, formerly `includes/migrate.php`.
  *
@@ -1481,10 +1880,8 @@ trait MigrateStatsQueryTrait
  */
 final class MigrateCommand
 {
-    use \GDPlayer\Console\Commands\MigrateDataQueryTrait;
-    use \GDPlayer\Console\Commands\MigrateKeyQueryTrait;
-    use \GDPlayer\Console\Commands\MigrateSchemaQueryTrait;
-    use \GDPlayer\Console\Commands\MigrateStatsQueryTrait;
+    private const MIGRATION_FAIL = "❌ Failed\n";
+    private const MIGRATION_OK = "✅ Success\n";
     /**
      * Run the command.
      *
@@ -1500,6 +1897,7 @@ final class MigrateCommand
     {
     }
 }
+
 /**
  * CLI command `bg_stats.php` (F8.1).
  *
@@ -1508,6 +1906,10 @@ final class MigrateCommand
  */
 final class StatsCommand
 {
+    /** Rows fetched per page, hard cap for one keyset batch. */
+    private const PAGE_SIZE = 1000;
+    /** @var array<int, true> ASN ids already present in `tb_maxmind_asn` during this run */
+    private array $knownAsnIds = [];
     /**
      * Run the command.
      *
@@ -1517,6 +1919,7 @@ final class StatsCommand
     {
     }
 }
+
 namespace GDPlayer\Core;
 
 /**
@@ -1527,14 +1930,20 @@ namespace GDPlayer\Core;
  */
 final class API
 {
+    private \GDPlayer\Config\BinFile $binConfig;
+    private \GDPlayer\Config\Config $config;
+    private ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    private \GDPlayer\Core\Security\Security $security;
     /**
      * Bind the binary config, settings and security services.
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request PSR-7 request
+     * @param ServerRequestInterface|null $request PSR-7 request
      */
     public function __construct(?\Psr\Http\Message\ServerRequestInterface $request = null)
     {
     }
     /**
+     * Expose the application info when the object is dumped.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
@@ -1549,21 +1958,68 @@ final class API
     {
     }
 }
+
 /**
- * Pipeline sumber data & validasi kelas host.
+ * Source resolution orchestrator for a single video.
  *
- * Split out of `Core` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Core` through this trait.
+ * Dispatches to the matching hosting extractor, applies host health/blocking
+ * rules and caches the resolved sources.
  */
-trait CoreSourceTrait
+final class Core
 {
+    private \GDPlayer\Config\BinFile $binConfig;
+    private string $clientIp = '';
+    private string $email = '';
+    private bool $isDownloadable = false;
+    private \GDPlayer\Model\LoadBalancer $loadBalancerModel;
     /**
+     * @var array{
+     *     sources:list<array{file:string,type:string,label:string}>,
+     *     tracks:list<array{file:string,label:string}>,
+     *     referer:string,
+     *     title:string,
+     *     email:string,
+     *     image:string,
+     *     cookies:array<int,string>,
+     *     filmstrip:string,
+     *     clientip:string
+     * } $resultFormat
+     */
+    private array $resultFormat = ['sources' => [], 'tracks' => [], 'referer' => '', 'title' => '', 'email' => '', 'image' => '', 'cookies' => [], 'filmstrip' => '', 'clientip' => ''];
+    private \GDPlayer\Core\Security\Security $security;
+    private ?int $serverId = null;
+    private string $serverIp = '';
+    private string $userAgent = USER_AGENT;
+    private string $userLanguage = \GDPlayer\Config\App::ACCEPT_LANGUAGE;
+    private string $videoHost = 'direct';
+    private string $videoHostId = '';
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
+    /** @var list<list<string|int|null>> $criteriaArray */
+    protected array $criteriaArray = [];
+    /**
+     * @param array<string,mixed> $query
+     * @return void
+     */
+    public function __construct(array $query = [])
+    {
+    }
+    /**
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Read the cached source record, deleting it when it holds no usable sources.
+     *
      * @return array<string,mixed>
      */
     protected function filterDataSources(): array
     {
     }
     /**
+     * Run the host extractor and collect its sources, tracks, metadata and cookies.
+     *
      * @return array<string,mixed>
      */
     protected function getOriginalSources(): array
@@ -1579,32 +2035,11 @@ trait CoreSourceTrait
     {
     }
     /**
+     * Look up the cached source record matching the current host, client and download flag.
+     *
      * @return array<string,mixed>
      */
     public function getDataSources(): array
-    {
-    }
-}
-/**
- * Source resolution orchestrator for a single video.
- *
- * Dispatches to the matching hosting extractor, applies host health/blocking
- * rules and caches the resolved sources.
- */
-final class Core
-{
-    use \GDPlayer\Core\CoreSourceTrait;
-    /**
-     * @param array<string,mixed> $query
-     * @return void
-     */
-    public function __construct(array $query = [])
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
     {
     }
     /**
@@ -1639,343 +2074,6 @@ final class Core
     {
     }
 }
-namespace GDPlayer\Helper\Core;
-
-/**
- * Shared base for every video-host extractor.
- *
- * Boots the common services (config, headless Chrome, anti-captcha) and exposes the
- * getters/setters each extractor fills in while resolving sources. HTTP requests go
- * through `Http\Fetcher` (see `Core\Extractor::createRequestFetcher()`), so this class
- * owns no cURL handle.
- */
-abstract class CoreHelper
-{
-    /** @var null|array<string,mixed> $accessToken */
-    protected ?array $accessToken;
-    /** @var string[] $cookies */
-    protected array $cookies = [];
-    protected string $email = '';
-    protected string $filmstrip = '';
-    protected string $host;
-    protected string $id = '';
-    protected string $image = '';
-    /** @var array<int<0,max>,mixed> $mp4Sources */
-    protected array $mp4Sources = [];
-    protected \GDPlayer\Helper\Core\CoreHelperOptions $options;
-    protected string $referer = '';
-    protected \GDPlayer\Helper\Core\CoreHelperServices $services;
-    /** @var array<int<0,max>,mixed> $sources */
-    protected array $sources = [];
-    protected string $status = 'fail';
-    protected string $title = '';
-    /** @var array<int<0,max>,mixed> $tracks */
-    protected array $tracks = [];
-    protected string $url;
-    protected string $userAgent = USER_AGENT;
-    /**
-     * Initialize the shared services and bind the host from the concrete class name.
-     */
-    public function __construct()
-    {
-    }
-    /**
-     * Process AJAX requests to find m3u8 files
-     *
-     * @param array<string, mixed> $chromeResponse
-     */
-    protected function chromeAjaxResponseParser(array $chromeResponse): void
-    {
-    }
-    /**
-     * @return string[]
-     */
-    protected function getCustomCookies(): array
-    {
-    }
-    protected function googleLabel(string $itag = ''): string
-    {
-    }
-    protected function sanitizeTitle(string $title): string
-    {
-    }
-    /**
-     * Return the collected cookies as a single Cookie header value.
-     *
-     * @return string semicolon-separated cookie pairs
-     */
-    public function getCookies(): string
-    {
-    }
-    /**
-     * Return the account email associated with the extraction.
-     *
-     * @return string email address, or an empty string when not set
-     */
-    public function getEmail(): string
-    {
-    }
-    /**
-     * Return the filmstrip (thumbnail sprite) URL.
-     *
-     * @return string filmstrip URL, or an empty string when disabled by settings
-     */
-    public function getFilmstrip(): string
-    {
-    }
-    /**
-     * Return the poster image URL, honoring the force-default-poster setting.
-     *
-     * @return string poster image URL
-     */
-    public function getImage(): string
-    {
-    }
-    /**
-     * Return the network interface address used for the extraction.
-     *
-     * @return string interface hostname or IP address
-     */
-    public function getNetworkInterface(): string
-    {
-    }
-    /**
-     * Return the referer used for the extraction requests.
-     *
-     * @return string referer URL
-     */
-    public function getReferer(): string
-    {
-    }
-    /**
-     * @return array<int<0,max>,mixed>
-     */
-    public function getSources(): array
-    {
-    }
-    /**
-     * Return the extraction status.
-     *
-     * @return string Status flag (e.g. 'ok' or 'fail').
-     */
-    public function getStatus(): string
-    {
-    }
-    /**
-     * Return the sanitized media title.
-     *
-     * @return string sanitized title
-     */
-    public function getTitle(): string
-    {
-    }
-    /**
-     * @return array<int<0,max>,mixed>
-     */
-    public function getTracks(): array
-    {
-    }
-    /**
-     * Set whether the media can be downloaded.
-     *
-     * @param bool $isDownloadable download availability flag
-     * @return self fluent instance
-     */
-    public function setDownloadable(bool $isDownloadable = false): self
-    {
-    }
-    /**
-     * Set the account email for the extraction.
-     *
-     * @param string $email email address
-     * @return self fluent instance
-     */
-    public function setEmail(string $email = ''): self
-    {
-    }
-    /**
-     * Set the video host and configure its proxy when the host is eligible.
-     *
-     * @param string $host host identifier or fully-qualified extractor class name
-     * @return self fluent instance
-     */
-    public function setHost(string $host = ''): self
-    {
-    }
-}
-namespace GDPlayer\Core\Extractor;
-
-/**
- * Parsing respons Cloudflare dan DOM halaman sumber.
- *
- * Split out of `Extractor` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Extractor` through this trait.
- */
-trait ParseTrait
-{
-    protected function getCFSources(): void
-    {
-    }
-    protected function getDOMTitle(string $url = '', string $titleElm = 'title'): void
-    {
-    }
-    protected function parseCFResponse(string $response): void
-    {
-    }
-    protected function parseCFTracks(): void
-    {
-    }
-    protected function processDOMTitle(?string $response, string $titleElm = 'title'): void
-    {
-    }
-}
-/**
- * Builds a single `Extractor` HTTP request: headers, referer, proxy, and cookie hooks.
- *
- * Split out of `Extractor` so that class only carries the extraction flow
- * (rule of <=20 methods per class). This trait is used only by `Extractor`; it reads the class
- * properties (host, referer, cookies, clientIp, networkInterface, proxy, usingProxy) as-is.
- */
-trait RequestTrait
-{
-    /**
-     * @return string[]
-     */
-    private function createBrowserBasedHeaders(): array
-    {
-    }
-    /**
-     * Fetcher for a single request to this host, using the same proxy order as before:
-     * WARP (when this host qualifies) first, then the rotating proxy overrides it.
-     *
-     * @param string $method HTTP method ('' = no CUSTOMREQUEST, same as before)
-     * @param string $body request body for non-GET methods
-     * @param bool $followRedirects false when the caller needs to read `Location` itself
-     * @param int $connectTimeout connection limit in seconds (0 = transport default)
-     * @param int $timeout single-request limit in seconds (the multi path uses 15 s)
-     */
-    protected function createRequestFetcher(string $method = 'GET', string $body = '', bool $followRedirects = true, int $connectTimeout = 0, int $timeout = 60): \GDPlayer\Http\Fetcher\Fetcher
-    {
-    }
-    /**
-     * @param string $url
-     * @param string[] $customHeaders
-     * @return string[]
-     */
-    protected function createRequestHeaders(string $url = '', array $customHeaders = []): array
-    {
-    }
-    /**
-     * @param string $headerLine raw header from upstream
-     * @return int length of the processed header
-     */
-    protected function headerCallback(string $headerLine): int
-    {
-    }
-    /**
-     * @param string $url
-     * @return string[]
-     */
-    // Protected, bukan private: satu-satunya pemanggil adalah RequestTrait
-    // ($this->parseCustomHeaders). Intelephense (P1003) & Sonar (S1144) tidak menghitung
-    // pemakaian di dalam trait sebagai pemakaian method kelas, jadi `private` akan
-    // salah dilaporkan "declared but not used".
-    protected function parseCustomHeaders(string $url = ''): array
-    {
-    }
-    /**
-     * Ready-to-use request headers for one call (including the active network interface).
-     *
-     * @param string[] $headers extra headers
-     * @return string[] normalized header lines
-     */
-    protected function prepareRequestHeaders(string $url, array $headers = []): array
-    {
-    }
-    /**
-     * @return array{proxy: string, type: int, usrpwd: string}|null
-     */
-    protected function resolveProxy(): ?array
-    {
-    }
-}
-/**
- * Base class for the concrete per-host extractors.
- *
- * Provides the shared HTTP/headless-browser plumbing and the contract that each
- * hosting extractor implements to resolve playable sources.
- */
-abstract class Extractor extends \GDPlayer\Helper\Core\CoreHelper
-{
-    use \GDPlayer\Core\Extractor\ParseTrait;
-    use \GDPlayer\Core\Extractor\RequestTrait;
-    protected const CLOSE = '"';
-    protected string $baseURL = '';
-    /** @var array<string,mixed> $cfCustomData */
-    protected array $cfCustomData = [];
-    protected string $cfSources = '';
-    protected string $cfTracks = '';
-    protected string $clientIp = '';
-    /** @var array<string,mixed> $loggerDefaultContext */
-    protected array $loggerDefaultContext = [];
-    protected ?\Psr\Http\Message\ServerRequestInterface $request = null;
-    protected bool $usingProxy = false;
-    /**
-     * @param string $id host-specific media identifier
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request PSR-7 request
-     */
-    public function __construct(string $id = '', ?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    protected function createCustomReferer(): void
-    {
-    }
-    /**
-     * @param string $url
-     * @param string[] $headers
-     * @param null|callable $success
-     * @param string $method
-     * @return mixed
-     */
-    protected function curlRequest(string $url = '', array $headers = [], ?callable $success = null, string $method = 'GET'): mixed
-    {
-    }
-    /**
-     * Check every source at once: one HEAD request per source, run concurrently
-     * through `Http\FetcherPool` (handles are created and closed by the pool, not here).
-     *
-     * @param array<array<string,mixed>> $sources
-     * @param string[] $customHeaders
-     * @return array<int|string, \GDPlayer\Http\Fetcher\FetchResult> results keyed by source index
-     */
-    protected function getMultiSources(array $sources, array $customHeaders = []): array
-    {
-    }
-    /**
-     * @param array<array<string,mixed>> $oldSources
-     * @return array<array<string,mixed>>
-     */
-    protected function getNewSources(array $oldSources = []): array
-    {
-    }
-    protected function getType(string $url = ''): string
-    {
-    }
-    /**
-     * @param array<string|int, array<string, mixed>> $tracks
-     * @return void
-     */
-    protected function parseTracks(array $tracks = []): void
-    {
-    }
-}
-namespace GDPlayer\Core;
 
 /**
  * Filmstrip (thumbnail sprite) and WebVTT preview generator.
@@ -1984,13 +2082,20 @@ namespace GDPlayer\Core;
  */
 final class Filmstrip
 {
+    private int $imageHeight = 0;
+    /** @var array<string|int, string|int> $imageInfo */
+    private array $imageInfo = [];
+    private string $imageURL = '';
+    private int $imageWidth = 0;
+    private int $thumbCount = 0;
+    private int $thumbDuration = 0;
+    private int $thumbHeight = 0;
+    private int $thumbWidth = 0;
+    private string $tmpDir = \GDPlayer\Config\App::TMP_PATH . 'img/';
+    private string $tmpFile = '';
     /**
-     * Resolve the working directory for generated thumbnails.
-     */
-    public function __construct()
-    {
-    }
-    /**
+     * Expose the application info block instead of the internal sprite state.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
@@ -2027,66 +2132,189 @@ final class Filmstrip
     {
     }
 }
-namespace GDPlayer\Core\Hosting;
+
+namespace GDPlayer\Core\Extractor;
 
 /**
- * Parser array sources/tracks beserta metadata.
+ * Base class for the concrete per-host extractors.
  *
- * Split out of `XVFSParser` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `XVFSParser` through this trait.
+ * Provides the shared HTTP/headless-browser plumbing and the contract that each
+ * hosting extractor implements to resolve playable sources.
  */
-trait ArrayTrait
+abstract class Extractor extends \GDPlayer\Helper\Core\CoreHelper
 {
+    public const CLOSE = '"';
+    protected string $baseURL = '';
+    /** @var array<string,mixed> $cfCustomData */
+    protected array $cfCustomData = [];
+    protected string $cfSources = '';
+    protected string $cfTracks = '';
+    protected string $clientIp = '';
+    /** @var array<string,mixed> $loggerDefaultContext */
+    protected array $loggerDefaultContext = [];
+    protected ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    protected bool $usingProxy = false;
     /**
-     * @param array<string,mixed> $playerConfigArray
-     * @return void
+     * @param string $id host-specific media identifier
+     * @param ServerRequestInterface|null $request PSR-7 request
      */
-    protected function parseArray(array $playerConfigArray = []): void
+    public function __construct(string $id = '', ?\Psr\Http\Message\ServerRequestInterface $request = null)
     {
     }
     /**
-     * @param array<string,mixed> $playerConfigArray
-     * @return void
+     * @return array<string, mixed>
      */
-    protected function parseArrayMetadata(array $playerConfigArray): void
+    public function __debugInfo(): array
     {
     }
     /**
-     * @param array<string,mixed> $playerConfigArray
-     * @return void
+     * Derive the referer from the configured referer, base URL, source URL or hosting download link, in that order.
      */
-    protected function parseArraySources(array $playerConfigArray): void
+    protected function createCustomReferer(): void
     {
     }
     /**
-     * @param array<string,mixed> $playerConfigArray
+     * Fetcher for a single request to this host, using the same proxy order as before:
+     * WARP (when this host qualifies) first, then the rotating proxy overrides it.
+     *
+     * @param string $method HTTP method ('' = no CUSTOMREQUEST, same as before)
+     * @param string $body request body for non-GET methods
+     * @param bool $followRedirects false when the caller needs to read `Location` itself
+     * @param int $connectTimeout connection limit in seconds (0 = transport default)
+     * @param int $timeout single-request limit in seconds (the multi path uses 15 s)
+     */
+    protected function createRequestFetcher(string $method = 'GET', string $body = '', bool $followRedirects = true, int $connectTimeout = 0, int $timeout = 60): \GDPlayer\Http\Fetcher\Fetcher
+    {
+    }
+    /**
+     * @param string $url
+     * @param string[] $customHeaders
+     * @return string[]
+     */
+    protected function createRequestHeaders(string $url = '', array $customHeaders = []): array
+    {
+    }
+    /**
+     * @param string $url
+     * @param string[] $headers
+     * @param null|callable $success
+     * @param string $method
+     * @return mixed
+     */
+    protected function curlRequest(string $url = '', array $headers = [], ?callable $success = null, string $method = 'GET'): mixed
+    {
+    }
+    /**
+     * Ask the licence endpoint for the Cloudflare source bundle and merge it into the parser state.
+     *
+     * The POST carries the host id and client IP plus plugin-supplied custom data; a non-200 reply
+     * is logged and leaves the current state untouched.
+     */
+    protected function getCFSources(): void
+    {
+    }
+    /**
+     * Fetch the page and store the text of the first matching title element as the item title.
+     *
+     * @param string $url page to fetch
+     * @param string $titleElm CSS selector whose first match supplies the title
+     */
+    protected function getDOMTitle(string $url = '', string $titleElm = 'title'): void
+    {
+    }
+    /**
+     * Check every source at once: one HEAD request per source, run concurrently
+     * through `Http\FetcherPool` (handles are created and closed by the pool, not here).
+     *
+     * @param array<array<string,mixed>> $sources
+     * @param string[] $customHeaders
+     * @return array<int|string, FetchResult> results keyed by source index
+     */
+    protected function getMultiSources(array $sources, array $customHeaders = []): array
+    {
+    }
+    /**
+     * @param array<array<string,mixed>> $oldSources
+     * @return array<array<string,mixed>>
+     */
+    protected function getNewSources(array $oldSources = []): array
+    {
+    }
+    /**
+     * Map a URL to the HLS, MPD or progressive video type by its file extension.
+     *
+     * @param string $url source URL to inspect
+     * @return string detected media type
+     */
+    protected function getType(string $url = ''): string
+    {
+    }
+    /**
+     * @param string $headerLine raw header from upstream
+     * @return int length of the processed header
+     */
+    protected function headerCallback(string $headerLine): int
+    {
+    }
+    /**
+     * Unpack a successful Cloudflare API payload into the referer, cookies, sources and tracks fields.
+     *
+     * A failing status only logs the server message; mp4Sources are used when no regular sources exist.
+     * @param string $response raw JSON body from the licence endpoint
+     */
+    protected function parseCFResponse(string $response): void
+    {
+    }
+    /**
+     * Rebuild the subtitle track list from the Cloudflare track markup, skipping upload captions.
+     *
+     * Parse errors are logged and leave the previously collected tracks in place.
+     */
+    protected function parseCFTracks(): void
+    {
+    }
+    /**
+     * @param string $url
+     * @return string[]
+     */
+    protected function parseCustomHeaders(string $url = ''): array
+    {
+    }
+    /**
+     * @param array<string|int, array<string, mixed>> $tracks
      * @return void
      */
-    protected function parseArrayTracks(array $playerConfigArray): void
+    protected function parseTracks(array $tracks = []): void
+    {
+    }
+    /**
+     * Ready-to-use request headers for one call (including the active network interface).
+     *
+     * @param string[] $headers extra headers
+     * @return string[] normalized header lines
+     */
+    protected function prepareRequestHeaders(string $url, array $headers = []): array
+    {
+    }
+    /**
+     * Read the first matching title element out of an HTML body and store its trimmed text.
+     *
+     * @param ?string $response HTML body; null or empty clears the title
+     * @param string $titleElm CSS selector whose first match supplies the title
+     */
+    protected function processDOMTitle(?string $response, string $titleElm = 'title'): void
+    {
+    }
+    /**
+     * @return array{proxy: string, type: int, usrpwd: string}|null
+     */
+    protected function resolveProxy(): ?array
     {
     }
 }
-/**
- * Ekstraksi host dan id dari URL/query.
- *
- * Split out of `Hosting` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Hosting` through this trait.
- */
-trait ExtractTrait
-{
-    protected function extractHost(): void
-    {
-    }
-    protected function extractID(): void
-    {
-    }
-    protected function extractPathId(string $path = '', string $query = ''): void
-    {
-    }
-    protected function hasExtractedQueryId(string $query = ''): bool
-    {
-    }
-}
+
+namespace GDPlayer\Core\Hosting;
+
 /**
  * Video-host URL resolver.
  *
@@ -2095,17 +2323,96 @@ trait ExtractTrait
  */
 final class Hosting
 {
-    use \GDPlayer\Core\Hosting\ExtractTrait;
+    private \GDPlayer\Config\Config $config;
+    /** @var array<string,mixed> $downloadUrls */
+    private array $downloadUrls = [];
+    /** @var string[] $fullPathId */
+    private array $fullPathId = [];
+    /** @var string[] $fullPathQryId */
+    private array $fullPathQryId = [];
+    /** @var string[] $fullQryId */
+    private array $fullQryId = [];
+    private string $host = 'direct';
+    /** @var array<string,mixed> $hostnameList */
+    private array $hostnameList = [];
+    private string $id = '';
+    /** @var string[] $lastPathId */
+    private array $lastPathId = [];
+    /** @var string[] $onePathId */
+    private array $onePathId = [];
+    /** @var string[] $removeFromId */
+    private array $removeFromId = [];
+    private string $url = '';
+    /** @var string[] $zeroPathId */
+    private array $zeroPathId = [];
     /**
+     * Load the hostname tables, then resolve `$url` when one is given.
+     *
+     * Custom hostnames from the `custom-hostnames` setting override the bundled defaults.
+     *
      * @param string $url optional media URL to resolve immediately
      */
     public function __construct(string $url = '')
     {
     }
     /**
+     * Expose the application info block instead of the hostname tables.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
+    {
+    }
+    /**
+     * Resolve the host key from the URL, falling back to `direct`.
+     *
+     * Each configured hostname maps to a canonical host name; the first domain
+     * part that matches a known name wins. Host-specific quirks are applied
+     * last through {@see handleSpecialHostOverrides()}.
+     */
+    protected function extractHost(): void
+    {
+    }
+    /**
+     * Derive the media id from the URL, query string, or path.
+     *
+     * `direct` and Dzen URLs keep the whole URL as the id; Google Drive ids come
+     * from the shared helper, and every other host tries the query before the
+     * path.
+     */
+    protected function extractID(): void
+    {
+    }
+    /**
+     * Pick the id segment out of the URL path for the current host.
+     *
+     * Each host maps to exactly one path form, so a single `match` decides which
+     * segment (or whole path) becomes the id.
+     *
+     * @param string $path URL path
+     * @param string $query URL query string, appended for hosts that need both
+     */
+    protected function extractPathId(string $path = '', string $query = ''): void
+    {
+    }
+    /**
+     * Override the extracted host for providers whose URL alone identifies them.
+     *
+     * PeerTube instance paths map to `peertube`; Rumble, Mail.ru weblinks and archive.org download links
+     * map to `direct`.
+     *
+     * @return void
+     */
+    protected function handleSpecialHostOverrides(): void
+    {
+    }
+    /**
+     * Read the id from the query string for hosts that expose one there.
+     *
+     * @param string $query raw query string
+     * @return bool true when a host rule matched and the id was replaced
+     */
+    protected function hasExtractedQueryId(string $query = ''): bool
     {
     }
     /**
@@ -2160,30 +2467,7 @@ final class Hosting
     {
     }
 }
-/**
- * Parser konfigurasi per provider (jwplayer, earnvids, js, mixdrop, mp4upload).
- *
- * Split out of `XVFSParser` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `XVFSParser` through this trait.
- */
-trait ProviderTrait
-{
-    protected function defaultJwplayerParser(string $response, string $jwpStart = 'jwplayer("vplayer").setup(', string $jwpEnd = ');'): void
-    {
-    }
-    protected function earnvidsParser(string $response): void
-    {
-    }
-    protected function jsConfigParser(string $script = '', string $searchStart = '', string $searchEnd = ''): void
-    {
-    }
-    protected function mixdropParser(string $response): void
-    {
-    }
-    protected function mp4uploadParser(string $script = ''): void
-    {
-    }
-}
+
 /**
  * Base parser for XVFS-style hosts that embed sources in page markup.
  *
@@ -2192,29 +2476,145 @@ trait ProviderTrait
  */
 abstract class XVFSParser extends \GDPlayer\Core\Extractor\Extractor
 {
-    use \GDPlayer\Core\Hosting\ArrayTrait;
-    use \GDPlayer\Core\Hosting\ProviderTrait;
     protected const EVAL = 'eval(function(p,a,c,k,e,d)';
     protected const MSG_JSCONVERTER_FAILED = 'Failed to parse JS config into array';
+    protected string $close = '"';
     /**
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
+    /**
+     * Pull the jwplayer setup payload out of a page and parse it into sources.
+     *
+     * @param string $response raw page body
+     * @param string $jwpStart marker that opens the player config
+     * @param string $jwpEnd marker that closes the player config
+     */
+    protected function defaultJwplayerParser(string $response, string $jwpStart = 'jwplayer("vplayer").setup(', string $jwpEnd = ');'): void
+    {
+    }
+    /**
+     * Take the highest available hls variant from an earnvids page as the source.
+     *
+     * @param string $response raw page body
+     */
+    protected function earnvidsParser(string $response): void
+    {
+    }
+    /**
+     * Convert a JS object literal slice into an array and hand it to the parser.
+     *
+     * @param string $script script body to read from
+     * @param string $searchStart marker that opens the config object
+     * @param string $searchEnd marker that closes the config object
+     */
+    protected function jsConfigParser(string $script = '', string $searchStart = '', string $searchEnd = ''): void
+    {
+    }
+    /**
+     * Read the stream URL, poster and referrer out of a mixdrop page.
+     *
+     * @param string $response raw page body
+     */
+    protected function mixdropParser(string $response): void
+    {
+    }
+    /**
+     * Extract the mp4upload player source and poster from a minified script.
+     *
+     * @param string $script script body to read from
+     */
+    protected function mp4uploadParser(string $script = ''): void
+    {
+    }
+    /**
+     * Parse a JW Player style config array: metadata, tracks, then sources.
+     *
+     * @param array<string,mixed> $playerConfigArray decoded player configuration
+     * @return void
+     */
+    protected function parseArray(array $playerConfigArray = []): void
+    {
+    }
+    /**
+     * Read the title and poster from a player config.
+     *
+     * `chromecast.media.title` wins over `title`; `image` wins over `poster`.
+     * Both fields are reset to an empty string when neither key is usable.
+     *
+     * @param array<string,mixed> $playerConfigArray decoded player configuration
+     * @return void
+     */
+    protected function parseArrayMetadata(array $playerConfigArray): void
+    {
+    }
+    /**
+     * Collect sources from `sources`, its first string element, and `file`.
+     *
+     * Existing sources are kept, so a later call never duplicates or overrides
+     * what an earlier parser already found.
+     *
+     * @param array<string,mixed> $playerConfigArray decoded player configuration
+     * @return void
+     */
+    protected function parseArraySources(array $playerConfigArray): void
+    {
+    }
+    /**
+     * Hand the config's subtitle tracks to the shared track parser.
+     *
+     * `externalTracks` wins; otherwise `tracks` is accepted as an array or as a
+     * JSON/JS object literal, which is converted and logged on failure.
+     *
+     * @param array<string,mixed> $playerConfigArray decoded player configuration
+     * @return void
+     */
+    protected function parseArrayTracks(array $playerConfigArray): void
+    {
+    }
+    /**
+     * Parse the obfuscated script captured from a Cloudflare-protected page.
+     *
+     * The script is unpacked and minified first, then routed to the host-specific
+     * parser or the generic source scanner.
+     */
     protected function parseCFSources(): void
     {
     }
+    /**
+     * Dispatch an embed page body to the parser that matches the current host.
+     *
+     * Unknown hosts fall back to the default JW Player parser.
+     *
+     * @param string|null $response embed page body, or null when the request failed
+     */
     protected function parseEmbedSources(?string $response): void
     {
     }
+    /**
+     * Unpack and minify a player script, then scan it for a known player setup.
+     *
+     * A script that cannot be unpacked is blanked and logged instead of aborting
+     * the extraction.
+     *
+     * @param string $script player script to scan
+     */
     protected function parseSources(string $script = ''): void
     {
     }
+    /**
+     * Return the page body with any packed eval block already unpacked.
+     *
+     * @param string $response raw page body
+     * @return string unpacked body, or the original when no eval block is present
+     */
     protected function unpackEvalContent(string $response): string
     {
     }
 }
+
 /**
  * Base parser for YetiShare-based file hosts.
  *
@@ -2222,22 +2622,43 @@ abstract class XVFSParser extends \GDPlayer\Core\Extractor\Extractor
  */
 abstract class YetiShare extends \GDPlayer\Core\Extractor\Extractor
 {
+    private const URLS = ['cyberfile' => 'https://cyberfile.me/video/embed/%s/640x320', 'iceyfile' => 'https://iceyfile.net/video/embed/%s/640x320', 'udrop' => 'https://www.udrop.com/video/embed/%s/640x320'];
     /**
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
+    /**
+     * Scrape the embed page for a file id, an mp4 URL or a `<source>` URL and fill the source list.
+     *
+     * A file id is preferred and delegated to parseSources(); otherwise only URLs carrying a
+     * download_token are accepted, and a miss leaves the status untouched.
+     */
     protected function getEmbedSources(): void
     {
     }
+    /**
+     * Read the download token off the #download-file button and call the direct_download endpoint.
+     *
+     * Missing nodes, a missing onclick attribute or an empty payload are logged and skipped.
+     * @param string $fileID numeric file id taken from the embed page
+     * @param string $html page markup holding the download button
+     */
     protected function parseDownloadHTML(string $fileID, string $html): void
     {
     }
+    /**
+     * Resolve a file id through file_details and store its openUrl target as the single source.
+     *
+     * The page title is reused as the item title; a missing html field is logged and skipped.
+     * @param string $fileID numeric file id to resolve
+     */
     protected function parseSources(string $fileID): void
     {
     }
 }
+
 /**
  * Bridge that resolves sources through the yt-dlp based Ytdlp host.
  */
@@ -2256,97 +2677,9 @@ final class YtdlpBridge extends \GDPlayer\Helper\Core\CoreHelper
     {
     }
 }
+
 namespace GDPlayer\Core\Parser;
 
-/**
- * Bootstrap video: validasi input dan penyiapan awal.
- *
- * Split out of `Parser` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Parser` through this trait.
- */
-trait BootstrapTrait
-{
-    /**
-     * @return null|array<string,mixed>
-     */
-    protected function bootstrapVideo(): ?array
-    {
-    }
-    /**
-     * @return null|array<string,mixed>
-     */
-    protected function bootstrapWithValidation(): ?array
-    {
-    }
-}
-/**
- * Penyusunan respons dan hasil parsing.
- *
- * Split out of `Parser` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Parser` through this trait.
- */
-trait ResponseTrait
-{
-    /**
-     * @param string $status
-     * @param string $message
-     * @return array{
-     *     query:array<string,mixed>,
-     *     status:string,
-     *     message:string,
-     *     embed_url?:string,
-     *     download_url?:string,
-     *     title?:string,
-     *     poster?:string,
-     *     filmstrip?:string,
-     *     sources?:array<mixed>,
-     *     tracks?:array<mixed>
-     * }
-     */
-    protected function createResponse(string $status = 'fail', string $message = ''): array
-    {
-    }
-    /**
-     * @return array<string,mixed>
-     */
-    public function getResult(): array
-    {
-    }
-}
-/**
- * Penyimpanan video, subtitle, dan status.
- *
- * Split out of `Parser` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Parser` through this trait.
- */
-trait SaveTrait
-{
-    /**
-     * @param string $qryHost
-     * @param string $qryId
-     * @return array<string,mixed>
-     */
-    protected function extractQuery(string $qryHost = 'host', string $qryId = 'id'): array
-    {
-    }
-    protected function saveNewVideo(): void
-    {
-    }
-    /**
-     * @param mixed $videoId
-     * @return array<mixed>
-     */
-    protected function saveVideoSubtitles(mixed $videoId): array
-    {
-    }
-    /**
-     * @param string $status
-     * @param array<string,mixed> $criteria
-     */
-    protected function updateVideoStatus(string $status = 'ok', array $criteria = []): void
-    {
-    }
-}
 /**
  * Query parser that resolves a request into video metadata and sources.
  *
@@ -2355,12 +2688,15 @@ trait SaveTrait
  */
 final class Parser
 {
-    use \GDPlayer\Core\Parser\BootstrapTrait;
-    use \GDPlayer\Core\Parser\ResponseTrait;
-    use \GDPlayer\Core\Parser\SaveTrait;
+    private \GDPlayer\Core\Parser\ParserBootstrap $bootstrap;
+    private \GDPlayer\Core\Parser\ParserMedia $media;
+    private \GDPlayer\Core\Parser\ParserResponse $response;
+    private \GDPlayer\Core\Parser\ParserSave $save;
+    private \GDPlayer\Core\Parser\ParserServices $services;
+    private \GDPlayer\Core\Parser\ParserState $state;
     /**
      * @param array<string,mixed>|array<int|string,array<mixed>|string> $queryParams
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request PSR-7 request
+     * @param ServerRequestInterface|null $request PSR-7 request
      * @return void
      */
     public function __construct(array $queryParams = [], ?\Psr\Http\Message\ServerRequestInterface $request = null)
@@ -2372,7 +2708,38 @@ final class Parser
     public function __debugInfo(): array
     {
     }
+    /**
+     * @return array<string,mixed>
+     */
+    public function getResult(): array
+    {
+    }
 }
+
+/**
+ * Bootstrap of {@see Parser}: input validation and initial request setup.
+ */
+final class ParserBootstrap
+{
+    /**
+     * @param ParserState $state request-scoped parser state
+     * @param ParserServices $services collaborators used to read settings and rows
+     * @param ParserResponse $response failure response builder
+     * @param ParserSave $save query extractor
+     */
+    public function __construct(private \GDPlayer\Core\Parser\ParserState $state, private \GDPlayer\Core\Parser\ParserServices $services, private \GDPlayer\Core\Parser\ParserResponse $response, private \GDPlayer\Core\Parser\ParserSave $save)
+    {
+    }
+    /**
+     * Run the whole bootstrap: license check, settings, context and core query validation.
+     *
+     * @return null|array<string,mixed> failure response, or null when bootstrapping succeeded
+     */
+    public function bootstrapWithValidation(): ?array
+    {
+    }
+}
+
 /**
  * Request-scoped helpers extracted from {@see Parser} (Sonar php:S1200).
  *
@@ -2385,7 +2752,7 @@ final class ParserContext
      * Store the alternative video row (`aid`/`ahost` query params) for the current video.
      *
      * @param array<int|string,mixed> $queryParams query string
-     * @param \GDPlayer\Core\Hosting\Hosting $hosting host resolver used to split the alternative URL
+     * @param Hosting $hosting host resolver used to split the alternative URL
      * @param int $videoId row id of the video the alternative belongs to
      */
     public static function altVideo(array $queryParams, \GDPlayer\Core\Hosting\Hosting $hosting, int $videoId = 0): void
@@ -2396,7 +2763,7 @@ final class ParserContext
      *
      * @param array<string,mixed> $appConfig settings row (disable_validation)
      * @param array<int|string,mixed> $queryParams query string
-     * @param \GDPlayer\Core\Security\Security $security security service used to encrypt the client IP
+     * @param Security $security security service used to encrypt the client IP
      * @return string token ('gt=...') or '' when validation is disabled
      */
     public static function clientToken(array $appConfig, ?\Psr\Http\Message\ServerRequestInterface $request, array $queryParams, \GDPlayer\Core\Security\Security $security): string
@@ -2422,6 +2789,119 @@ final class ParserContext
     {
     }
 }
+
+/**
+ * Parsed media identity: source hash, source URL, and subtitle tracks.
+ */
+final class ParserMedia
+{
+    /**
+     * @param ParserState $state request-scoped parser state
+     * @param ParserServices $services collaborators used to resolve media rows
+     */
+    public function __construct(private \GDPlayer\Core\Parser\ParserState $state, private \GDPlayer\Core\Parser\ParserServices $services)
+    {
+    }
+    /**
+     * Rewrite every source into a local bypass URL keyed by the video hash id.
+     *
+     * @param array<mixed> $sources
+     * @return array<mixed>
+     */
+    public function parseSources(array $sources = []): array
+    {
+    }
+    /**
+     * Rewrite subtitle track URLs into local bypass URLs and flag the default track.
+     *
+     * @param array<mixed> $tracks
+     * @return array<mixed>
+     */
+    public function parseTracks(array $tracks = []): array
+    {
+    }
+}
+
+/**
+ * Assembles the normalized parser result consumed by the API and player.
+ */
+final class ParserResponse
+{
+    /**
+     * @param ParserState $state request-scoped parser state
+     * @param ParserServices $services collaborators used to resolve video rows
+     * @param ParserMedia $media stream URL rewriter
+     * @param ParserSave $save persistence helper for the status update
+     */
+    public function __construct(private \GDPlayer\Core\Parser\ParserState $state, private \GDPlayer\Core\Parser\ParserServices $services, private \GDPlayer\Core\Parser\ParserMedia $media, private \GDPlayer\Core\Parser\ParserSave $save)
+    {
+    }
+    /**
+     * @param string $status
+     * @param string $message
+     * @return array{
+     *     query:array<string,mixed>,
+     *     status:string,
+     *     message:string,
+     *     embed_url?:string,
+     *     download_url?:string,
+     *     title?:string,
+     *     poster?:string,
+     *     filmstrip?:string,
+     *     sources?:array<mixed>,
+     *     tracks?:array<mixed>
+     * }
+     */
+    public function createResponse(string $status = 'fail', string $message = ''): array
+    {
+    }
+}
+
+/**
+ * Video, subtitle and status persistence of {@see Parser}.
+ */
+final class ParserSave
+{
+    /**
+     * @param ParserState $state request-scoped parser state
+     * @param ParserServices $services collaborators used to persist rows
+     */
+    public function __construct(private \GDPlayer\Core\Parser\ParserState $state, private \GDPlayer\Core\Parser\ParserServices $services)
+    {
+    }
+    /**
+     * @param string $qryHost
+     * @param string $qryId
+     * @return array<string,mixed>
+     */
+    public function extractQuery(string $qryHost = 'host', string $qryId = 'id'): array
+    {
+    }
+    /**
+     * Persist the video parsed from the current request when public saving is enabled.
+     *
+     * With a database source only the subtitles are stored; otherwise the hosting
+     * payload is de-duplicated per user before a new row is inserted.
+     */
+    public function saveNewVideo(): void
+    {
+    }
+    /**
+     * @param mixed $videoId
+     * @return array<mixed>
+     */
+    public function saveVideoSubtitles(mixed $videoId): array
+    {
+    }
+    /**
+     * @param string $status
+     * @param array<string,mixed> $criteria
+     */
+    public function updateVideoStatus(string $status = 'ok', array $criteria = []): void
+    {
+    }
+}
+
 /**
  * Collaborators of {@see Parser} (Sonar php:S1820).
  *
@@ -2443,6 +2923,42 @@ final class ParserServices
     {
     }
 }
+
+/**
+ * Request-scoped state of {@see Parser}.
+ *
+ * Mutable value object: the bootstrap fills it, the response assembly reads it back.
+ */
+final class ParserState
+{
+    public int $altVideoId = -1;
+    /** @var array<string,mixed> $appConfig */
+    public array $appConfig = [];
+    /** @var array<string,mixed> $coreQueryParams */
+    public array $coreQueryParams = [];
+    public bool $dbSource = false;
+    public string $filmstrip = '';
+    public string $gdriveEmail = '';
+    /** @var array<mixed> $inputTracks */
+    public array $inputTracks = [];
+    public bool $isDownload = false;
+    public string $mainURL = '';
+    public string $poster = '';
+    /** @var array<string,mixed>|array<int|string,array<mixed>|string> $queryParams */
+    public array $queryParams = [];
+    public ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    public string $shortKey = '';
+    /** @var array<mixed> $sources */
+    public array $sources = [];
+    public string $title = '';
+    public string $token = '';
+    /** @var array<mixed> $tracks */
+    public array $tracks = [];
+    public int $userID = 0;
+    /** @var array<mixed> $videoTracks */
+    public array $videoTracks = [];
+}
+
 /**
  * Subtitle track collection for {@see Parser} (Sonar php:S1200).
  *
@@ -2481,168 +2997,40 @@ final class ParserSubtitles
     {
     }
 }
+
 namespace GDPlayer\Core\Player;
 
-/**
- * Konfigurasi halaman download player.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait DownloadConfigTrait
-{
-    /**
-     * Build the client-side configuration for the download page player.
-     *
-     * @return string JSON player configuration
-     */
-    public function getDownloadPageConfig(): string
-    {
-    }
-}
-/**
- * Render halaman download player.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait DownloadPageTrait
-{
-    /**
-     * Render the download page HTML for the current video.
-     *
-     * @return string rendered page HTML
-     */
-    public function getDownloadPage(): string
-    {
-    }
-}
-/**
- * Konfigurasi halaman embed player.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait EmbedConfigTrait
-{
-    /**
-     * Build the client-side configuration for the embed page player.
-     *
-     * @return string JSON player configuration
-     */
-    public function getEmbedPageConfig(): string
-    {
-    }
-}
-/**
- * Render halaman embed player.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait EmbedPageTrait
-{
-    /**
-     * Render the embed page HTML for the current video.
-     *
-     * @return string rendered page HTML
-     */
-    public function getEmbedPage(): string
-    {
-    }
-}
-/**
- * Data publik player: config, query publik, validasi.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait PublicTrait
-{
-    /**
-     * @param array<string,mixed> $options
-     * @return string
-     */
-    protected function createPlayerConfig(array $options): string
-    {
-    }
-    protected function validation(): void
-    {
-    }
-    /**
-     * @param array<string,mixed> $queries
-     * @return self
-     */
-    public function setPublicQueries(array $queries = []): self
-    {
-    }
-}
-/**
- * Server aktif, host id, alternatif, dan info video.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait ServerTrait
-{
-    protected function getActiveServer(): void
-    {
-    }
-    protected function getHostID(string $idKey = 'id', string $hostKey = 'host'): void
-    {
-    }
-    protected function getVideoAlternatives(): void
-    {
-    }
-    protected function getVideoInfo(): void
-    {
-    }
-}
-/**
- * Parsing slug path/query dan query API.
- *
- * Split out of `Player` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Player` through this trait.
- */
-trait SlugTrait
-{
-    /**
-     * Slug from a path segment: record the raw slug, then resolve through parseSlug or a DB lookup.
-     */
-    protected function applyPathSlug(string $pageUri): void
-    {
-    }
-    /**
-     * Slug from the query string (no path segment): the first key is used as the slug.
-     */
-    protected function applyQueryStringSlug(): void
-    {
-    }
-    protected function createApiQuery(): void
-    {
-    }
-    protected function parseSlug(string $slug): void
-    {
-    }
-    protected function replaceSupportedSitesName(): void
-    {
-    }
-}
 /**
  * Embed and download page renderer.
  *
  * Resolves the request slug into video/server data and builds the embed page,
  * download page and their client-side player configuration payloads.
+ * Rendering itself is delegated to {@see PlayerPageRenderer} and
+ * {@see PlayerConfigBuilder}.
  */
 final class Player
 {
-    use \GDPlayer\Core\Player\DownloadConfigTrait;
-    use \GDPlayer\Core\Player\DownloadPageTrait;
-    use \GDPlayer\Core\Player\EmbedConfigTrait;
-    use \GDPlayer\Core\Player\EmbedPageTrait;
-    use \GDPlayer\Core\Player\PublicTrait;
-    use \GDPlayer\Core\Player\ServerTrait;
-    use \GDPlayer\Core\Player\SlugTrait;
+    private \GDPlayer\Core\Player\PlayerConfigBuilder $configBuilder;
+    /** @var array<string,mixed> $customSupportedSites */
+    private array $customSupportedSites = [];
+    /** @var string[] $disabledHosts */
+    private array $disabledHosts = [];
+    private \GDPlayer\Core\Player\PlayerOptions $options;
+    private \GDPlayer\Core\Player\PlayerPageRenderer $pageRenderer;
+    private ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    private \GDPlayer\Core\Player\PlayerServices $services;
+    private \GDPlayer\Core\Player\PlayerState $state;
+    /** @var array<string,mixed> $supportedSites */
+    private array $supportedSites = [];
+    private \GDPlayer\Core\Player\PlayerTheme $theme;
+    /** @var string[] $allowApiQueries */
+    protected array $allowApiQueries = ['source', 'host', 'id', 'ahost', 'aid', 'subs', 'sub', 'lang', 'poster', 'token', 'uid', 'email', 'saved'];
+    protected string $defaultHostLabel = 'Direct Link';
+    protected bool $isDirectHost = true;
+    /** @var array<string, string> */
+    protected array $removeLabel = ['|New' => '', '|Additional Host' => ''];
+    /** @var list<array<string,mixed>> $servers */
+    protected array $servers = [];
     /**
      * @param string $clientIp   client IP address
      * @param string $referer    request referer
@@ -2657,7 +3045,154 @@ final class Player
     public function __debugInfo(): array
     {
     }
+    /**
+     * Slug from a path segment: record the raw slug, then resolve through parseSlug or a DB lookup.
+     */
+    protected function applyPathSlug(string $pageUri): void
+    {
+    }
+    /**
+     * Slug from the query string (no path segment): the first key is used as the slug.
+     */
+    protected function applyQueryStringSlug(): void
+    {
+    }
+    /**
+     * Resolve the download/embed base URLs and build the API query from the path or query slug.
+     */
+    protected function createApiQuery(): void
+    {
+    }
+    /**
+     * Build the server list from the query string and pick the active server's API URL.
+     *
+     * Appends entries for the direct host, the alternate host and the stored video
+     * alternatives, then stores the encrypted API query string in the player state.
+     */
+    protected function getActiveServer(): void
+    {
+    }
+    /**
+     * Resolve a URL query parameter into the host name and host id pair.
+     *
+     * @param string $idKey query key holding the URL to resolve
+     * @param string $hostKey query key that receives the resolved host name
+     */
+    protected function getHostID(string $idKey = 'id', string $hostKey = 'host'): void
+    {
+    }
+    /**
+     * Append the stored alternative hosts of the requested video to the server list.
+     */
+    protected function getVideoAlternatives(): void
+    {
+    }
+    /**
+     * Load the title, poster and host of the requested video into the player state.
+     */
+    protected function getVideoInfo(): void
+    {
+    }
+    /**
+     * Decrypt the slug payload into the API query and decode the Sqids user ID when it is not numeric.
+     *
+     * @param string $slug encrypted video slug from the request
+     */
+    protected function parseSlug(string $slug): void
+    {
+    }
+    /**
+     * Replace the display name of each server with the configured name for its host when one exists.
+     */
+    protected function replaceSupportedSitesName(): void
+    {
+    }
+    /**
+     * Apply the embed, referer, network and download guards to the player request.
+     *
+     * `/api` requests bypass the check; a blocked request is logged and answered.
+     */
+    protected function validation(): void
+    {
+    }
+    /**
+     * Render the download page HTML for the current video.
+     *
+     * @return string rendered page HTML
+     */
+    public function getDownloadPage(): string
+    {
+    }
+    /**
+     * Build the client-side configuration for the download page player.
+     *
+     * @return string JSON player configuration
+     */
+    public function getDownloadPageConfig(): string
+    {
+    }
+    /**
+     * Render the embed page HTML for the current video.
+     *
+     * @return string rendered page HTML
+     */
+    public function getEmbedPage(): string
+    {
+    }
+    /**
+     * Build the client-side configuration for the embed page player.
+     *
+     * @return string JSON player configuration
+     */
+    public function getEmbedPageConfig(): string
+    {
+    }
+    /**
+     * @param array<string,mixed> $queries
+     * @return self
+     */
+    public function setPublicQueries(array $queries = []): self
+    {
+    }
 }
+
+/**
+ * Builds the client-side player configuration payloads of {@see Player}.
+ *
+ * Owns the resolved request state, so `Player` only resolves data and hands the
+ * server list to this builder.
+ */
+final class PlayerConfigBuilder
+{
+    /**
+     * @param PlayerServices $services page services (config, security, ...)
+     * @param PlayerState    $state    resolved request/video state
+     * @param PlayerOptions  $options  player options
+     * @param PlayerTheme    $theme    theme and rendering options
+     */
+    public function __construct(private \GDPlayer\Core\Player\PlayerServices $services, private \GDPlayer\Core\Player\PlayerState $state, private \GDPlayer\Core\Player\PlayerOptions $options, private \GDPlayer\Core\Player\PlayerTheme $theme)
+    {
+    }
+    /**
+     * Build the client-side configuration for the download page player.
+     *
+     * @param array<array<string,mixed>> $servers resolved server list
+     * @return string JSON player configuration
+     */
+    public function buildDownloadConfig(array $servers): string
+    {
+    }
+    /**
+     * Build the client-side configuration for the embed page player.
+     *
+     * @param array<array<string,mixed>> $servers resolved server list
+     * @return string JSON player configuration
+     */
+    public function buildEmbedConfig(array $servers): string
+    {
+    }
+}
+
 /**
  * Behaviour toggles of {@see Player} (Sonar php:S1820).
  *
@@ -2674,6 +3209,48 @@ final class PlayerOptions
     public int $repeat = 0;
     public int $selectedServer = -1;
 }
+
+/**
+ * Renders the embed and download pages of {@see Player}.
+ *
+ * Owns the resolved request state, so `Player` only resolves data and hands the
+ * server list to this renderer.
+ */
+final class PlayerPageRenderer
+{
+    /**
+     * @param PlayerServices $services page services (config, security, ...)
+     * @param PlayerState    $state    resolved request/video state
+     * @param PlayerOptions  $options  player options
+     * @param PlayerTheme    $theme    theme and rendering options
+     * @param ServerRequestInterface|null $request current request, when available
+     */
+    public function __construct(private \GDPlayer\Core\Player\PlayerServices $services, private \GDPlayer\Core\Player\PlayerState $state, private \GDPlayer\Core\Player\PlayerOptions $options, private \GDPlayer\Core\Player\PlayerTheme $theme, private ?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+    /**
+     * Render the download page HTML for the current video.
+     *
+     * @param array<array<string,mixed>> $servers resolved server list
+     * @param bool $isDirectHost whether the active host is a direct-link host
+     * @return string rendered page HTML
+     */
+    public function renderDownloadPage(array $servers, bool $isDirectHost): string
+    {
+    }
+    /**
+     * Render the embed page HTML for the current video.
+     *
+     * @param array<array<string,mixed>> $servers resolved server list
+     * @param string $referer request referer
+     * @param bool   $isDirectHost whether the active host is a direct-link host
+     * @return string rendered page HTML
+     */
+    public function renderEmbedPage(array $servers, string $referer, bool $isDirectHost): string
+    {
+    }
+}
+
 /**
  * Collaborators of {@see Player} (Sonar php:S1820).
  *
@@ -2691,12 +3268,13 @@ final class PlayerServices
     /**
      * Build the service set for one page render.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request request whose UA seeds the mobile detector
+     * @param ServerRequestInterface|null $request request whose UA seeds the mobile detector
      */
     public function __construct(?\Psr\Http\Message\ServerRequestInterface $request = null)
     {
     }
 }
+
 /**
  * Resolved request/video state of {@see Player} (Sonar php:S1820).
  *
@@ -2712,6 +3290,7 @@ final class PlayerState
     public string $downloadURL = '';
     public string $embedURL = '';
     public string $extra = '';
+    public bool $isError = false;
     public bool $isMobile = false;
     public bool $isSafariIE = false;
     public string $messageText = '';
@@ -2722,6 +3301,7 @@ final class PlayerState
     public string $videoSlug = '';
     public string $videoTitle = '';
 }
+
 /**
  * Player theme/rendering options of {@see Player} (Sonar php:S1820).
  *
@@ -2741,211 +3321,9 @@ final class PlayerTheme
     /** @var array<mixed> $templates */
     public array $templates = [];
 }
+
 namespace GDPlayer\Core\Security;
 
-/**
- * Shared cryptographic helpers for the Security service (key/IV derivation).
- */
-trait SecurityTrait
-{
-    /**
-     * Transport settings for authentication API calls.
-     *
-     * This trait used to configure cURL handles (`getCurlConfig()`); the same policy is now
-     * declared once here as `Http\Fetcher` settings — HTTP/1.1, connect 60 s,
-     * timeout 300 s, max 10 redirects, no SSL verification (same as before).
-     *
-     * @return \GDPlayer\Http\Fetcher\Fetcher ready to use
-     */
-    private function createAuthFetcher(): \GDPlayer\Http\Fetcher\Fetcher
-    {
-    }
-}
-/**
- * Licensing/signature core of Security: server capability check, token validation, plugin licence.
- *
- * Deliberately split from `Security` (see src/Core/Security.php) so this base file
- * can be distributed encrypted (ionCube) without also locking the crypto/HMAC API
- * used by themes & plugins.
- */
-abstract class SecurityBase
-{
-    use \GDPlayer\Core\Security\SecurityTrait;
-    protected string $hostname = '';
-    protected string $kirimKode = 'license=%s&hostname=%s&ver=%s';
-    protected string $kunciPublik = '';
-    protected string $otentikasiURL = 'https://auth.gdplayer.to';
-    /**
-     * @param null|\Redis  $redis      optional Redis instance for shared state
-     * @param null|string $licenseKey optional license key override
-     */
-    public function __construct(private ?\Redis $redis = null, private ?string $licenseKey = null)
-    {
-    }
-    /**
-     * Helper function to isolate cURL code duplication and encryption.
-     *
-     * @param string $pluginName
-     * @return string
-     */
-    protected function ambilValidasiDariApi(string $pluginName): string
-    {
-    }
-    /**
-     * Decrypt text produced by {@see Security::encrypt()}; provided by the concrete class.
-     *
-     * @param string $encryptedText encrypted text (base64)
-     * @return string plaintext, empty string on failure
-     */
-    abstract protected function decrypt(string $encryptedText = ''): string;
-    /**
-     * Open a URL produced by {@see Security::encryptURL()}.
-     *
-     * @param null|string $url encrypted URL
-     * @return string original URL, empty string on failure
-     */
-    abstract protected function decryptURL(?string $url): string;
-    /**
-     * Encrypt plaintext (AES-256-CBC); provided by the concrete class.
-     *
-     * @param string $plainText plaintext
-     * @return string encrypted text (base64)
-     */
-    abstract protected function encrypt(string $plainText = ''): string;
-    /**
-     * Encrypt a URL (URL-safe base64); provided by the concrete class.
-     *
-     * @param null|string $url original URL
-     * @return string encrypted URL
-     */
-    abstract protected function encryptURL(?string $url): string;
-    /**
-     * Read the plugin token from cache (encrypted form), '' when absent.
-     *
-     * @param string $cacheKey
-     * @return string signed token, or '' when empty/unreadable
-     */
-    protected function getPluginCacheData(string $cacheKey): string
-    {
-    }
-    /**
-     * This application version is still served by the server.
-     *
-     * @return bool true when the app version >= VERSI_MINIMUM
-     */
-    protected function isVersionAllowed(): bool
-    {
-    }
-    /**
-     * Populate the server signing public key, read once per instance.
-     * Without this key no token can be trusted (fail-closed).
-     *
-     * @return string public key file contents, or '' when unreadable
-     */
-    protected function kunciUmum(): string
-    {
-    }
-    /**
-     * Verify the signature (RSA-SHA256) on a token from the server.
-     *
-     * Token: `v1.<base64url payload>.<base64url signature>` (no padding). The JSON payload
-     * is used as-is as the signed data, so the signature cannot be moved to other content.
-     * Payload contents: `h` hostname, `l` license, `e` expiry (unix), `v` app version, `s` scope.
-     *
-     * @param string $token   raw token from the server
-     * @param string $cakupan 'core' | 'swoole' | 'roadrunner'
-     * @return array<string, mixed> payload contents when the signature is valid, empty array otherwise
-     */
-    protected function periksaCap(string $token, string $cakupan = 'core'): array
-    {
-    }
-    /**
-     * Restore the base64url padding stripped by the sender.
-     *
-     * @param string $isi base64url chunk without padding
-     * @return null|string original bytes, or null when invalid
-     */
-    protected function pulihkanB64(string $isi): ?string
-    {
-    }
-    /**
-     * Store the plugin token in cache.
-     *
-     * @param string $cacheKey
-     * @param string $token      signed token from the server
-     * @param int    $kedaluwarsa unix timestamp from the token payload
-     * @return void
-     */
-    protected function savePluginCacheData(string $cacheKey, string $token, int $kedaluwarsa): void
-    {
-    }
-    /**
-     * Store the signed token in cache (encrypted form, as before).
-     *
-     * @param null|\GDPlayer\Service\Cache\CacheItem $cache
-     * @param string                          $token
-     * @param int                             $kedaluwarsa unix timestamp from the payload
-     * @return void
-     */
-    protected function simpanToken(?\GDPlayer\Service\Cache\CacheItem $cache, string $token, int $kedaluwarsa): void
-    {
-    }
-    /**
-     * Fetch the plugin token from the authentication server (request payload encrypted with the public key).
-     *
-     * @param string $pluginName
-     * @return string signed token, or '' when the server does not serve it
-     */
-    protected function tokenPlugin(string $pluginName): string
-    {
-    }
-    /**
-     * Request a signed token from the authentication server and store it when the signature is valid.
-     *
-     * The cache now holds only tokens genuinely signed by the server, so writing a cache
-     * entry yourself (or calling this method with a forged key) is no longer
-     * enough to pass the gate: without a private-key signature the token counts as empty.
-     *
-     * @param null|\GDPlayer\Service\Cache\CacheItem $cache
-     * @return array<string,mixed> payload contents when the signature is valid, empty array otherwise
-     */
-    protected function validasiLisensi(?\GDPlayer\Service\Cache\CacheItem $cache): array
-    {
-    }
-    /**
-     * After the key is stored through the admin form: request a token from the server and store it when valid.
-     *
-     * This method used to write its own cache entry (bypass door: one call was enough
-     * to mark an instance as licensed). Now the only token source is the server
-     * signature, so a forged key yields no entry at all.
-     *
-     * @return bool true when a valid server token was stored successfully
-     */
-    public function hasSavedLicenseStatus(): bool
-    {
-    }
-    /**
-     * Validate the running environment/instance against the license server.
-     *
-     * The result is cached to avoid repeated remote checks.
-     *
-     * @return bool true when the environment is authorized
-     */
-    public function isLicenseValid(): bool
-    {
-    }
-    /**
-     * Validate a licensed plugin (e.g. swoole, roadrunner) against the license server.
-     *
-     * The response is cached until its expiry.
-     *
-     * @param string $pluginName plugin identifier to validate
-     * @return bool true when the plugin is licensed
-     */
-    public function isPluginValid(string $pluginName = 'swoole'): bool
-    {
-    }
-}
 /**
  * Encryption, URL tokenization and HMAC request-signature service.
  *
@@ -2955,6 +3333,11 @@ abstract class SecurityBase
  */
 final class Security extends \GDPlayer\Core\Security\SecurityBase
 {
+    private string $apiSalt = 'kntlMmkLuCoeg';
+    private string $cipher = 'aes-256-cbc';
+    private string $hmacDerivationKey = 'V8xK2mP9qR4wT6yA3bN7cJ5dF1gH0eL';
+    private int $hmacExpiry = 60;
+    private string $kunciGaram = 'GDPlayer~F1r3b4Ll';
     /**
      * @return array<string, mixed>
      */
@@ -3067,6 +3450,197 @@ final class Security extends \GDPlayer\Core\Security\SecurityBase
     {
     }
 }
+
+/**
+ * Licensing/signature core of Security: server capability check, token validation, plugin licence.
+ *
+ * Deliberately split from `Security` (see src/Core/Security.php) so this base file
+ * can be distributed encrypted (ionCube) without also locking the crypto/HMAC API
+ * used by themes & plugins.
+ */
+abstract class SecurityBase
+{
+    /**
+     * Lowest version the server still serves. Raise it only together with a new release:
+     * the server refuses to sign tokens for versions below this.
+     */
+    private const VERSI_MINIMUM = '5.0.0';
+    protected string $hostname = '';
+    protected string $kirimKode = 'license=%s&hostname=%s&ver=%s';
+    protected string $kunciPublik = '';
+    protected string $otentikasiURL = 'https://auth.gdplayer.to';
+    /**
+     * @param null|Redis  $redis      optional Redis instance for shared state
+     * @param null|string $licenseKey optional license key override
+     */
+    public function __construct(private ?\Redis $redis = null, private ?string $licenseKey = null)
+    {
+    }
+    /**
+     * Helper function to isolate cURL code duplication and encryption.
+     *
+     * @param string $pluginName
+     * @return string
+     */
+    protected function ambilValidasiDariApi(string $pluginName): string
+    {
+    }
+    /**
+     * Decrypt text produced by {@see Security::encrypt()}; provided by the concrete class.
+     *
+     * @param string $encryptedText encrypted text (base64)
+     * @return string plaintext, empty string on failure
+     */
+    abstract protected function decrypt(string $encryptedText = ''): string;
+    /**
+     * Open a URL produced by {@see Security::encryptURL()}.
+     *
+     * @param null|string $url encrypted URL
+     * @return string original URL, empty string on failure
+     */
+    abstract protected function decryptURL(?string $url): string;
+    /**
+     * Encrypt plaintext (AES-256-CBC); provided by the concrete class.
+     *
+     * @param string $plainText plaintext
+     * @return string encrypted text (base64)
+     */
+    abstract protected function encrypt(string $plainText = ''): string;
+    /**
+     * Encrypt a URL (URL-safe base64); provided by the concrete class.
+     *
+     * @param null|string $url original URL
+     * @return string encrypted URL
+     */
+    abstract protected function encryptURL(?string $url): string;
+    /**
+     * Read the plugin token from cache (encrypted form), '' when absent.
+     *
+     * @param string $cacheKey
+     * @return string signed token, or '' when empty/unreadable
+     */
+    protected function getPluginCacheData(string $cacheKey): string
+    {
+    }
+    /**
+     * This application version is still served by the server.
+     *
+     * @return bool true when the app version >= VERSI_MINIMUM
+     */
+    protected function isVersionAllowed(): bool
+    {
+    }
+    /**
+     * Populate the server signing public key, read once per instance.
+     * Without this key no token can be trusted (fail-closed).
+     *
+     * @return string public key file contents, or '' when unreadable
+     */
+    protected function kunciUmum(): string
+    {
+    }
+    /**
+     * Verify the signature (RSA-SHA256) on a token from the server.
+     *
+     * Token: `v1.<base64url payload>.<base64url signature>` (no padding). The JSON payload
+     * is used as-is as the signed data, so the signature cannot be moved to other content.
+     * Payload contents: `h` hostname, `l` license, `e` expiry (unix), `v` app version, `s` scope.
+     *
+     * @param string $token   raw token from the server
+     * @param string $cakupan 'core' | 'swoole' | 'roadrunner'
+     * @return array<string, mixed> payload contents when the signature is valid, empty array otherwise
+     */
+    protected function periksaCap(string $token, string $cakupan = 'core'): array
+    {
+    }
+    /**
+     * Restore the base64url padding stripped by the sender.
+     *
+     * @param string $isi base64url chunk without padding
+     * @return null|string original bytes, or null when invalid
+     */
+    protected function pulihkanB64(string $isi): ?string
+    {
+    }
+    /**
+     * Store the plugin token in cache.
+     *
+     * @param string $cacheKey
+     * @param string $token      signed token from the server
+     * @param int    $kedaluwarsa unix timestamp from the token payload
+     * @return void
+     */
+    protected function savePluginCacheData(string $cacheKey, string $token, int $kedaluwarsa): void
+    {
+    }
+    /**
+     * Store the signed token in cache (encrypted form, as before).
+     *
+     * @param null|CacheItem $cache
+     * @param string                          $token
+     * @param int                             $kedaluwarsa unix timestamp from the payload
+     * @return void
+     */
+    protected function simpanToken(?\GDPlayer\Service\Cache\CacheItem $cache, string $token, int $kedaluwarsa): void
+    {
+    }
+    /**
+     * Fetch the plugin token from the authentication server (request payload encrypted with the public key).
+     *
+     * @param string $pluginName
+     * @return string signed token, or '' when the server does not serve it
+     */
+    protected function tokenPlugin(string $pluginName): string
+    {
+    }
+    /**
+     * Request a signed token from the authentication server and store it when the signature is valid.
+     *
+     * The cache now holds only tokens genuinely signed by the server, so writing a cache
+     * entry yourself (or calling this method with a forged key) is no longer
+     * enough to pass the gate: without a private-key signature the token counts as empty.
+     *
+     * @param null|CacheItem $cache
+     * @return array<string,mixed> payload contents when the signature is valid, empty array otherwise
+     */
+    protected function validasiLisensi(?\GDPlayer\Service\Cache\CacheItem $cache): array
+    {
+    }
+    /**
+     * After the key is stored through the admin form: request a token from the server and store it when valid.
+     *
+     * This method used to write its own cache entry (bypass door: one call was enough
+     * to mark an instance as licensed). Now the only token source is the server
+     * signature, so a forged key yields no entry at all.
+     *
+     * @return bool true when a valid server token was stored successfully
+     */
+    public function hasSavedLicenseStatus(): bool
+    {
+    }
+    /**
+     * Validate the running environment/instance against the license server.
+     *
+     * The result is cached to avoid repeated remote checks.
+     *
+     * @return bool true when the environment is authorized
+     */
+    public function isLicenseValid(): bool
+    {
+    }
+    /**
+     * Validate a licensed plugin (e.g. swoole, roadrunner) against the license server.
+     *
+     * The response is cached until its expiry.
+     *
+     * @param string $pluginName plugin identifier to validate
+     * @return bool true when the plugin is licensed
+     */
+    public function isPluginValid(string $pluginName = 'swoole'): bool
+    {
+    }
+}
+
 namespace GDPlayer\Database;
 
 /**
@@ -3076,21 +3650,33 @@ namespace GDPlayer\Database;
  */
 final class Conn
 {
+    /** @var null|array<int,mixed> $config */
+    private static ?array $config = null;
+    private static ?self $instance = null;
+    private ?\PDO $pdoRead = null;
+    private ?\PDO $pdoWrite = null;
+    private static ?\GDPlayer\Database\ConnectionProviderInterface $provider = null;
     /**
+     * Expose the application info instead of the connection internals when dumping the object.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
     {
     }
     /**
-     * @return array{0:\PDO|null,1:\PDO|null} [$pdoWrite, $pdoRead]
+     * Return the cached handles, opening them once when the manager has none yet.
+     *
+     * @return array{0:PDO|null,1:PDO|null} [$pdoWrite, $pdoRead]
      */
     public function connect(): array
     {
     }
     /**
+     * Open one PDO connection, retrying a few times before giving up.
+     *
      * @param array<string,string|int> $dbConfig
-     * @return null|\PDO
+     * @return null|PDO
      */
     public function createConnection(array $dbConfig): ?\PDO
     {
@@ -3128,6 +3714,7 @@ final class Conn
     {
     }
 }
+
 /**
  * Source of PDO handles for a runtime that manages its own connections/pool.
  *
@@ -3136,136 +3723,166 @@ final class Conn
  */
 interface ConnectionProviderInterface
 {
+    /**
+     * Return the handle used for read queries.
+     *
+     * @return null|PDO read connection, null when the provider cannot supply one
+     */
     public function pdoRead(): ?\PDO;
+    /**
+     * Return the handle used for write queries.
+     *
+     * @return null|PDO write connection, null when the provider cannot supply one
+     */
     public function pdoWrite(): ?\PDO;
     /**
      * Drop/release the handles held by the provider (end of request or reconnect).
      */
     public function reset(): void;
 }
-/**
- * Query pembersihan dan pemutakhiran data lama.
- *
- * Split out of `MigrationQueries` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrationQueries` through this trait.
- */
-trait MigrationDataQueryTrait
-{
-    /**
-     * @return string[]
-     */
-    public static function getDeleteUnwantedDataQueries(): array
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public static function getMigrateDataMaxmindQueries(): array
-    {
-    }
-    /**
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $migrationsMap
-     * @return string[]
-     */
-    public static function getModifiedFieldQueries(array $migrationsMap): array
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public static function getUpdateOldDataQueries(): array
-    {
-    }
-}
-/**
- * Query view database saat migrasi.
- *
- * Split out of `MigrationQueries` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrationQueries` through this trait.
- */
-trait MigrationViewQueryTrait
-{
-    /**
-     * @return string[]
-     */
-    public static function getCreateViewsQueries(): array
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public static function getDropViewsQueries(): array
-    {
-    }
-}
+
 /**
  * Builds the ALTER/CREATE SQL fragments used by the database migrations.
  */
 final class MigrationQueries
 {
-    use \GDPlayer\Database\MigrationDataQueryTrait;
-    use \GDPlayer\Database\MigrationViewQueryTrait;
     /**
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $migrationsMap
+     * Hash the password stored in an environment key for the seeded admin user.
+     *
+     * @param string $envKey Name of the environment variable holding the password
+     * @return string Bcrypt hash of the password
+     */
+    protected static function getCredentialsHash(string $envKey): string
+    {
+    }
+    /**
+     * Collect the ADD FOREIGN KEY statements of every table, without duplicates.
+     *
+     * @param array<string, Migrate> $migrationsMap
      * @return string[]
      */
     public static function getAddForeignKeysTablesQueries(array $migrationsMap): array
     {
     }
     /**
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $migrationsMap
+     * Collect the ADD INDEX statements of every table, without duplicates.
+     *
+     * @param array<string, Migrate> $migrationsMap
      * @return string[]
      */
     public static function getAddIndexesTablesQueries(array $migrationsMap): array
     {
     }
     /**
+     * Return the statements creating the reporting views.
+     *
+     * @return string[]
+     */
+    public static function getCreateViewsQueries(): array
+    {
+    }
+    /**
+     * Return the statements removing orphaned rows and duplicated settings.
+     *
+     * @return string[]
+     */
+    public static function getDeleteUnwantedDataQueries(): array
+    {
+    }
+    /**
+     * Drop the events left behind by older releases.
+     *
      * @return string[]
      */
     public static function getDropEventsQueries(): array
     {
     }
     /**
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $migrationsMap
+     * Collect the DROP FOREIGN KEY statements, in reverse table order.
+     *
+     * @param array<string, Migrate> $migrationsMap
      * @return string[]
      */
     public static function getDropForeignKeysTablesQueries(array $migrationsMap): array
     {
     }
     /**
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $migrationsMap
+     * Collect the DROP INDEX statements, in reverse table order.
+     *
+     * @param array<string, Migrate> $migrationsMap
      * @return string[]
      */
     public static function getDropIndexesTablesQueries(array $migrationsMap): array
     {
     }
     /**
+     * Drop the migration procedures left behind by older releases.
+     *
      * @return string[]
      */
     public static function getDropProceduresQueries(): array
     {
     }
     /**
+     * Drop the tables that no longer exist in the current schema.
+     *
      * @return string[]
      */
     public static function getDropTablesQueries(): array
     {
     }
     /**
-     * @param array<string, \GDPlayer\Database\MySQL\Migrate> $migrationsMap
+     * Return the statements dropping the reporting views.
+     *
+     * @return string[]
+     */
+    public static function getDropViewsQueries(): array
+    {
+    }
+    /**
+     * Return the statements rebuilding `tb_maxmind` with a unique prefix on `ip`.
+     *
+     * @return string[]
+     */
+    public static function getMigrateDataMaxmindQueries(): array
+    {
+    }
+    /**
+     * Turn the rename map of every migration into `CHANGE` statements.
+     *
+     * @param array<string, Migrate> $migrationsMap
+     * @return string[]
+     */
+    public static function getModifiedFieldQueries(array $migrationsMap): array
+    {
+    }
+    /**
+     * Collect the CREATE/ALTER statements that bring every table to the current schema.
+     *
+     * @param array<string, Migrate> $migrationsMap
      * @return string[]
      */
     public static function getModifyTablesQueries(array $migrationsMap): array
     {
     }
+    /**
+     * Return the statements rewriting legacy host names and seeding the default accounts.
+     *
+     * @return string[]
+     */
+    public static function getUpdateOldDataQueries(): array
+    {
+    }
 }
+
 /**
  * Creates migration query objects bound to the write connection.
  */
 final class MigrationQueriesCreator
 {
+    private \PDO $pdoWrite;
     /**
-     * @param \PDO $pdoWrite write connection used to execute migrations
+     * @param PDO $pdoWrite write connection used to execute migrations
      */
     public function __construct(\PDO $pdoWrite)
     {
@@ -3285,88 +3902,7 @@ final class MigrationQueriesCreator
     {
     }
 }
-/**
- * Diagnostik query dan pengolahan nilai baris.
- *
- * Split out of `ModelHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ModelHelper` through this trait.
- */
-trait ModelDiagnosticTrait
-{
-    /**
-     * @param string $qry
-     * @param null|mixed[] $params
-     * @return void
-     */
-    protected function explainQuery(string $qry, ?array $params = null): void
-    {
-    }
-    /**
-     * PDO data processing function to the master database for insert, update, delete
-     * mixed[] formatted value for default insert operation,
-     * array<string,mixed> formatted value for custom operation according to the placeholder used
-     * default insert operation yields string|false, string value obtained from lastInsertId()
-     *
-     * @param string $qry
-     * @param null|array<string,mixed>|mixed[] $params null value can be used if there are no parameters,
-     * @param bool $insertMode set to true to get the latest id from lastInsertId() during the insert process
-     * @return string|bool result of type boolean(true|false) for update and delete operations,
-     */
-    protected function writeProcessor(string $qry, ?array $params = null, bool $insertMode = false): string|bool
-    {
-    }
-    /**
-     * Return a generic, user-safe description of the last database error.
-     *
-     * @return string fixed message; the detailed error is written to the server log
-     */
-    public function getLastError(): string
-    {
-    }
-}
-/**
- * Query mentah dan validasi placeholder.
- *
- * Split out of `ModelHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ModelHelper` through this trait.
- */
-trait ModelQueryTrait
-{
-    /**
-     * @param string $sql
-     * @param null|array<mixed> $params
-     * @return bool
-     */
-    public function hasValidPlaceholders(string $sql, ?array $params): bool
-    {
-    }
-    /**
-     * To maintain data integrity, make sure you call the method with the appropriate model,
-     * for example (new VideoModel())->rawQuery("DELETE FROM `tb_videos` WHERE `id` IN (?,?);", [1, 2]);
-     * You must call the closeCursor() function after executing this function if the result is a PDOStatement
-     *
-     * @param string $qry
-     * @param null|array<mixed> $params positional and named placeholders supported
-     * @return \PDOStatement|false
-     */
-    public function rawQuery(string $qry, ?array $params = null): \PDOStatement|false
-    {
-    }
-    /**
-     * To maintain data integrity, make sure you call the method with the appropriate model,
-     * for example (new VideoModel())->rawQuery(
-     * "SELECT a.* FROM `tb_videos` v LEFT JOIN `tb_videos_alternatives` a ON a.`vid` = v.`id` WHERE v.`id` = ?;",
-     * [1]);
-     * You must call the closeCursor() function after executing this function if the result is a PDOStatement
-     *
-     * @param string $qry
-     * @param null|array<mixed> $params positional and named placeholders supported
-     * @return \PDOStatement|false
-     */
-    public function rawSelect(string $qry, ?array $params = null): \PDOStatement|false
-    {
-    }
-}
+
 /**
  * Shared query-builder, caching and connection base for all database models.
  *
@@ -3375,8 +3911,6 @@ trait ModelQueryTrait
  */
 abstract class ModelHelper
 {
-    use \GDPlayer\Database\ModelDiagnosticTrait;
-    use \GDPlayer\Database\ModelQueryTrait;
     protected const MSG_CONNECTION_ERROR = 'Database connection unavailable';
     protected const MSG_EMPTY = 'SQL query is empty';
     protected const MSG_EXECUTION_FAILED = 'Execution failed';
@@ -3384,7 +3918,7 @@ abstract class ModelHelper
     /**
      * @var list<array{
      *     column:string,
-     *     value:null|string|int,
+     *     value:mixed,
      *     comparison:string|null,
      *     logical:string|null
      * }> $criteriaParams
@@ -3418,15 +3952,30 @@ abstract class ModelHelper
     public function __destruct()
     {
     }
+    /**
+     * Invalidate every cache entry tagged for this table and its views.
+     *
+     * @return int number of cache entries removed
+     */
     protected function clearCache(): int
     {
     }
     /**
+     * Hash a query and its bind values into a cache-safe key fragment.
+     *
      * @param string $qry
      * @param mixed[] $values
      * @return string
      */
     protected function createCacheHash(string $qry = '', array $values = []): string
+    {
+    }
+    /**
+     * @param string $qry
+     * @param null|mixed[] $params
+     * @return void
+     */
+    protected function explainQuery(string $qry, ?array $params = null): void
     {
     }
     /**
@@ -3448,28 +3997,118 @@ abstract class ModelHelper
     protected function getVersionedCacheKey(string $prefix, string $hash, ?string $opTag = null): string
     {
     }
+    /**
+     * Return a live PDO handle, reconnecting up to three times when it is dead.
+     *
+     * @param bool $writeable use the write connection instead of the read replica
+     * @return PDO|null connection handle, or null when every attempt failed
+     */
     protected function onConnect(bool $writeable = true): ?\PDO
     {
     }
+    /**
+     * Clear the accumulated ordering, limit, criteria and bind values.
+     *
+     * @return self fluent instance
+     */
     protected function resetValues(): self
     {
     }
+    /**
+     * PDO data processing function to the master database for insert, update, delete
+     * mixed[] formatted value for default insert operation,
+     * array<string,mixed> formatted value for custom operation according to the placeholder used
+     * default insert operation yields string|false, string value obtained from lastInsertId()
+     *
+     * @param string $qry
+     * @param null|array<string,mixed>|mixed[] $params null value can be used if there are no parameters,
+     * @param bool $insertMode set to true to get the latest id from lastInsertId() during the insert process
+     * @return string|bool result of type boolean(true|false) for update and delete operations,
+     */
+    protected function writeProcessor(string $qry, ?array $params = null, bool $insertMode = false): string|bool
+    {
+    }
+    /**
+     * Return a generic, user-safe description of the last database error.
+     *
+     * @return string fixed message; the detailed error is written to the server log
+     */
+    public function getLastError(): string
+    {
+    }
+    /**
+     * Tell whether the parameter list matches the placeholders found in the statement.
+     *
+     * Quoted literals are stripped first, so a `?` inside a string does not count.
+     *
+     * @param string $sql
+     * @param null|array<mixed> $params
+     * @return bool
+     */
+    public function hasValidPlaceholders(string $sql, ?array $params): bool
+    {
+    }
+    /**
+     * Run a write statement, delegating SELECT queries to `rawSelect()`.
+     *
+     * To maintain data integrity, make sure you call the method with the appropriate model,
+     * for example (new VideoModel())->rawQuery("DELETE FROM `tb_videos` WHERE `id` IN (?,?);", [1, 2]);
+     * You must call the closeCursor() function after executing this function if the result is a PDOStatement
+     *
+     * @param string $qry
+     * @param null|array<mixed> $params positional and named placeholders supported
+     * @return PDOStatement|false
+     */
+    public function rawQuery(string $qry, ?array $params = null): \PDOStatement|false
+    {
+    }
+    /**
+     * Run a SELECT on the read connection and keep its statement cursor open for the caller.
+     *
+     * To maintain data integrity, make sure you call the method with the appropriate model,
+     * for example (new VideoModel())->rawQuery(
+     * "SELECT a.* FROM `tb_videos` v LEFT JOIN `tb_videos_alternatives` a ON a.`vid` = v.`id` WHERE v.`id` = ?;",
+     * [1]);
+     * You must call the closeCursor() function after executing this function if the result is a PDOStatement
+     *
+     * @param string $qry
+     * @param null|array<mixed> $params positional and named placeholders supported
+     * @return PDOStatement|false
+     */
+    public function rawSelect(string $qry, ?array $params = null): \PDOStatement|false
+    {
+    }
 }
+
 namespace GDPlayer\Database\MySQL;
 
 /**
- * Shared connection and cache-tag plumbing for the migration classes.
+ * Fluent schema builder for creating and altering tables during migration.
  */
-abstract class MigrateHelper
+class Migrate
 {
-    /** @var array<string,array<string,mixed>> $columns */
-    protected array $columns = [];
+    use \GDPlayer\Database\MySQL\MigrateColumnTypes;
+    /**
+     * @var list<array{name:string, field:string, refTable:string, refColumn:string,
+     *     onDelete:string, onUpdate:string}> $foreignKeys
+     */
+    private array $foreignKeys = [];
+    /**
+     * @var list<array{name:string, fields:list<string>, unique?:bool, fulltext?:bool}> $indexes
+     */
+    private array $indexes = [];
+    /** @var list<array<string,string>> $modifyColumns */
+    private array $modifyColumns = [];
+    /** @var bool true when the PRIMARY KEY (`id`) is already handled in another statement */
+    private bool $primaryKeyAdded = false;
+    private \GDPlayer\Database\MySQL\MigrateSchema $schema;
     protected \PDO $pdoWrite;
     protected string $table;
     /**
-     * @param \PDO $pdoWrite write connection used to execute migrations
+     * @param PDO $pdoWrite write connection used to execute migrations
+     * @param null|MigrateSchema $schema schema reader override (tests)
      */
-    public function __construct(\PDO $pdoWrite)
+    public function __construct(\PDO $pdoWrite, ?\GDPlayer\Database\MySQL\MigrateSchema $schema = null)
     {
     }
     /**
@@ -3491,21 +4130,61 @@ abstract class MigrateHelper
      * @param string $indexName
      * @param string $type
      * @param bool $typeValue
-     * @return array<string,mixed>
+     * @return array{name:string, fields:list<string>, unique?:bool, fulltext?:bool}
      */
     protected function createIndex(mixed $indexFields, string $indexName, string $type = 'unique', bool $typeValue = false): array
     {
     }
     /**
-     * @return array<string,array<string,mixed>>
+     * Add a foreign key constraint to the table.
+     *
+     * @param string $field      local column
+     * @param string $refTable   referenced table
+     * @param string $refColumn  referenced column
+     * @param string $onDelete   ON DELETE action
+     * @param string $onUpdate   ON UPDATE action
+     * @return self fluent instance
      */
-    protected function getColumns(): array
+    public function addForeignKey(string $field, string $refTable, string $refColumn, string $onDelete = 'cascade', string $onUpdate = 'no action'): self
     {
     }
-    protected function tableCollation(): mixed
+    /**
+     * Add a FULLTEXT index to the table.
+     *
+     * @param mixed  $fields column(s) to index
+     * @param string $name   index name
+     * @return self fluent instance
+     */
+    public function addFulltextIndex(mixed $fields, string $name): self
     {
     }
-    protected function hasTable(): bool
+    /**
+     * Add a (optionally unique) index to the table.
+     *
+     * @param mixed  $fields column(s) to index
+     * @param string $name   index name
+     * @param bool   $unique whether the index is unique
+     * @return self fluent instance
+     */
+    public function addIndex(mixed $fields, string $name, bool $unique = false): self
+    {
+    }
+    /**
+     * @return string[]
+     */
+    public function getAddForeignKeysQueries(): array
+    {
+    }
+    /**
+     * @return string[]
+     */
+    public function getAddIndexesQueries(): array
+    {
+    }
+    /**
+     * @return string[]
+     */
+    public function getCreateModifyTableQueries(): array
     {
     }
     /**
@@ -3521,6 +4200,12 @@ abstract class MigrateHelper
     {
     }
     /**
+     * @return list<array<string,string>>
+     */
+    public function getModifyColumns(): array
+    {
+    }
+    /**
      * Return the current table name.
      *
      * @return string table name
@@ -3528,19 +4213,49 @@ abstract class MigrateHelper
     public function getTable(): string
     {
     }
+    /**
+     * Add an auto-incrementing unsigned primary key column.
+     *
+     * @param bool $useInt use INT instead of BIGINT
+     * @return self fluent instance
+     */
+    public function id(bool $useInt = false): self
+    {
+    }
+    /**
+     * Define a column rename that preserves data during migration.
+     * Usage: ->modifyColumn('old_name', 'new_name', 'INT(10) UNSIGNED NOT NULL DEFAULT \'0\'');
+     *
+     * @param string $oldName
+     * @param string $newName
+     * @param string $sql
+     * @return self
+     */
+    public function modifyColumn(string $oldName, string $newName, string $sql): self
+    {
+    }
+    /**
+     * Start a new table definition, resetting columns/indexes/constraints.
+     *
+     * @param string $name table name
+     * @return self fluent instance
+     */
+    public function setTable(string $name): self
+    {
+    }
 }
+
 /**
  * Column type builder and addColumn helper for the Migrate schema builder.
  */
 trait MigrateColumnTypes
 {
+    /** @var array<string,array<string,mixed>> $columns */
+    protected array $columns = [];
     /** @var string[] $numericTypes Numeric column types (always UNSIGNED). */
     protected array $numericTypes = ['INT', 'TINYINT', 'BIGINT', 'SMALLINT', 'MEDIUMINT'];
     /** @var string[] $textTypes Text column types (given the utf8mb4_unicode_ci collation). */
     protected array $textTypes = ['CHAR', 'VARCHAR', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT'];
-    private function addColumn(string $name, string $type, ?int $length, bool $allowNull = false, ?string $default = null): self
-    {
-    }
     /**
      * Add a BIGINT column.
      *
@@ -3622,477 +4337,88 @@ trait MigrateColumnTypes
     {
     }
 }
-/**
- * Fluent schema builder for creating and altering tables during migration.
- */
-class Migrate extends \GDPlayer\Database\MySQL\MigrateHelper
-{
-    use \GDPlayer\Database\MySQL\MigrateColumnTypes;
-    /**
-     * Add a foreign key constraint to the table.
-     *
-     * @param string $field      local column
-     * @param string $refTable   referenced table
-     * @param string $refColumn  referenced column
-     * @param string $onDelete   ON DELETE action
-     * @param string $onUpdate   ON UPDATE action
-     * @return self fluent instance
-     */
-    public function addForeignKey(string $field, string $refTable, string $refColumn, string $onDelete = 'cascade', string $onUpdate = 'no action'): self
-    {
-    }
-    /**
-     * Add a FULLTEXT index to the table.
-     *
-     * @param mixed  $fields column(s) to index
-     * @param string $name   index name
-     * @return self fluent instance
-     */
-    public function addFulltextIndex(mixed $fields, string $name): self
-    {
-    }
-    /**
-     * Add a (optionally unique) index to the table.
-     *
-     * @param mixed  $fields column(s) to index
-     * @param string $name   index name
-     * @param bool   $unique whether the index is unique
-     * @return self fluent instance
-     */
-    public function addIndex(mixed $fields, string $name, bool $unique = false): self
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public function getAddForeignKeysQueries(): array
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public function getAddIndexesQueries(): array
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public function getCreateModifyTableQueries(): array
-    {
-    }
-    /**
-     * @return list<array<string,string>>
-     */
-    public function getModifyColumns(): array
-    {
-    }
-    /**
-     * Add an auto-incrementing unsigned primary key column.
-     *
-     * @param bool $useInt use INT instead of BIGINT
-     * @return self fluent instance
-     */
-    public function id(bool $useInt = false): self
-    {
-    }
-    /**
-     * Define a column rename that preserves data during migration.
-     * Usage: ->modifyColumn('old_name', 'new_name', 'INT(10) UNSIGNED NOT NULL DEFAULT \'0\'');
-     *
-     * @param string $oldName
-     * @param string $newName
-     * @param string $sql
-     * @return self
-     */
-    public function modifyColumn(string $oldName, string $newName, string $sql): self
-    {
-    }
-    /**
-     * Start a new table definition, resetting columns/indexes/constraints.
-     *
-     * @param string $name table name
-     * @return self fluent instance
-     */
-    public function setTable(string $name): self
-    {
-    }
-}
-namespace GDPlayer\Database\MySQL\Migration;
 
 /**
- * Migration builders for the core tables, split from {@see MigrationRegistry} so this class
- * stays under the dependency limit (Sonar php:S1200).
+ * Reads the live schema of a table: columns, keys, indexes and collation.
  */
-final class CoreMigrations
+class MigrateSchema
 {
+    private \PDO $pdoWrite;
     /**
-     * Base tables created first (settings, users, videos).
-     *
-     * @param \PDO $pdoWrite write connection used to execute the migrations
-     * @return array<string, \GDPlayer\Database\MySQL\Migrate>
+     * @param PDO $pdoWrite write connection used to execute migrations
      */
-    public static function base(\PDO $pdoWrite): array
+    public function __construct(\PDO $pdoWrite)
     {
     }
     /**
-     * Tables depending on the base ones (keys, stats, subtitles, videos).
-     *
-     * @param \PDO $pdoWrite write connection used to execute the migrations
-     * @return array<string, \GDPlayer\Database\MySQL\Migrate>
+     * @param string $table table name
+     * @return array<string,array<string,mixed>>
      */
-    public static function support(\PDO $pdoWrite): array
+    public function getColumns(string $table): array
+    {
+    }
+    /**
+     * @param string $table table name
+     * @return string[]
+     */
+    public function getDropForeignKeysQueries(string $table): array
+    {
+    }
+    /**
+     * @param string $table table name
+     * @return string[]
+     */
+    public function getDropIndexesQueries(string $table): array
+    {
+    }
+    /**
+     * Check the table PRIMARY KEY (so `ADD PRIMARY KEY` is not repeated when it already exists).
+     *
+     * @param string $table table name
+     * @return bool true when the PRIMARY key exists
+     */
+    public function hasPrimaryKey(string $table): bool
+    {
+    }
+    /**
+     * Check whether the table is present in the current schema.
+     *
+     * @param string $table table name
+     * @return bool true when SHOW TABLES returns a row; false on a miss or an exception
+     */
+    public function hasTable(string $table): bool
+    {
+    }
+    /**
+     * Read the collation of the table from INFORMATION_SCHEMA.
+     *
+     * @param string $table table name
+     * @return mixed collation name, or false when the query throws
+     */
+    public function tableCollation(string $table): mixed
     {
     }
 }
-/**
- * Migration definition for the `tb_gdrive_auth` table.
- */
-final class GDriveAuthMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_gdrive_duplicate` table.
- */
-final class GDriveDuplicateMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Google Drive migration builders, split from {@see MigrationRegistry} (Sonar php:S1200).
- */
-final class GDriveMigrations
-{
-    /**
-     * Google Drive tables (accounts, mirrors, duplicates, queue).
-     *
-     * @param \PDO $pdoWrite write connection used to execute the migrations
-     * @return array<string, \GDPlayer\Database\MySQL\Migrate>
-     */
-    public static function build(\PDO $pdoWrite): array
-    {
-    }
-}
-/**
- * Migration definition for the `tb_gdrive_mirrors` table.
- */
-final class GDriveMirrorMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_gdrive_queue` table.
- */
-final class GDriveQueueMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_loadbalancers` table.
- */
-final class LoadBalancerMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_maxmind_asn` table.
- */
-final class MaxmindAsnMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_maxmind` table.
- */
-class MaxmindMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    protected string $table = 'tb_maxmind';
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Single source of the migration builders, bound to the write connection.
- *
- * The list used to be duplicated in `Console\Commands\MigrateCommand` and
- * `Database\MigrationQueriesCreator`; both now share it so neither class depends on the
- * 21 migration classes (Sonar php:S1200 — too many class dependencies). The domain builders
- * live in {@see CoreMigrations} and {@see GDriveMigrations} so no single class owns them all.
- */
-final class MigrationRegistry
-{
-    /**
-     * Build every migration group in the canonical order (FK drop, data move, key restore).
-     *
-     * The order is behavior: Google Drive tables sit between the base and the support tables,
-     * exactly like the legacy list. Do not reorder without an A/B temp copy.
-     *
-     * @param \PDO $pdoWrite write connection used to execute the migrations
-     * @return array<string, \GDPlayer\Database\MySQL\Migrate>
-     */
-    public static function build(\PDO $pdoWrite): array
-    {
-    }
-}
-/**
- * Migration definition for the `tb_plugins` table.
- */
-class PluginMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    protected string $table = 'tb_plugins';
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_plugin_routes` table.
- *
- * Stores the page routes declared by each active plugin, replacing the legacy
- * `/p/<plugin_folder>/<page>` URL scheme with flat plugin-owned prefixes.
- */
-final class PluginRouteMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_sessions` table.
- */
-class SessionMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    protected string $table = 'tb_sessions';
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_settings` table.
- */
-final class SettingMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_stats` table.
- */
-final class StatMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_stats_ua` table.
- */
-final class StatUAMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_subtitle_manager` table.
- */
-final class SubtitleManagerMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_subtitles` table.
- */
-final class SubtitleMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tmp_videos_sources` table.
- */
-final class TmpVideoSourceMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_users` table.
- */
-final class UserMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_videos_alternatives` table.
- */
-final class VideoAlternativeMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_videos_hash` table.
- */
-final class VideoHashMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_videos` table.
- */
-final class VideoMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-/**
- * Migration definition for the `tb_videos_sources` table.
- */
-final class VideoSourceMigration extends \GDPlayer\Database\MySQL\Migrate
-{
-    /**
-     * Define the table schema (columns, indexes and foreign keys).
-     *
-     * @return self fluent instance
-     */
-    public function build(): self
-    {
-    }
-}
-namespace GDPlayer\Database\MySQL;
 
 /**
- * Penyusunan klausa query: where, order, limit, group.
- *
- * Split out of `Model` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Model` through this trait.
+ * Thrown when a destructive query runs without WHERE criteria.
  */
-trait ModelQueryBuilderTrait
+final class MissingCriteriaException extends \RuntimeException
 {
+}
+
+/**
+ * Fluent, cache-aware query builder for a single database table.
+ *
+ * Chain the criteria/order/limit setters, then call get(), getOne(), insert(),
+ * update() or delete(). Reads and writes are invalidated through cache tags.
+ */
+class Model extends \GDPlayer\Database\ModelHelper
+{
+    protected const COMPARISON_OPERATORS = ['=', '>', '<', '>=', '<=', '<>', '!=', 'LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'];
     /**
+     * Render the LIMIT clause from an `[offset, length]` pair.
+     *
      * @param null|int[] $limit
      * @return self
      */
@@ -4100,20 +4426,124 @@ trait ModelQueryBuilderTrait
     {
     }
     /**
+     * Render the ORDER BY clause, rejecting anything that is not a bare identifier.
+     *
      * @param string[] $orderBy
      * @return self
      */
     protected function createOrderByQry(array $orderBy): self
     {
     }
+    /**
+     * Render the WHERE clause from the collected criteria, binding every non-null value.
+     *
+     * @return self fluent instance
+     */
     protected function createWhereSqlParams(): self
     {
     }
     /**
+     * Quote a column list for SELECT; '*' and unusable input fall back to all columns.
+     *
      * @param mixed $selectColumns you can insert '*' or 'id, name' string fields or array('id', 'name') fields
      * @return string
      */
     protected static function repairSelectColumns(mixed $selectColumns = '*'): string
+    {
+    }
+    /**
+     * @param array{start:int, length:int, search:string, orderBy:string, orderDir:string} $qry
+     * @param string[] $searchColumns
+     * @param string|string[] $selectColumns
+     * @return array{data:array<string|int, array<string,string|int|float|null>>, recordsFiltered:int, recordsTotal:int}
+     */
+    public function datatables(array $qry, array $searchColumns, string|array $selectColumns = '*'): array
+    {
+    }
+    /**
+     * Fetch the rows matching the current query builder state.
+     *
+     * @param string|string[] $selectColumns
+     * @param null|string[] $orderBy
+     * @param null|int[] $limit
+     * @return list<array<string,string|int|float|null>>
+     */
+    public function get(string|array $selectColumns = '*', ?array $orderBy = null, ?array $limit = null): array
+    {
+    }
+    /**
+     * Count the rows matching the current query builder state.
+     *
+     * @param null|string[] $orderBy
+     * @param null|int[] $limit
+     * @return int
+     */
+    public function getNumRows(?array $orderBy = null, ?array $limit = null): int
+    {
+    }
+    /**
+     * Fetch the first row matching the current query builder state.
+     *
+     * @param string|string[] $selectColumns
+     * @param null|string[] $orderBy
+     * @return array<string,string|int|float|null>
+     */
+    public function getOne(string|array $selectColumns = '*', ?array $orderBy = null): array
+    {
+    }
+    /**
+     * Count all rows in the table (ignoring any criteria).
+     *
+     * @return int total row count
+     */
+    public function getTotalRows(): int
+    {
+    }
+    /**
+     * @param string $column
+     * @param mixed[] $values
+     * @param mixed $selectColumns
+     * @return list<array<string,string|int|float|null>>
+     */
+    public function getWhereIn(string $column, array $values, mixed $selectColumns = '*'): array
+    {
+    }
+    /**
+     * Determine whether at least one row matches the current criteria.
+     *
+     * @return bool true when a matching row exists
+     */
+    public function hasData(): bool
+    {
+    }
+    /**
+     * Delete every row matching the current criteria.
+     *
+     * @return bool true when the delete executed successfully
+     */
+    public function hasDeleted(): bool
+    {
+    }
+    /**
+     * @param string $column
+     * @param mixed[] $params
+     * @return bool
+     */
+    public function hasDeletedWhereIn(string $column, array $params): bool
+    {
+    }
+    /**
+     * @param array<string,mixed> $data
+     * @return bool
+     */
+    public function hasUpdated(array $data): bool
+    {
+    }
+    /**
+     * @param array<string,mixed> $data
+     * @return string|false inserted id from lastInsertId(), or false on failure
+     */
+    public function insert(array $data): string|false
     {
     }
     /**
@@ -4148,6 +4578,8 @@ trait ModelQueryBuilderTrait
     {
     }
     /**
+     * Add several criteria at once, each as `[column, value, comparison, logical]`.
+     *
      * @param list<list<mixed>> $criteriaList, example: [['id', 1, '<>'],['username', 'admin', '=', 'AND']]
      * @return self
      */
@@ -4165,126 +4597,497 @@ trait ModelQueryBuilderTrait
     {
     }
 }
+
+namespace GDPlayer\Database\MySQL\Migration;
+
 /**
- * Pembacaan baris tunggal dan jumlah baris.
- *
- * Split out of `Model` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Model` through this trait.
+ * Migration builders for the core tables, split from {@see MigrationRegistry} so this class
+ * stays under the dependency limit (Sonar php:S1200).
  */
-trait ModelReadTrait
+final class CoreMigrations
 {
     /**
-     * @param string|string[] $selectColumns
-     * @param null|string[] $orderBy
-     * @param null|int[] $limit
-     * @return list<array<string, mixed>>
-     */
-    public function get(string|array $selectColumns = '*', ?array $orderBy = null, ?array $limit = null): array
-    {
-    }
-    /**
-     * @param null|string[] $orderBy
-     * @param null|int[] $limit
-     * @return int
-     */
-    public function getNumRows(?array $orderBy = null, ?array $limit = null): int
-    {
-    }
-    /**
-     * @param string|string[] $selectColumns
-     * @param null|string[] $orderBy
-     * @return array<string,mixed>
-     */
-    public function getOne(string|array $selectColumns = '*', ?array $orderBy = null): array
-    {
-    }
-    /**
-     * Determine whether at least one row matches the current criteria.
+     * Base tables created first (settings, users, videos).
      *
-     * @return bool true when a matching row exists
+     * @param PDO $pdoWrite write connection used to execute the migrations
+     * @return array<string, Migrate>
      */
-    public function hasData(): bool
+    public static function base(\PDO $pdoWrite): array
+    {
+    }
+    /**
+     * Tables depending on the base ones (keys, stats, subtitles, videos).
+     *
+     * @param PDO $pdoWrite write connection used to execute the migrations
+     * @return array<string, Migrate>
+     */
+    public static function support(\PDO $pdoWrite): array
     {
     }
 }
+
 /**
- * Insert dan penanda baris terhapus/terubah.
- *
- * Split out of `Model` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Model` through this trait.
+ * Migration definition for the `tb_gdrive_auth` table.
  */
-trait ModelWriteTrait
+final class GDriveAuthMigration extends \GDPlayer\Database\MySQL\Migrate
 {
+    protected string $table = 'tb_gdrive_auth';
     /**
-     * Delete every row matching the current criteria.
+     * Define the table schema (columns, indexes and foreign keys).
      *
-     * @return bool true when the delete executed successfully
+     * @return self fluent instance
      */
-    public function hasDeleted(): bool
-    {
-    }
-    /**
-     * @param string $column
-     * @param mixed[] $params
-     * @return bool
-     */
-    public function hasDeletedWhereIn(string $column, array $params): bool
-    {
-    }
-    /**
-     * @param array<string,mixed> $data
-     * @return bool
-     */
-    public function hasUpdated(array $data): bool
-    {
-    }
-    /**
-     * @param array<string,mixed> $data
-     * @return mixed
-     */
-    public function insert(array $data): mixed
+    public function build(): self
     {
     }
 }
+
 /**
- * Fluent, cache-aware query builder for a single database table.
- *
- * Chain the criteria/order/limit setters, then call get(), getOne(), insert(),
- * update() or delete(). Reads and writes are invalidated through cache tags.
+ * Migration definition for the `tb_gdrive_duplicate` table.
  */
-class Model extends \GDPlayer\Database\ModelHelper
+final class GDriveDuplicateMigration extends \GDPlayer\Database\MySQL\Migrate
 {
-    use \GDPlayer\Database\MySQL\ModelQueryBuilderTrait;
-    use \GDPlayer\Database\MySQL\ModelReadTrait;
-    use \GDPlayer\Database\MySQL\ModelWriteTrait;
-    protected const COMPARISON_OPERATORS = ['=', '>', '<', '>=', '<=', '<>', '!=', 'LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'];
+    protected string $table = 'tb_gdrive_duplicate';
     /**
-     * @param array{start:int, length:int, search:string, orderBy:string, orderDir:string} $qry
-     * @param string[] $searchColumns
-     * @param string|string[] $selectColumns
-     * @return array{data:array<string|int, array<string, mixed>>, recordsFiltered:int, recordsTotal:int}
-     */
-    public function datatables(array $qry, array $searchColumns, string|array $selectColumns = '*'): array
-    {
-    }
-    /**
-     * Count all rows in the table (ignoring any criteria).
+     * Define the table schema (columns, indexes and foreign keys).
      *
-     * @return int total row count
+     * @return self fluent instance
      */
-    public function getTotalRows(): int
-    {
-    }
-    /**
-     * @param string $column
-     * @param mixed[] $values
-     * @param mixed $selectColumns
-     * @return list<array<string, mixed>>
-     */
-    public function getWhereIn(string $column, array $values, mixed $selectColumns = '*'): array
+    public function build(): self
     {
     }
 }
+
+/**
+ * Google Drive migration builders, split from {@see MigrationRegistry} (Sonar php:S1200).
+ */
+final class GDriveMigrations
+{
+    /**
+     * Google Drive tables (accounts, mirrors, duplicates, queue).
+     *
+     * @param PDO $pdoWrite write connection used to execute the migrations
+     * @return array<string, Migrate>
+     */
+    public static function build(\PDO $pdoWrite): array
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_gdrive_mirrors` table.
+ */
+final class GDriveMirrorMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_gdrive_mirrors';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_gdrive_queue` table.
+ */
+final class GDriveQueueMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_gdrive_queue';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_loadbalancers` table.
+ */
+final class LoadBalancerMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_loadbalancers';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_maxmind_asn` table.
+ */
+final class MaxmindAsnMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_maxmind_asn';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_maxmind` table.
+ */
+class MaxmindMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_maxmind';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Single source of the migration builders, bound to the write connection.
+ *
+ * The list used to be duplicated in `Console\Commands\MigrateCommand` and
+ * `Database\MigrationQueriesCreator`; both now share it so neither class depends on the
+ * 21 migration classes (Sonar php:S1200 — too many class dependencies). The domain builders
+ * live in {@see CoreMigrations} and {@see GDriveMigrations} so no single class owns them all.
+ */
+final class MigrationRegistry
+{
+    /**
+     * Build every migration group in the canonical order (FK drop, data move, key restore).
+     *
+     * The order is behavior: Google Drive tables sit between the base and the support tables,
+     * exactly like the legacy list. Do not reorder without an A/B temp copy.
+     *
+     * @param PDO $pdoWrite write connection used to execute the migrations
+     * @return array<string, Migrate>
+     */
+    public static function build(\PDO $pdoWrite): array
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_plugins` table.
+ */
+class PluginMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_plugins';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_plugin_routes` table.
+ *
+ * Stores the page routes declared by each active plugin, replacing the legacy
+ * `/p/<plugin_folder>/<page>` URL scheme with flat plugin-owned prefixes.
+ */
+final class PluginRouteMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_plugin_routes';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_sessions` table.
+ */
+class SessionMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_sessions';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_settings` table.
+ */
+final class SettingMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_settings';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_stats` table.
+ */
+final class StatMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_stats';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_stats_ua` table.
+ */
+final class StatUAMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_stats_ua';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_subtitle_manager` table.
+ */
+final class SubtitleManagerMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_subtitle_manager';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_subtitles` table.
+ */
+final class SubtitleMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_subtitles';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tmp_videos_sources` table.
+ */
+final class TmpVideoSourceMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tmp_videos_sources';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_users` table.
+ */
+final class UserMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_users';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_videos_alternatives` table.
+ */
+final class VideoAlternativeMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_videos_alternatives';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_videos_hash` table.
+ */
+final class VideoHashMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_videos_hash';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_videos` table.
+ */
+final class VideoMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_videos';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+/**
+ * Migration definition for the `tb_videos_sources` table.
+ */
+final class VideoSourceMigration extends \GDPlayer\Database\MySQL\Migrate
+{
+    protected string $table = 'tb_videos_sources';
+    /**
+     * Define the table schema (columns, indexes and foreign keys).
+     *
+     * @return self fluent instance
+     */
+    public function build(): self
+    {
+    }
+}
+
+namespace GDPlayer\Enum;
+
+/**
+ * `tb_videos.dmca` value.
+ */
+enum Dmca : int
+{
+    /** Playable. */
+    case Clear = 0;
+    /** Blocked: the player must answer with a takedown notice. */
+    case Flagged = 1;
+    /**
+     * Normalise a raw database value. Anything other than a stored `1` is treated as clear.
+     *
+     * @param mixed $value raw `dmca` column value
+     * @return self normalised flag
+     */
+    public static function fromValue(mixed $value): self
+    {
+    }
+}
+
+/**
+ * `tb_users.role` value. Only `Admin` passes the admin guard.
+ */
+enum UserRole : int
+{
+    case Admin = 0;
+    case User = 1;
+    case Premium = 2;
+    /**
+     * Resolve a stored role index, falling back to the plain user role.
+     *
+     * @param int|null $index stored `role` value, or null when the row has no value
+     * @return self matching role, or `User` for an unknown index
+     */
+    public static function fromIndex(?int $index): self
+    {
+    }
+    /**
+     * @return string label shown in the user list
+     */
+    public function label(): string
+    {
+    }
+}
+
+/**
+ * `tb_users.status` value.
+ */
+enum UserStatus : int
+{
+    /** Blocked by an admin. */
+    case Inactive = 0;
+    /** Confirmed and allowed to log in. */
+    case Active = 1;
+    /** Signed up, confirmation email sent, waiting for the link to be opened. */
+    case AwaitingApproval = 2;
+}
+
+/**
+ * `tb_videos.status` value: whether the primary source and the alternatives still exist upstream.
+ */
+enum VideoStatus : int
+{
+    /** Primary source and every alternative are still reachable. */
+    case Good = 0;
+    /** No reachable source at all. */
+    case Broken = 1;
+    /** Primary source is gone but at least one alternative still works. */
+    case Warning = 2;
+    /**
+     * Derive the status from the availability of both source groups.
+     *
+     * @param bool $primaryAlive     the `tb_videos` source is still reachable
+     * @param bool $alternativeAlive at least one `tb_videos_alternatives` source is still reachable
+     * @return self status implied by those two facts
+     */
+    public static function fromAvailability(bool $primaryAlive, bool $alternativeAlive): self
+    {
+    }
+}
+
 namespace GDPlayer\Extension;
 
 /**
@@ -4296,7 +5099,11 @@ namespace GDPlayer\Extension;
  */
 final class ExtensionManifest
 {
+    /** @var array<string, true> directories whose autoloader is already registered */
+    private static array $registered = [];
     /**
+     * Decode a manifest file and keep only its string-keyed entries.
+     *
      * @param string $file manifest JSON path
      * @return array<string, mixed> manifest contents; empty array when missing/invalid
      */
@@ -4307,12 +5114,13 @@ final class ExtensionManifest
      * Register the PSR-4 autoloader from the manifest (once per extension directory).
      *
      * @param string $baseDir theme/plugin directory
-     * @param array<string, mixed> $manifest manifest contents
+     * @param array<mixed, mixed> $manifest manifest contents
      */
     public static function registerAutoload(string $baseDir, array $manifest): void
     {
     }
 }
+
 /**
  * Uninstall hook declared by an extension manifest (`hooks.uninstall`).
  *
@@ -4325,6 +5133,7 @@ interface UninstallHookInterface
      */
     public function uninstall(): void;
 }
+
 namespace GDPlayer\External;
 
 /**
@@ -4332,6 +5141,12 @@ namespace GDPlayer\External;
  */
 final class AntiCaptcha
 {
+    private string $apiBaseUrl = 'https://api.anti-captcha.com/';
+    private string $apiKey = '';
+    /** @var array<string,mixed> $proxy */
+    private array $proxy = [];
+    private string $websiteKey = '';
+    private string $websiteURL = '';
     /**
      * Initialize the cURL handle and load the configured API key.
      */
@@ -4386,82 +5201,277 @@ final class AntiCaptcha
     {
     }
 }
+
 /**
- * Operasi berkas Drive: info, daftar, folder, rename.
+ * Shared Drive state, auth headers, transport and cache writes.
  *
- * Split out of `GoogleDriveRestAPI` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GoogleDriveRestAPI` through this trait.
+ * The properties are public on purpose: the file, permission and mirror
+ * collaborators read the same per-request state without accessor boilerplate.
+ *
+ * @internal
  */
-trait GDriveFileApiTrait
+class GDriveClient
 {
+    /** @var null|array<string,mixed> */
+    public ?array $accessToken = null;
+    public ?string $apiKey = null;
+    public string $baseURL = 'https://www.googleapis.com';
+    public string $email = '';
+    public bool $encryptTitle = false;
+    public string $fileID = '';
+    public \GDPlayer\Model\GDriveAuth $gdAuth;
+    public \GDPlayer\Model\GDriveMirror $gdMirror;
+    /** @var array<string,mixed> */
+    public array $inputFileInfo = [];
+    public string $nextPageToken = '';
+    public string $searchTitle = '';
+    public bool $showFolderOnly = false;
+    public bool $showPrivateOnly = false;
+    public string $tokenPath = '/oauth2/v4/token';
+    /** @var null|array<string,mixed> */
+    public ?array $userDetail = null;
+    public string $v2Path = '/drive/v2';
+    public \GDPlayer\Model\VideoHash $vHash;
     /**
-     * @param string $folderName
-     * @param list<array<string,mixed>> $parents
-     * @return array<string,mixed>|false
+     * Initialize the Drive auth/mirror models.
+     */
+    public function __construct()
+    {
+    }
+    /**
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Single request to the Google Drive API: Cloudflare proxy, method, body, headers.
+     *
+     * @param string[] $headers header lines sent with the request
+     * @return array{response: string, error: string, status: int}
+     */
+    public function apiRequest(string $url, string $method = 'GET', string $postData = '', array $headers = []): array
+    {
+    }
+    /**
+     * Build the auth header list for the active account, refreshing the token when needed.
+     *
+     * @param bool $jsonType add JSON accept/content-type headers
+     * @return string[]
+     */
+    public function createAuthHeader(bool $jsonType = false): array
+    {
+    }
+    /**
+     * Send an authenticated JSON body and return the created resource.
+     *
+     * @param string $url absolute API URL
+     * @param string $postData JSON body
+     * @param string $method POST or PUT
+     * @return array<string,mixed>|false response when it carries an `id`, false otherwise
+     */
+    public function customCurlRequest(string $url, string $postData, string $method = 'POST'): array|false
+    {
+    }
+    /**
+     * Toggle title encryption for returned file names.
+     *
+     * @param bool $encrypted whether to encrypt titles
+     * @return static fluent instance
+     */
+    public function encryptTitle(bool $encrypted = false): static
+    {
+    }
+    /**
+     * Return the active Drive API key.
+     *
+     * @return null|string API key, or null when not set
+     */
+    public function getAPIKey(): ?string
+    {
+    }
+    /**
+     * Return a cached access token, refreshing it through the OAuth2 endpoint when stale.
+     *
+     * Cached for 3500 seconds behind a 15 second lock, so parallel requests refresh only once.
+     *
+     * @return null|array<string,mixed> token response, or null when the account is unknown
+     */
+    public function getAccessToken(): ?array
+    {
+    }
+    /**
+     * Return the pagination token for the next result page.
+     *
+     * @return string next page token
+     */
+    public function getNextPageToken(): string
+    {
+    }
+    /**
+     * @return array<string,mixed>
+     */
+    public function getUserInfo(): array
+    {
+    }
+    /**
+     * Store file metadata in the local hash cache unless the id is already cached.
+     *
+     * @param array<string,mixed> $file
+     * @return string|false
+     */
+    public function saveFileInfo(array $file = []): string|false
+    {
+    }
+    /**
+     * Record the source/mirror id pair in the gdMirror table unless it is already stored.
+     *
+     * @param string $fileID original Drive file id
+     * @param string $fileMirrorID copy id; an identical value means no mirror row is needed
+     * @return string|false insert result, or false when the pair exists or the ids match
+     */
+    public function saveFileMirrorDB(string $fileID = '', string $fileMirrorID = ''): string|false
+    {
+    }
+    /**
+     * Restrict search results to folders only.
+     *
+     * @param bool $showFolderOnly folder-only flag
+     * @return static fluent instance
+     */
+    public function searchFolderOnly(bool $showFolderOnly = false): static
+    {
+    }
+    /**
+     * Restrict search results to private (non-shared) files only.
+     *
+     * @param bool $showPrivateOnly private-only flag
+     * @return static fluent instance
+     */
+    public function searchPrivateOnly(bool $showPrivateOnly = false): static
+    {
+    }
+    /**
+     * Set the title filter used by file searches.
+     *
+     * @param string $searchTitle title query
+     * @return static fluent instance
+     */
+    public function searchTitle(string $searchTitle = ''): static
+    {
+    }
+    /**
+     * Set the pagination token for the next result page.
+     *
+     * @param string $nextPageToken next page token
+     * @return static fluent instance
+     */
+    public function setNextPageToken(string $nextPageToken = ''): static
+    {
+    }
+}
+
+/**
+ * Drive file operations: info, listing, folders, rename.
+ *
+ * @internal
+ */
+final class GDriveFileApi
+{
+    public function __construct(private \GDPlayer\External\GDriveClient $client)
+    {
+    }
+    /**
+     * Create a Drive folder, optionally inside the given parents.
+     *
+     * @param string $folderName new folder title
+     * @param list<array<string,mixed>> $parents Parent references (`['id' => ...]`).
+     * @return array<string,mixed>|false created folder, or false on failure
      */
     public function createNewFolder(string $folderName = '', array $parents = []): array|false
     {
     }
     /**
-     * @param bool $searchInCache
-     * @return false|array<string,mixed>
+     * Fetch one file's metadata, optionally from the local hash cache first.
+     *
+     * A cached row whose JSON no longer decodes is deleted and refetched, and a
+     * successful API response is written back to the cache.
+     *
+     * @param bool $searchInCache whether the local cache may answer the call
+     * @return false|array<string,mixed> file metadata, or false when unavailable
      */
     public function getFileInfo(bool $searchInCache = true): false|array
     {
     }
     /**
-     * @param string $parentId
-     * @param int $maxResult
-     * @param string $orderBy
-     * @param string $orderDir
-     * @return list<array<string,mixed>>
+     * List files with a v2 query filter built from the current object state.
+     *
+     * The filter always excludes trashed files and keeps only folders, video,
+     * audio, and octet-stream entries; a title search also matches MD5,
+     * HMAC-SHA256, and full-text forms, and then skips `orderBy`.
+     *
+     * @param string $parentId restrict to one parent folder, or empty for all
+     * @param int $maxResult page size
+     * @param string $orderBy sort field
+     * @param string $orderDir sort direction, `asc` or `desc`
+     * @return list<array<mixed, mixed>>
      */
     public function getFiles(string $parentId = '', int $maxResult = 10, string $orderBy = 'modifiedDate', string $orderDir = 'desc'): array
     {
     }
     /**
-     * @return list<array<string,mixed>>
+     * List up to 100 shared drives and store the next page token.
+     *
+     * @return list<array<mixed, mixed>>
      */
     public function getSharedDrives(): array
     {
     }
     /**
-     * @param string $newFolderName
-     * @return array<string,mixed>|false
+     * Rename the current file or folder.
+     *
+     * The v2 endpoint expects both `title` and `name`, so the same value is sent
+     * twice.
+     *
+     * @param string $newFolderName new title
+     * @return array<string,mixed>|false updated resource, or false on failure
      */
     public function renameFileFolder(string $newFolderName = ''): array|false
     {
     }
 }
+
 /**
- * Mirror Drive: pencarian dan pencocokan record.
+ * Drive mirror lookup: existing record matching and cross-account search.
  *
- * Split out of `GoogleDriveRestAPI` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GoogleDriveRestAPI` through this trait.
+ * @internal
  */
-trait GDriveMirrorTrait
+final class GDriveMirrorStore
 {
-    /**
-     * @return false|array<string,mixed>
-     */
-    protected function findExistingMirrorInDB(): false|array
+    public function __construct(private \GDPlayer\External\GoogleDriveRestAPI $api)
     {
     }
     /**
-     * @return false|array<string,mixed>
+     * Search other accounts for the same title and record the first hit as a new mirror.
+     *
+     * @return false|array<string,mixed> newly resolved file info, the existing mirror record,
+     *                                    or false when nothing was mirrored before either
      */
     public function searchFileMirror(): false|array
     {
     }
 }
+
 /**
- * Pemeriksaan izin & status hapus berkas Drive.
+ * Drive file permission and deletion-status checks.
  *
- * Split out of `GoogleDriveRestAPI` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GoogleDriveRestAPI` through this trait.
+ * @internal
  */
-trait GDrivePermissionTrait
+final class GDrivePermissionApi
 {
+    public function __construct(private \GDPlayer\External\GDriveClient $client)
+    {
+    }
     /**
      * Delete the file referenced by the current file id.
      *
@@ -4487,184 +5497,133 @@ trait GDrivePermissionTrait
     {
     }
 }
-/**
- * Transport API Drive: token akses dan request cURL.
- *
- * Split out of `GoogleDriveRestAPI` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GoogleDriveRestAPI` through this trait.
- */
-trait GDriveTransportTrait
-{
-    /**
-     * Single request to the Google Drive API: WARP (when eligible), method, body, headers.
-     *
-     * @param string[] $headers
-     * @return array{response: string, error: string, status: int}
-     */
-    protected function apiRequest(string $url, string $method = 'GET', string $postData = '', array $headers = []): array
-    {
-    }
-    /**
-     * @param string $url
-     * @param string $postData json
-     * @param string $method POST|PUT
-     * @return array<string,mixed>|false
-     */
-    protected function customCurlRequest(string $url, string $postData, string $method = 'POST'): array|false
-    {
-    }
-    /**
-     * @return null|array<string,mixed>
-     */
-    public function getAccessToken(): ?array
-    {
-    }
-}
-/**
- * Shared state, search filters and accessors for the Google Drive REST client.
- */
-trait GoogleDriveRestAPITrait
-{
-    /** @var null|array<string,mixed> $accessToken */
-    private ?array $accessToken = null;
-    private ?string $apiKey = null;
-    private string $baseURL = 'https://www.googleapis.com';
-    private string $email = '';
-    private bool $encryptTitle = false;
-    private string $fileID = '';
-    private \GDPlayer\Model\GDriveAuth $gdAuth;
-    private \GDPlayer\Model\GDriveMirror $gdMirror;
-    private string $nextPageToken = '';
-    private string $searchTitle = '';
-    private bool $showFolderOnly = false;
-    private bool $showPrivateOnly = false;
-    private string $tokenPath = '/oauth2/v4/token';
-    /** @var null|array<string,mixed> $userDetail */
-    private ?array $userDetail = null;
-    private string $v2Path = '/drive/v2';
-    private \GDPlayer\Model\VideoHash $vHash;
-    /**
-     * Initialize the Drive auth/mirror models.
-     */
-    public function __construct()
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    /**
-     * @param bool $jsonType
-     * @return string[]
-     */
-    private function createAuthHeader(bool $jsonType = false): array
-    {
-    }
-    /**
-     * @param array<string,mixed> $file
-     * @return string|false
-     */
-    private function saveFileInfo(array $file = []): string|false
-    {
-    }
-    private function saveFileMirrorDB(string $fileID = '', string $fileMirrorID = ''): string|false
-    {
-    }
-    /**
-     * Toggle title encryption for returned file names.
-     *
-     * @param bool $encrypted whether to encrypt titles
-     * @return self fluent instance
-     */
-    public function encryptTitle(bool $encrypted = false): self
-    {
-    }
-    /**
-     * Return the active Drive API key.
-     *
-     * @return null|string API key, or null when not set
-     */
-    public function getAPIKey(): ?string
-    {
-    }
-    /**
-     * Return the pagination token for the next result page.
-     *
-     * @return string next page token
-     */
-    public function getNextPageToken(): string
-    {
-    }
-    /**
-     * @return array<string,mixed>
-     */
-    public function getUserInfo(): array
-    {
-    }
-    /**
-     * Restrict search results to folders only.
-     *
-     * @param bool $showFolderOnly folder-only flag
-     * @return self fluent instance
-     */
-    public function searchFolderOnly(bool $showFolderOnly = false): self
-    {
-    }
-    /**
-     * Restrict search results to private (non-shared) files only.
-     *
-     * @param bool $showPrivateOnly private-only flag
-     * @return self fluent instance
-     */
-    public function searchPrivateOnly(bool $showPrivateOnly = false): self
-    {
-    }
-    /**
-     * Set the title filter used by file searches.
-     *
-     * @param string $searchTitle title query
-     * @return self fluent instance
-     */
-    public function searchTitle(string $searchTitle = ''): self
-    {
-    }
-    /**
-     * Set the pagination token for the next result page.
-     *
-     * @param string $nextPageToken next page token
-     * @return self fluent instance
-     */
-    public function setNextPageToken(string $nextPageToken = ''): self
-    {
-    }
-}
+
 /**
  * Google Drive REST API client for file and permission management.
  *
  * Wraps the Drive v2/v3 endpoints used for mirroring, listing, copying and
  * sharing files across the configured Drive accounts.
  */
-final class GoogleDriveRestAPI
+final class GoogleDriveRestAPI extends \GDPlayer\External\GDriveClient
 {
-    use \GDPlayer\External\GDriveFileApiTrait;
-    use \GDPlayer\External\GDriveMirrorTrait;
-    use \GDPlayer\External\GDrivePermissionTrait;
-    use \GDPlayer\External\GDriveTransportTrait;
-    use \GDPlayer\External\GoogleDriveRestAPITrait;
+    private \GDPlayer\External\GDriveFileApi $fileApi;
+    private \GDPlayer\External\GDriveMirrorStore $mirrorStore;
+    private \GDPlayer\External\GDrivePermissionApi $permissionApi;
     /**
-     * @param string $parentId
-     * @return false|array<string,mixed>
+     * Build the file, permission and mirror collaborators around this client.
+     */
+    public function __construct()
+    {
+    }
+    /**
+     * Copy `$this->fileID` into a folder, reusing a mirror that already exists.
+     *
+     * Only accounts flagged `bypass` may copy.
+     *
+     * @param string $parentId destination folder id
+     * @return false|array<string,mixed> copy metadata, or false when no copy was made
      */
     public function copy(string $parentId = 'root'): false|array
     {
     }
     /**
-     * @param string $parentId
-     * @return false|array<string,mixed>
+     * Copy `$this->fileID` with the first enabled and bypassing Drive account that succeeds.
+     *
+     * @param string $parentId destination folder id
+     * @return false|array<string,mixed> copy metadata, or false when every account failed
      */
     public function copyToAll(string $parentId = 'root'): false|array
+    {
+    }
+    /**
+     * Create a Drive folder, optionally inside the given parents.
+     *
+     * @param string $folderName new folder title
+     * @param list<array<string,mixed>> $parents Parent references (`['id' => ...]`).
+     * @return array<string,mixed>|false created folder, or false on failure
+     */
+    public function createNewFolder(string $folderName = '', array $parents = []): array|false
+    {
+    }
+    /**
+     * Build the title used to look for an existing mirror.
+     *
+     * A description that already looks like a mirror marker (`copy by`, `mirror`, `upload`...) falls back
+     * to the file title, then to the original filename.
+     *
+     * @return string title to search with, possibly empty
+     */
+    public function createSearchTitle(): string
+    {
+    }
+    /**
+     * Fetch one file's metadata, optionally from the local hash cache first.
+     *
+     * @param bool $searchInCache whether the local cache may answer the call
+     * @return false|array<string,mixed> file metadata, or false when unavailable
+     */
+    public function getFileInfo(bool $searchInCache = true): false|array
+    {
+    }
+    /**
+     * List files with a v2 query filter built from the current object state.
+     *
+     * @param string $parentId restrict to one parent folder, or empty for all
+     * @param int $maxResult page size
+     * @param string $orderBy sort field
+     * @param string $orderDir sort direction, `asc` or `desc`
+     * @return list<array<mixed, mixed>>
+     */
+    public function getFiles(string $parentId = '', int $maxResult = 10, string $orderBy = 'modifiedDate', string $orderDir = 'desc'): array
+    {
+    }
+    /**
+     * List up to 100 shared drives and store the next page token.
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    public function getSharedDrives(): array
+    {
+    }
+    /**
+     * Delete the file referenced by the current file id.
+     *
+     * @return bool true when the file was deleted
+     */
+    public function hasDeleted(): bool
+    {
+    }
+    /**
+     * Remove the public "anyone" permission from the current file.
+     *
+     * @return bool true when the permission was removed
+     */
+    public function hasDeletedPermissions(): bool
+    {
+    }
+    /**
+     * Grant public read ("anyone") permission on the current file.
+     *
+     * @return bool true when the permission was granted
+     */
+    public function hasInsertedPermissions(): bool
+    {
+    }
+    /**
+     * Rename the current file or folder.
+     *
+     * @param string $newFolderName new title
+     * @return array<string,mixed>|false updated resource, or false on failure
+     */
+    public function renameFileFolder(string $newFolderName = ''): array|false
+    {
+    }
+    /**
+     * Search other accounts for the same title and record the first hit as a new mirror.
+     *
+     * @return false|array<string,mixed> newly resolved file info or false when unknown
+     */
+    public function searchFileMirror(): false|array
     {
     }
     /**
@@ -4686,6 +5645,7 @@ final class GoogleDriveRestAPI
     {
     }
 }
+
 /**
  * Mail driver dispatcher (SMTP, Mailgun or Resend).
  *
@@ -4693,6 +5653,13 @@ final class GoogleDriveRestAPI
  */
 final class Mailer
 {
+    private \GDPlayer\Config\Config $config;
+    private string $driver = 'smtp';
+    private string $email;
+    private ?\PHPMailer\PHPMailer\PHPMailer $mail = null;
+    private ?\GDPlayer\External\Mailgun $mailgun = null;
+    private string $password;
+    private ?\GDPlayer\External\Resend $resend = null;
     /**
      * Read the configured mail driver and instantiate the matching backend.
      */
@@ -4700,24 +5667,35 @@ final class Mailer
     {
     }
     /**
+     * Expose the application metadata instead of the credentials held by this object.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
     {
     }
     /**
+     * Send a message through the driver selected by the `mail_driver` setting.
+     *
      * @param array<string,mixed> $messagePayload
-     * @return int
+     * @return int 1 when the message was accepted, 0 otherwise
      */
     public function send(array $messagePayload = []): int
     {
     }
 }
+
 /**
  * Mailgun HTTP REST API mail driver (bypasses SMTP port blocking).
  */
 final class Mailgun
 {
+    private const DEFAULT_API_URL = 'https://api.mailgun.net';
+    private const DEFAULT_EU_API_URL = 'https://api.eu.mailgun.net';
+    private string $apiKey;
+    private \GDPlayer\Config\Config $config;
+    private string $domain;
+    private string $endpoint;
     /**
      * Load the Mailgun API key, domain and region settings.
      */
@@ -4738,13 +5716,57 @@ final class Mailgun
     {
     }
 }
+
 /**
- * Provider IP info eksternal dan penyusunan request API.
+ * MaxMind geolocation/ASN lookup service.
  *
- * Split out of `Maxmind` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Maxmind` through this trait.
+ * Resolves the client IP and enriches it with country, continent and ASN data.
  */
-trait MaxmindApiTrait
+final class Maxmind
+{
+    /** Readers are opened once per process: reopening the mmdb on every lookup is expensive. */
+    private static ?\GeoIp2\Database\Reader $asnReader = null;
+    private static ?\GeoIp2\Database\Reader $countryReader = null;
+    /**
+     * @param null|Redis $redis optional Redis instance for shared state
+     */
+    public function __construct(private ?\Redis $redis = null, private \GDPlayer\External\MaxmindApi $api = new \GDPlayer\External\MaxmindApi())
+    {
+    }
+    /**
+     * Expose the application info instead of the internal readers in var_dump output.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Resolve ASN, country and continent for an IP, using the cache and the API fallbacks.
+     *
+     * @param string $ip
+     * @return array<string,mixed>|null null when the IP is private/reserved or no source knows it
+     */
+    public function getASNInfo(string $ip = ''): ?array
+    {
+    }
+    /**
+     * Resolve the client IP address from the request or the proxy headers.
+     *
+     * @param ServerRequestInterface|null $request request to read, or null to fall back to the server vars
+     * @return string Client IP address, defaulting to 127.0.0.1.
+     */
+    public function getIP(?\Psr\Http\Message\ServerRequestInterface $request = null): string
+    {
+    }
+}
+
+/**
+ * Fallback IP info providers (api.ipinfo.io, stat.ripe.net) for the MaxMind service.
+ *
+ * Used only when the local GeoLite2 snapshot has nothing for the address.
+ */
+class MaxmindApi
 {
     /**
      * @return string[] standard headers for the external API
@@ -4755,111 +5777,42 @@ trait MaxmindApiTrait
     /**
      * HTTP request owned by this class (15 s timeout, matching the previous setting).
      *
-     * @return \GDPlayer\Http\Fetcher\Fetcher Fetcher preconfigured with the application User-Agent
+     * @return Fetcher Fetcher preconfigured with the application User-Agent
      */
     protected function createFetcher(): \GDPlayer\Http\Fetcher\Fetcher
     {
     }
     /**
-     * @param string $ip
-     * @return null|array<string,mixed>
-     */
-    protected function getIPInfoAPI(string $ip = ''): ?array
-    {
-    }
-    /**
-     * @param string $ip
-     * @return null|array<string,mixed>
-     */
-    protected function getRipeStatIP(string $ip = ''): ?array
-    {
-    }
-}
-/**
- * Ekstraksi IP request/server dan filter data.
- *
- * Split out of `Maxmind` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Maxmind` through this trait.
- */
-trait MaxmindRequestTrait
-{
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param array<string, string> $ipHeaderCandidates
-     * @return string
-     */
-    protected function extractIpFromRequest(\Psr\Http\Message\ServerRequestInterface $request, array $ipHeaderCandidates): string
-    {
-    }
-    /**
-     * @param array<string, string> $ipHeaderCandidates
-     * @return string
-     */
-    protected function extractIpFromServer(array $ipHeaderCandidates): string
-    {
-    }
-    /**
-     * @param string $prefixItem
-     * @return string|null
-     */
-    protected function extractPrefixLength(string $prefixItem): ?string
-    {
-    }
-    /**
-     * @param array<string,mixed> $data
-     * @param string $searchKey
-     * @return string[]
-     */
-    protected function filterDataByKey(array $data, string $searchKey): array
-    {
-    }
-}
-/**
- * MaxMind geolocation/ASN lookup service.
- *
- * Resolves the client IP and enriches it with country, continent and ASN data.
- */
-final class Maxmind
-{
-    use \GDPlayer\External\MaxmindApiTrait;
-    use \GDPlayer\External\MaxmindRequestTrait;
-    /**
-     * @param null|\Redis $redis optional Redis instance for shared state
-     */
-    public function __construct(private ?\Redis $redis = null)
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    /**
-     * @param string $ip
-     * @return array<string,mixed>|null
-     */
-    public function getASNInfo(string $ip = ''): ?array
-    {
-    }
-    /**
-     * Resolve the client IP address from the request/proxy headers.
+     * Fetch and decode the RIPE stat whois payload.
      *
-     * @return string client IP address
+     * @param string $ip
+     * @return array<string,mixed>
      */
+    protected function fetchRipeStat(string $ip): array
+    {
+    }
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request
-     * @return string
+     * @param string $ip
+     * @return null|array<string,mixed>
      */
-    public function getIP(?\Psr\Http\Message\ServerRequestInterface $request = null): string
+    public function getIPInfoAPI(string $ip = ''): ?array
+    {
+    }
+    /**
+     * @param string $ip
+     * @return null|array<string,mixed>
+     */
+    public function getRipeStatIP(string $ip = ''): ?array
     {
     }
 }
+
 /**
  * Free/rotating proxy list manager with availability checking.
  */
 final class Proxy
 {
+    private \GDPlayer\Config\Config $config;
     /**
      * Load the configuration used for proxy fetching.
      */
@@ -4900,11 +5853,15 @@ final class Proxy
     {
     }
 }
+
 /**
  * Resend HTTP REST API mail driver.
  */
 final class Resend
 {
+    private const API_URL = 'https://api.resend.com/emails';
+    private string $apiKey;
+    private \GDPlayer\Config\Config $config;
     /**
      * Load the configured Resend API key.
      */
@@ -4925,24 +5882,7 @@ final class Resend
     {
     }
 }
-/**
- * Unduh, ekstrak, dan simpan berkas subtitle Subscene.
- *
- * Split out of `Subscene` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Subscene` through this trait.
- */
-trait SubsceneDownloadTrait
-{
-    protected function download(string $url, string $outputFile, int $attempts = 0): string|false
-    {
-    }
-    protected function extractZipFile(string $file): string|false
-    {
-    }
-    protected function saveToFile(string $file, string $content): string|false
-    {
-    }
-}
+
 /**
  * Subscene subtitle scraper and downloader.
  *
@@ -4950,7 +5890,11 @@ trait SubsceneDownloadTrait
  */
 final class Subscene
 {
-    use \GDPlayer\External\SubsceneDownloadTrait;
+    private string $baseUrl = 'https://sub-scene.com/';
+    /** @var string[] $httpHeaders */
+    private array $httpHeaders = [];
+    private string $subsceneDir;
+    private string $subsceneUrl;
     /**
      * @param string $url optional subtitle page URL to resolve immediately
      */
@@ -4961,6 +5905,54 @@ final class Subscene
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
+    {
+    }
+    /**
+     * Download the archive into the given file and extract its best subtitle entry.
+     *
+     * @param string $url archive URL to download
+     * @param string $outputFile destination path of the archive
+     * @param int $attempts number of attempts already spent on rotating proxies
+     * @return string|false path of the saved subtitle, false on failure
+     */
+    protected function download(string $url, string $outputFile, int $attempts = 0): string|false
+    {
+    }
+    /**
+     * Extract the best subtitle entry from a zip archive and move it next to the archive.
+     *
+     * @param string $file path of the downloaded archive
+     * @return string|false path of the saved subtitle, false when no entry was kept
+     */
+    protected function extractZipFile(string $file): string|false
+    {
+    }
+    /**
+     * @param ZipArchive $zip
+     * @param string[] $allowedExtensions
+     * @return array{filename: string, extension: string}|null
+     */
+    protected function findBestSubtitleEntry(\ZipArchive $zip, array $allowedExtensions): ?array
+    {
+    }
+    /**
+     * Read one archive member fully into memory using an unbuffered small-chunk stream.
+     *
+     * @param ZipArchive $zip open archive handle
+     * @param string $filename member name inside the archive
+     * @return string member contents, empty when the name is empty or the stream cannot be opened
+     */
+    protected function getContent(\ZipArchive $zip, string $filename): string
+    {
+    }
+    /**
+     * Validate the subtitle content and save it under a non-conflicting file name.
+     *
+     * @param string $file preferred destination path
+     * @param string $content raw subtitle content
+     * @return string|false path actually written, false when the content was rejected
+     */
+    protected function saveToFile(string $file, string $content): string|false
     {
     }
     /**
@@ -4990,6 +5982,7 @@ final class Subscene
     {
     }
 }
+
 /**
  * Fetches and decodes subtitle JSON feeds.
  */
@@ -5011,7 +6004,784 @@ final class SubtitleJson
     {
     }
 }
+
+namespace GDPlayer\Helper;
+
+/**
+ * Base controller for the Ajax endpoints.
+ *
+ * Normalizes the request, resolves the caller/token and dispatches the
+ * requested action, returning a JSON response.
+ */
+abstract class AjaxHelper implements \Psr\Http\Server\RequestHandlerInterface
+{
+    use \GDPlayer\Modules\AjaxBaseTrait;
+    protected const MESSAGE_BAD_REQUEST = 'Bad request';
+    protected const MESSAGE_UNAUTHORIZE = 'You are not authorized to access this feature';
+    protected string $action = '';
+    protected \GDPlayer\Config\BinFile $binConfig;
+    protected \GDPlayer\Config\Config $config;
+    /**
+     * The logged-in user of the active request.
+     *
+     * Readonly: resolved once in the constructor by {@see AjaxBaseTrait::resolveCurrentUser()}
+     * and never changed afterwards.
+     *
+     * @var null|array<string,string|int|float|null>
+     */
+    protected readonly ?array $currentUser;
+    /**
+     * The id of the logged-in user of the active request; 0 when anonymous.
+     *
+     * Readonly: derived from {@see $currentUser} once, in the constructor.
+     */
+    protected readonly int $currentUserId;
+    /** @var array<string,mixed> $data */
+    protected array $data;
+    protected int $draw = 0;
+    protected mixed $epeMelemek = false;
+    /** @var array<string,UploadedFile|null> $files */
+    protected array $files = [];
+    protected bool $isAdmin = false;
+    protected bool $isAdminShowUserData = false;
+    protected bool $isUserShowTheirData = false;
+    /** @var string[] $listColumns */
+    protected array $listColumns;
+    protected \GDPlayer\Core\Security\Security $security;
+    protected string $token = '';
+    /**
+     * Resolve and call the protected action method named by the request.
+     *
+     * The method must be protected, declared below `AjaxHelper` and take no required
+     * argument; anything else is reported as a bad request.
+     *
+     * @param object $class controller instance holding the action
+     * @return string JSON response from the action
+     */
+    protected function loadAction(object $class): string
+    {
+    }
+    /**
+     * Handle the PSR-7 request and return a JSON response.
+     *
+     * @param ServerRequestInterface $request incoming request
+     * @return ResponseInterface JSON response
+     */
+    public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Dispatch the list action for the current entity.
+     *
+     * @return string JSON response
+     */
+    public function list(): string
+    {
+    }
+    /**
+     * Handle the request and return the JSON payload, dispatched from `list()`.
+     *
+     * @return string JSON response
+     */
+    abstract public function response(): string;
+}
+
+final class FileSystem
+{
+    /**
+     * Write content to a file, creating its parent directory first.
+     *
+     * Writability is not pre-checked because PHP on Windows can report a
+     * directory as read-only while `fopen()` still succeeds; the open call is
+     * left to decide and its failure is logged.
+     *
+     * @param string $file target file path
+     * @param string $content bytes to write
+     * @param string $mode `fopen()` mode
+     * @return int|false Bytes written, or false on failure
+     */
+    public static function createFile(string $file, string $content = '', string $mode = 'w'): int|false
+    {
+    }
+    /**
+     * Read a whole file in buffered chunks.
+     *
+     * A failed read is retried a few times before the loop gives up, so a
+     * transient error cannot spin forever.
+     *
+     * @param string $file source file path
+     * @param string $mode `fopen()` mode
+     * @return string|false File contents, or false when unreadable
+     */
+    public static function getFileContent(string $file = '', string $mode = 'r'): string|false
+    {
+    }
+    /**
+     * Copy a file, or a directory tree, to the destination path.
+     *
+     * Existing directory entries are merged into; unreadable sources are skipped silently.
+     *
+     * @param string $source file or directory to copy
+     * @param string $destination destination path
+     * @return bool true on success, false when the source cannot be read
+     */
+    public static function hasCopiedDirectory(string $source, string $destination): bool
+    {
+    }
+    /**
+     * Create a directory tree, reporting success when it already exists.
+     *
+     * Failures are logged rather than thrown so callers can continue.
+     *
+     * @param string $dir directory path to create
+     * @return bool
+     */
+    public static function hasCreatedDir(string $dir): bool
+    {
+    }
+    /**
+     * Create a symlink to the target, falling back to a copy.
+     *
+     * Falls back to a Windows junction, then to a recursive copy, when the OS refuses the link or the
+     * process runs inside a container. An existing link or file at the destination is left untouched.
+     *
+     * @param string $target path the link should point at
+     * @param string $link path of the link to create
+     * @return bool true when a link or copy now exists at the destination
+     */
+    public static function hasCreatedSymlink(string $target, string $link): bool
+    {
+    }
+    /**
+     * Recursively delete a directory, or a single file, without following links.
+     *
+     * Refuses to delete the project base directory.
+     *
+     * @param string $dir path to remove
+     * @return bool true when the path was removed, false when it was missing or protected
+     */
+    public static function hasDeletedDirectory(string $dir = ''): bool
+    {
+    }
+    /**
+     * Clear the per-feature directories under the temporary path.
+     *
+     * @return bool true when at least one directory was removed
+     */
+    public static function hasDeletedTemporaryDirs(): bool
+    {
+    }
+    /**
+     * Guess whether a file holds PHP by looking for an opening tag near the top.
+     *
+     * @param string $file file path to inspect
+     * @return bool
+     */
+    public static function isPHPFile(string $file = ''): bool
+    {
+    }
+    /**
+     * Collapse repeated separators into the platform directory separator.
+     *
+     * @param string $path path to normalise
+     * @return string
+     */
+    public static function normalizeSeparator(string $path = ''): string
+    {
+    }
+}
+
+final class GDrive
+{
+    /**
+     * Reduce a Drive URL to the bare file or folder id.
+     *
+     * Unparseable input is returned unchanged; `id=` query values win over path shapes.
+     *
+     * @param string $url drive URL or an id that is already bare
+     * @return string
+     */
+    public static function extractDriveId(string $url = ''): string
+    {
+    }
+    /**
+     * Pick one active Google account at random from the authorisation table.
+     *
+     * @return string email address, or '' when no active account exists
+     */
+    public static function getRandomActiveEmail(): string
+    {
+    }
+}
+
+final class Platform
+{
+    /**
+     * Find a Chromium binary installed on the Unix host.
+     *
+     * @return null|string name of an available binary, or null when none is found
+     */
+    public static function findChromiumBinary(): ?string
+    {
+    }
+    /**
+     * Resolve the CLI PHP binary path of the running installation.
+     *
+     * @return string absolute binary path, or `php` when the constants are missing
+     */
+    public static function getPhpPath(): string
+    {
+    }
+    /**
+     * Resolve the PowerShell executable, preferring the absolute Windows paths.
+     *
+     * @return string absolute path when found, otherwise the bare command name
+     */
+    public static function getPowerShellPath(): string
+    {
+    }
+    /**
+     * Raise the open-file limit of the current process, once per process.
+     *
+     * @return void
+     */
+    public static function openResourcesHandler(): void
+    {
+    }
+}
+
+final class Request
+{
+    /**
+     * Build a query string that keeps array indexes out of the keys.
+     *
+     * @param array<int|string, mixed> $data
+     */
+    public static function buildQueryNoIndex(array $data): string
+    {
+    }
+    /**
+     * Return the sanitised Accept-Language header of the visitor.
+     *
+     * @param ServerRequestInterface|null $request Request to read, current request when null
+     * @return string Locale list or the application default
+     */
+    public static function getBrowserLanguage(?\Psr\Http\Message\ServerRequestInterface $request = null): string
+    {
+    }
+    /**
+     * Return the sanitised User-Agent header of the visitor.
+     *
+     * @param ServerRequestInterface|null $request Request to read, current request when null
+     * @return string User agent or the application default
+     */
+    public static function getBrowserUserAgent(?\Psr\Http\Message\ServerRequestInterface $request = null): string
+    {
+    }
+    /**
+     * Read a header by its $_SERVER style name from either request source.
+     *
+     * @param ServerRequestInterface|null $request Request to read, server state when null
+     * @param string $name Header name such as HTTP_X_TS
+     * @return string Header value, empty when absent
+     */
+    public static function getHeaderLine(?\Psr\Http\Message\ServerRequestInterface $request, string $name): string
+    {
+    }
+    /**
+     * Split the requested path, minus the base path, into segments.
+     *
+     * @return list<string>
+     */
+    public static function getPageUris(?\Psr\Http\Message\ServerRequestInterface $request = null): array
+    {
+    }
+    /**
+     * Resolve the referer from the header, the parsed body or the server state.
+     *
+     * @param ServerRequestInterface|null $request Request to read, current request when null
+     * @return string Referer URL, empty when absent
+     */
+    public static function getReferer(?\Psr\Http\Message\ServerRequestInterface $request = null): string
+    {
+    }
+    /**
+     * Detect an Apple device from the visitor user agent.
+     *
+     * @param ServerRequestInterface|null $request Request to read, current request when null
+     * @return bool True for macOS and iOS user agents
+     */
+    public static function isAppleProduct(?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    {
+    }
+    /**
+     * Detect whether the current request uses HTTPS.
+     *
+     * @param ServerRequestInterface|null $request
+     * @return bool
+     */
+    public static function isSSL(?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    {
+    }
+}
+
+/**
+ * Detects Smart TV user agents (brands and generic TV keywords).
+ */
+class SmartTVDetector
+{
+    /** @var string[] $genericTVKeywords */
+    private array $genericTVKeywords = ['SmartTV', 'Smart-TV', 'TV', 'SMART_TV', 'HBBTV', 'HbbTV', 'CE-HTML', 'InettvBrowser', 'Opera TV', 'NETRANGEMMH', 'Web0S', 'Maple', 'Espial', 'MIDP'];
+    /** @var array<string,list<string>> $tvBrands */
+    private array $tvBrands = ['Samsung' => ['SMART-TV', 'SmartTV', 'Samsung TV', 'Tizen'], 'LG' => ['webOSTV', 'webOS', 'NetCast', 'LG Browser'], 'Sony' => ['SonyDTV', 'Sony TV', 'BRAVIA'], 'Panasonic' => ['Viera', 'VIERA'], 'Philips' => ['NETTV', 'NetTV'], 'Sharp' => ['AQUOS', 'aquos'], 'Toshiba' => ['Toshiba DTV', 'DTV'], 'Hisense' => ['Hisense', 'VIDAA'], 'TCL' => ['TCL', 'AFT'], 'Vizio' => ['VIZIO', 'SmartCast'], 'Roku' => ['Roku'], 'Apple TV' => ['AppleTV', 'tvOS'], 'Amazon Fire TV' => ['AFTB', 'AFTS', 'AFTM', 'AFTT', 'AFT'], 'Android TV' => ['Android TV', 'SHIELD Android TV', 'ATV', 'BRAVIA 4K'], 'Chromecast' => ['Chromecast', 'CrKey'], 'Xbox' => ['Xbox One', 'Xbox Series'], 'PlayStation' => ['PlayStation 4', 'PlayStation 5', 'PS4', 'PS5'], 'General' => ['smart tv', 'smart-tv', 'smarttv', 'smart_tv']];
+    private string $userAgent = 'Bot';
+    /**
+     * @param null|string $userAgent user agent to inspect (defaults to the current request)
+     */
+    public function __construct(?string $userAgent = null, ?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+    /**
+     * @return string|null Brand name or null if not a Smart TV
+     */
+    public function detectBrand(): ?string
+    {
+    }
+    /**
+     * Determine whether the user agent belongs to a Smart TV.
+     *
+     * @return bool true when a Smart TV is detected
+     */
+    public function isSmartTV(): bool
+    {
+    }
+}
+
+class SourceHelper
+{
+    private const DEFAULT_MIME = 'application/octet-stream';
+    /**
+     * Drop sources whose resolution is disabled and mark the default one.
+     *
+     * @param array<array<string,mixed>> $sources
+     * @return array<array<string,mixed>>
+     */
+    public static function filterSources(array $sources = []): array
+    {
+    }
+    /**
+     * Return the custom request headers matching the first rule that hits the URL.
+     *
+     * @param string $url
+     * @return array<string,mixed>
+     */
+    public static function getCustomHeaders(string $url): array
+    {
+    }
+    /**
+     * Resolve the MIME type from the extension map, falling back to content sniffing.
+     *
+     * @param string $file local path or URL
+     * @return string MIME type, octet-stream when it cannot be determined
+     */
+    public static function getMimeType(string $file = ''): string
+    {
+    }
+    /**
+     * Sniff the MIME type of a local file with finfo.
+     *
+     * @param string $file path to an existing local file
+     * @return string detected MIME type, octet-stream when it cannot be detected
+     */
+    public static function getRealMimeType(string $file = ''): string
+    {
+    }
+    /**
+     * Retry a failed video source after a backoff and delete the stored source row.
+     *
+     * @param null|string $videoHost
+     * @param null|string $videoId
+     * @param int $maxRetries
+     * @return bool
+     */
+    public static function hasVideoAttemptFailed(?string $videoHost, ?string $videoId, int $maxRetries = 5): bool
+    {
+    }
+    /**
+     * Return the hosts whose sources are cached per client IP.
+     *
+     * @return string[]
+     */
+    public static function rateLimitHosts(): array
+    {
+    }
+    /**
+     * Sort sources by ascending resolution, highest resolution last.
+     *
+     * @param array<array<string,mixed>> $sources
+     * @return array<array<string,mixed>>
+     */
+    public static function reorderSources(array $sources = []): array
+    {
+    }
+}
+
+final class StringUtil
+{
+    /**
+     * Extract the substring between two literal markers.
+     *
+     * @param string $string haystack to search
+     * @param string $start marker that opens the slice
+     * @param string $end closing marker; an empty value runs to the end of the string
+     * @return string extracted slice, or an empty string when the opening marker is absent
+     */
+    public static function between(string $string, string $start, string $end): string
+    {
+    }
+    /**
+     * Trim scalars, drop non-scalar and empty values, then remove duplicates.
+     *
+     * @param array<int|string, mixed> $data
+     * @return list<string>
+     */
+    public static function cleanArray(array $data): array
+    {
+    }
+    /**
+     * Hash a scalar or array payload with the strongest available algorithm.
+     *
+     * Arrays are JSON encoded first. The algorithm degrades from xxh128 to murmur3f to sha256 depending
+     * on the extensions loaded, so digest length is not stable across hosts.
+     *
+     * @param mixed $data value to hash
+     * @return string hex digest, or an empty string for empty or non-string input
+     */
+    public static function createHash(mixed $data): string
+    {
+    }
+    /**
+     * Build a slug that is not yet used by any video row.
+     *
+     * Queries the video table up to ten times with a random suffix, then falls back to a random hex
+     * suffix. Each attempt issues a query.
+     *
+     * @param int $length length of the random part
+     * @param string $slug preferred base slug; a random word is generated when empty
+     * @return string unique slug
+     */
+    public static function createUniqueSlug(int $length = 5, string $slug = ''): string
+    {
+    }
+    /**
+     * Decode a JSON object or array, tolerating malformed input.
+     *
+     * @return array<int|string,mixed>|(string|int|float|mixed)[]
+     */
+    public static function decodeJson(mixed $input): array
+    {
+    }
+    /**
+     * Decode literal `\uXXXX` escape sequences into UTF-8 characters.
+     *
+     * @param string $string text containing the escapes
+     * @return string text with the escapes replaced
+     */
+    public static function decodeUnicodeEscape(string $string): string
+    {
+    }
+    /**
+     * Format a duration as `HH:MM:SS`.
+     *
+     * @param int $seconds duration in seconds
+     * @return string zero-padded time string
+     */
+    public static function durationToTimeFormat(int $seconds = 0): string
+    {
+    }
+    /**
+     * Convert a three or six digit hex colour into RGB components.
+     *
+     * @return array{red: int, green: int, blue: int}|string|false
+     */
+    public static function hexToRgb(?string $hexStr, bool $returnAsString = false, string $separator = ','): array|string|false
+    {
+    }
+    /**
+     * Strip characters that are unsafe in cache and file keys.
+     *
+     * Spaces become hyphens; anything outside letters, digits, dot, hyphen, underscore and tilde is dropped.
+     *
+     * @param string $key raw key
+     * @return string sanitised key
+     */
+    public static function keyFilter(string $key): string
+    {
+    }
+    /**
+     * Generate a URL-safe random string.
+     *
+     * @param int $length number of characters to produce
+     * @return string random string, empty when the length is not positive
+     */
+    public static function random(int $length = 5): string
+    {
+    }
+    /**
+     * Convert arbitrary text into a URL slug.
+     *
+     * Transliterates high ASCII characters through the bundled character map, collapses everything that
+     * is not a letter or digit into the delimiter, then truncates the result to 240 characters.
+     *
+     * @param string $str source text
+     * @param string $delimiter separator placed between words
+     * @return string slug
+     */
+    public static function slugify(string $str = '', string $delimiter = '-'): string
+    {
+    }
+}
+
+final class Validation
+{
+    /**
+     * Check a non-empty address against FILTER_VALIDATE_EMAIL.
+     *
+     * @param ?string $email address to check
+     * @return bool true when the address is syntactically valid
+     */
+    public static function isEmail(?string $email = null): bool
+    {
+    }
+    /**
+     * Flag a URL whose host is a loopback alias, a private/reserved IP, or resolves to one.
+     *
+     * @param string $url URL to inspect; an empty or host-less value counts as private
+     * @return bool true when the target must not be fetched server-side
+     */
+    public static function isPrivateUrl(string $url = ''): bool
+    {
+    }
+    /**
+     * Interpret loosely typed input as a boolean, treating 0, '', 'false' and null as false.
+     *
+     * @param mixed $data value coming from a request or database row
+     * @return bool normalised boolean
+     */
+    public static function isTrue(mixed $data = null): bool
+    {
+    }
+    /**
+     * Reject URLs containing control characters or lacking a valid scheme and host.
+     *
+     * @param mixed $url candidate URL from a request
+     * @return bool true when the URL passes FILTER_VALIDATE_URL after origin rebuild
+     */
+    public static function isUrl(mixed $url): bool
+    {
+    }
+    /**
+     * Strip characters that are not valid in an email address.
+     *
+     * @param ?string $email raw address, or null/empty for an empty result
+     * @return string sanitised address, empty string when the filter rejects it
+     */
+    public static function sanitizeEmail(?string $email = null): string
+    {
+    }
+    /**
+     * Accept an IPv4/IPv6 literal that is not inside a private or reserved range.
+     *
+     * @param ?string $ip IP literal to check
+     * @return string|false The input when valid, false when empty, malformed or private
+     */
+    public static function validateIp(?string $ip = null): string|false
+    {
+    }
+}
+
 namespace GDPlayer\Helper\Core;
+
+/**
+ * Shared base for every video-host extractor.
+ *
+ * Boots the common services (config, headless Chrome, anti-captcha) and exposes the
+ * getters/setters each extractor fills in while resolving sources. HTTP requests go
+ * through `Http\Fetcher` (see `Core\Extractor::createRequestFetcher()`), so this class
+ * owns no cURL handle.
+ */
+abstract class CoreHelper
+{
+    /** @var null|array<string,mixed> $accessToken */
+    protected ?array $accessToken;
+    /** @var string[] $cookies */
+    protected array $cookies = [];
+    protected string $email = '';
+    protected string $filmstrip = '';
+    protected string $host;
+    protected string $id = '';
+    protected string $image = '';
+    /** @var array<int, array<string,mixed>> $mp4Sources */
+    protected array $mp4Sources = [];
+    protected \GDPlayer\Helper\Core\CoreHelperOptions $options;
+    protected string $referer = '';
+    protected \GDPlayer\Helper\Core\CoreHelperServices $services;
+    /** @var array<int, array<string,mixed>> $sources */
+    protected array $sources = [];
+    protected string $status = 'fail';
+    protected string $title = '';
+    /** @var array<int, mixed> $tracks */
+    protected array $tracks = [];
+    protected string $url;
+    protected string $userAgent = USER_AGENT;
+    /**
+     * Initialize the shared services and bind the host from the concrete class name.
+     */
+    public function __construct()
+    {
+    }
+    /**
+     * Process AJAX requests to find m3u8 files
+     *
+     * @param array<string, mixed> $chromeResponse
+     */
+    protected function chromeAjaxResponseParser(array $chromeResponse): void
+    {
+    }
+    /**
+     * Merge the cookies stored in the config with the ones already collected.
+     *
+     * @return string[]
+     */
+    protected function getCustomCookies(): array
+    {
+    }
+    /**
+     * Map a Google itag or quality code to its human readable label.
+     *
+     * @param string $itag itag value or quality code
+     * @return string Quality label such as 720p, or the input when unknown
+     */
+    protected function googleLabel(string $itag = ''): string
+    {
+    }
+    /**
+     * Strip the host branding words out of a page title.
+     *
+     * @param string $title Raw title
+     * @return string Cleaned title
+     */
+    protected function sanitizeTitle(string $title): string
+    {
+    }
+    /**
+     * Return the collected cookies as a single Cookie header value.
+     *
+     * @return string semicolon-separated cookie pairs
+     */
+    public function getCookies(): string
+    {
+    }
+    /**
+     * Return the account email associated with the extraction.
+     *
+     * @return string email address, or an empty string when not set
+     */
+    public function getEmail(): string
+    {
+    }
+    /**
+     * Return the filmstrip (thumbnail sprite) URL.
+     *
+     * @return string filmstrip URL, or an empty string when disabled by settings
+     */
+    public function getFilmstrip(): string
+    {
+    }
+    /**
+     * Return the poster image URL, honoring the force-default-poster setting.
+     *
+     * @return string poster image URL
+     */
+    public function getImage(): string
+    {
+    }
+    /**
+     * Return the network interface address used for the extraction.
+     *
+     * @return string interface hostname or IP address
+     */
+    public function getNetworkInterface(): string
+    {
+    }
+    /**
+     * Return the referer used for the extraction requests.
+     *
+     * @return string referer URL
+     */
+    public function getReferer(): string
+    {
+    }
+    /**
+     * Return the extracted sources, falling back to the MP4 list for downloads.
+     *
+     * @return array<int, array<string,mixed>>
+     */
+    public function getSources(): array
+    {
+    }
+    /**
+     * Return the extraction status.
+     *
+     * @return string Status flag (e.g. 'ok' or 'fail').
+     */
+    public function getStatus(): string
+    {
+    }
+    /**
+     * Return the sanitized media title.
+     *
+     * @return string sanitized title
+     */
+    public function getTitle(): string
+    {
+    }
+    /**
+     * Return the extracted subtitle and audio tracks.
+     *
+     * @return array<int, mixed>
+     */
+    public function getTracks(): array
+    {
+    }
+    /**
+     * Set whether the media can be downloaded.
+     *
+     * @param bool $isDownloadable download availability flag
+     * @return self fluent instance
+     */
+    public function setDownloadable(bool $isDownloadable = false): self
+    {
+    }
+    /**
+     * Set the account email for the extraction.
+     *
+     * @param string $email email address
+     * @return self fluent instance
+     */
+    public function setEmail(string $email = ''): self
+    {
+    }
+    /**
+     * Set the video host and configure its proxy when the host is eligible.
+     *
+     * @param string $host host identifier or fully-qualified extractor class name
+     * @return self fluent instance
+     */
+    public function setHost(string $host = ''): self
+    {
+    }
+}
 
 /**
  * Extraction options/state of {@see CoreHelper} (Sonar php:S1820).
@@ -5044,6 +6814,7 @@ final class CoreHelperOptions
     /** Content type of the produced sources. */
     public string $videoType = 'video/mp4';
 }
+
 /**
  * Collaborators of {@see CoreHelper} (Sonar php:S1820).
  *
@@ -5068,76 +6839,18 @@ final class CoreHelperServices
     {
     }
 }
-namespace GDPlayer\Helper;
 
-/**
- * Operasi baca/tulis berkas untuk {@see FileSystem}.
- *
- * Dipisah agar kelas FileSystem tetap di bawah ambang 200 baris (php:S2042);
- * perilaku dan signature tidak berubah.
- */
-trait FileSystemIo
-{
-    /**
-     * Buat direktori bila belum ada, tanpa error-suppression.
-     *
-     * Dipakai beberapa helper di kelas ini; kegagalan sebenarnya (izin, disk penuh)
-     * sengaja tetap terlihat sebagai warning PHP, bukan ditelan.
-     */
-    private static function ensureDir(string $dir): bool
-    {
-    }
-    public static function hasCreatedDir(string $dir): bool
-    {
-    }
-    public static function createFile(string $file, string $content = '', string $mode = 'w'): int|false
-    {
-    }
-    public static function getFileContent(string $file = '', string $mode = 'r'): string|false
-    {
-    }
-    public static function isPHPFile(string $file = ''): bool
-    {
-    }
-    public static function normalizeSeparator(string $path = ''): string
-    {
-    }
-}
-final class FileSystem
-{
-    use \GDPlayer\Helper\FileSystemIo;
-    public static function hasCopiedDirectory(string $source, string $destination): bool
-    {
-    }
-    public static function hasCreatedSymlink(string $target, string $link): bool
-    {
-    }
-    public static function hasDeletedDirectory(string $dir = ''): bool
-    {
-    }
-    public static function hasDeletedTemporaryDirs(): bool
-    {
-    }
-}
-final class GDrive
-{
-    public static function extractDriveId(string $url = ''): string
-    {
-    }
-    public static function getRandomActiveEmail(): string
-    {
-    }
-}
 namespace GDPlayer\Helper\Misc;
 
 /**
- * cURL default config and share-handle helpers.
- *
- * Split out of `MiscHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MiscHelper` through this trait.
+ * Miscellaneous helpers: cURL defaults, cache paths, content types and parsers.
  */
-trait CurlTrait
+class MiscHelper
 {
+    private const HTTP = 'http://';
+    private const HTTPS = 'https://';
+    /** Last outbound interface address, read by `MiscHelper::getNetworkInterface()`. */
+    protected static string $curlInterface = '';
     // Store a single share handle instance for shared use
     protected static ?\CurlShareHandle $sharedHandle = null;
     /**
@@ -5149,93 +6862,8 @@ trait CurlTrait
     {
     }
     /**
-     * Apply the shared cURL defaults to a handle.
+     * List the trusted proxies that are exempt from the rate limit.
      *
-     * @param \CurlHandle $ch             cURL handle
-     * @param int         $timeout        request timeout in seconds
-     * @param bool        $returnTransfer whether to return the transfer as a string
-     * @return \CurlHandle configured handle
-     */
-    public static function getCurlDefaultConfig(\CurlHandle $ch, int $timeout = 60, bool $returnTransfer = true): \CurlHandle
-    {
-    }
-    public static function getCurlShareHandle(): \CurlShareHandle
-    {
-    }
-    /**
-     * Get or create cURL Share Handle
-     *
-     * @return CurlShareHandle
-     */
-    /**
-     * Inject the runtime's curl share handle (worker owns its lifetime).
-     */
-    public static function setCurlShareHandle(?\CurlShareHandle $handle): void
-    {
-    }
-}
-/**
- * Player-source helpers that parse subtitle/poster/filmstrip payloads and VAST tags.
- *
- * Split out of `MiscHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MiscHelper` through this trait.
- */
-trait ParserTrait
-{
-    /**
-     * Build the proxied filmstrip (preview track) URL.
-     *
-     * @param null|string $filmstrip source filmstrip URL
-     * @return string Proxied .vtt URL, or an empty string when invalid.
-     */
-    public static function filmstripParser(?string $filmstrip): string
-    {
-    }
-    /**
-     * @return array<string,mixed>
-     */
-    public static function getVast(): array
-    {
-    }
-    /**
-     * Build the proxied poster URL.
-     *
-     * @param null|string $poster source poster URL
-     * @return string proxied poster URL, or an empty string when invalid
-     */
-    public static function posterParser(?string $poster): string
-    {
-    }
-    /**
-     * Resolve the response content type for a stream, tuned per client/browser.
-     *
-     * @param string      $userAgent           client user agent
-     * @param null|string $upstreamContentType content type reported by upstream
-     * @param bool        $isMp4               whether the media is MP4
-     * @return string content type to send
-     */
-    public static function resolveContentType(string $userAgent, ?string $upstreamContentType, bool $isMp4): string
-    {
-    }
-    /**
-     * Build the proxied subtitle URL.
-     *
-     * @param null|string $subtitle source subtitle URL
-     * @return string proxied subtitle URL, or an empty string when invalid
-     */
-    public static function subtitleParser(?string $subtitle): string
-    {
-    }
-}
-/**
- * Miscellaneous helpers: cURL defaults, cache paths, content types and parsers.
- */
-class MiscHelper
-{
-    use \GDPlayer\Helper\Misc\CurlTrait;
-    use \GDPlayer\Helper\Misc\ParserTrait;
-    protected static string $curlInterface = '';
-    /**
      * @param string $ip
      * @return string[]
      */
@@ -5255,12 +6883,49 @@ class MiscHelper
     {
     }
     /**
+     * Decrypt the request payload, accepting both the current and the legacy encoding.
+     *
      * @param null|string $data
      * @return array<int|string,array<mixed>|string>
      */
     public static function decryptData(?string $data): array
     {
     }
+    /**
+     * Build the proxied filmstrip (preview track) URL.
+     *
+     * @param null|string $filmstrip source filmstrip URL
+     * @return string Proxied .vtt URL, or an empty string when invalid.
+     */
+    public static function filmstripParser(?string $filmstrip): string
+    {
+    }
+    /**
+     * Apply the shared cURL defaults to a handle.
+     *
+     * @param CurlHandle $ch             cURL handle
+     * @param int         $timeout        request timeout in seconds
+     * @param bool        $returnTransfer whether to return the transfer as a string
+     * @return CurlHandle configured handle
+     */
+    public static function getCurlDefaultConfig(\CurlHandle $ch, int $timeout = 60, bool $returnTransfer = true): \CurlHandle
+    {
+    }
+    /**
+     * Return the process-wide share handle, creating it on first use.
+     *
+     * @return CurlShareHandle shared handle holding the DNS, TLS session and connection caches
+     */
+    public static function getCurlShareHandle(): \CurlShareHandle
+    {
+    }
+    /**
+     * Extract the host, with a non-default port, from a URL.
+     *
+     * @param string $url URL to inspect
+     * @param bool $origin True to return the full origin with the scheme
+     * @return string Host or origin, empty when the URL has no host
+     */
     public static function getHostOrigin(string $url = '', bool $origin = false): string
     {
     }
@@ -5278,6 +6943,21 @@ class MiscHelper
      * @return string server IP address
      */
     public static function getServerIp(): string
+    {
+    }
+    /**
+     * @return array<string,mixed>
+     */
+    public static function getVast(): array
+    {
+    }
+    /**
+     * Build the proxied poster URL.
+     *
+     * @param null|string $poster source poster URL
+     * @return string proxied poster URL, or an empty string when invalid
+     */
+    public static function posterParser(?string $poster): string
     {
     }
     /**
@@ -5299,91 +6979,52 @@ class MiscHelper
     {
     }
     /**
-     * Extract the host (or origin) from a URL.
+     * Resolve the response content type for a stream, tuned per client/browser.
      *
-     * @param string $url    URL to parse
-     * @param bool   $origin return the scheme://host origin instead of the bare host
-     * @return string host/origin, or an empty string when the URL has no host
+     * @param string      $userAgent           client user agent
+     * @param null|string $upstreamContentType content type reported by upstream
+     * @param bool        $isMp4               whether the media is MP4
+     * @return string content type to send
      */
+    public static function resolveContentType(string $userAgent, ?string $upstreamContentType, bool $isMp4): string
+    {
+    }
     /**
-     * Ganti host URL dengan alamat IP hasil resolver sistem.
+     * Replace the URL host with the address produced by the system resolver.
      *
-     * `Fetcher` memaksa `CURLOPT_DNS_SERVERS` (DNS_SERVERS di .env), sehingga nama
-     * service container (mis. `nginx`) tidak pernah ter-resolve oleh cURL. Resolver
-     * sistem tetap tahu alamatnya, jadi host ditukar ke IP sebelum request.
+     * `Fetcher` pins `CURLOPT_DNS_SERVERS` (DNS_SERVERS in .env), so the container
+     * service names (e.g. `nginx`) are never resolved by cURL. The system resolver
+     * still knows their address, so the host is swapped for the IP before the request.
      */
     public static function resolveHostToIp(string $url = ''): string
     {
     }
-}
-namespace GDPlayer\Helper;
-
-final class Platform
-{
     /**
-     * Cari binary Chromium yang terpasang di sistem Unix.
+     * Inject the runtime's curl share handle (worker owns its lifetime).
+     */
+    public static function setCurlShareHandle(?\CurlShareHandle $handle): void
+    {
+    }
+    /**
+     * Build the proxied subtitle URL.
      *
-     * @return null|string nama binary yang tersedia, atau null bila tidak ada
+     * @param null|string $subtitle source subtitle URL
+     * @return string proxied subtitle URL, or an empty string when invalid
      */
-    public static function findChromiumBinary(): ?string
-    {
-    }
-    public static function getPhpPath(): string
-    {
-    }
-    public static function getPowerShellPath(): string
-    {
-    }
-    public static function openResourcesHandler(): void
+    public static function subtitleParser(?string $subtitle): string
     {
     }
 }
-final class Request
-{
-    /**
-     * @param array<int|string, mixed> $data
-     */
-    public static function buildQueryNoIndex(array $data): string
-    {
-    }
-    public static function getBrowserLanguage(?\Psr\Http\Message\ServerRequestInterface $request = null): string
-    {
-    }
-    public static function getBrowserUserAgent(?\Psr\Http\Message\ServerRequestInterface $request = null): string
-    {
-    }
-    public static function getHeaderLine(?\Psr\Http\Message\ServerRequestInterface $request, string $name): string
-    {
-    }
-    /**
-     * @return list<string>
-     */
-    public static function getPageUris(?\Psr\Http\Message\ServerRequestInterface $request = null): array
-    {
-    }
-    public static function getReferer(?\Psr\Http\Message\ServerRequestInterface $request = null): string
-    {
-    }
-    public static function isAppleProduct(?\Psr\Http\Message\ServerRequestInterface $request = null): bool
-    {
-    }
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request
-     * @return bool
-     */
-    public static function isSSL(?\Psr\Http\Message\ServerRequestInterface $request = null): bool
-    {
-    }
-}
+
 namespace GDPlayer\Helper\Security;
 
 /**
  * Browser, country, proxy/VPN and title blacklist rules.
  *
- * Split out of `SecurityHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SecurityHelper` through this trait.
+ * Extracted from `SecurityHelper` (rule php:S2042: at most 150 lines per class).
+ * The public API stays on `SecurityHelper` through delegation.
  */
-trait ClientRuleTrait
+final class ClientRuleChecker
 {
     /**
      * Determine whether a browser user agent is blacklisted.
@@ -5420,30 +7061,15 @@ trait ClientRuleTrait
     {
     }
 }
+
 /**
  * Domain and referer blacklist/whitelist rules.
  *
- * Split out of `SecurityHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SecurityHelper` through this trait.
+ * Extracted from `SecurityHelper` (rule php:S2042: at most 150 lines per class).
+ * The public API stays on `SecurityHelper` through delegation.
  */
-trait DomainRuleTrait
+final class DomainRuleChecker
 {
-    /**
-     * Pemisah baris untuk daftar konfigurasi (dipakai juga ClientRuleTrait).
-     *
-     * @return string pola regex pemisah baris
-     */
-    protected static function lineSplitPattern(): string
-    {
-    }
-    /**
-     * Prefiks yang dibuang sebelum domain dibandingkan.
-     *
-     * @return string[] daftar prefiks
-     */
-    protected static function unwantedStrings(): array
-    {
-    }
     /**
      * Determine whether a request domain/referer is blacklisted.
      *
@@ -5471,160 +7097,381 @@ trait DomainRuleTrait
     public static function isRefererBlacklisted(string $referer = ''): bool
     {
     }
+    /**
+     * Line separator for the configuration lists.
+     *
+     * @return string Regex pattern that splits the lines
+     */
+    public static function lineSplitPattern(): string
+    {
+    }
 }
+
 /**
  * IPv4/IPv6 range checks used by the blacklist rules.
  *
- * Split out of `SecurityHelper` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SecurityHelper` through this trait.
+ * Extracted from `SecurityHelper` (rule php:S2042: at most 150 lines per class).
+ * The public API stays on `SecurityHelper`; this class only owns the math and cache.
  */
-trait IpRangeTrait
+final class IpRangeChecker
 {
-    protected static function isIPv4InRange(string $ip, string $range): bool
+    /**
+     * Check whether an IPv4 address matches a single-IP or CIDR range, caching the result.
+     *
+     * @param string $ip IPv4 address to test
+     * @param string $range single IPv4 address or CIDR block
+     * @return bool true when the address falls inside the range
+     */
+    public static function isIPv4InRange(string $ip, string $range): bool
     {
     }
-    protected static function isIPv6InRange(string $ip, string $range): bool
+    /**
+     * Check whether an IPv6 address matches a single-IP or CIDR range by comparing the prefix bits.
+     *
+     * @param string $ip IPv6 address to test
+     * @param string $range single IPv6 address or CIDR block
+     * @return bool true when the address falls inside the range
+     */
+    public static function isIPv6InRange(string $ip, string $range): bool
     {
     }
 }
+
 /**
  * Blacklist/whitelist checks used to guard requests (domains, countries, referers, titles).
  */
 class SecurityHelper
 {
-    use \GDPlayer\Helper\Security\ClientRuleTrait;
-    use \GDPlayer\Helper\Security\DomainRuleTrait;
-    use \GDPlayer\Helper\Security\IpRangeTrait;
     /**
      * @return array<string, string>
      */
     public static function getHmacInput(\GDPlayer\Core\Security\Security $security, ?\Psr\Http\Message\ServerRequestInterface $request = null): array
     {
     }
-    public static function legacyDecode(?string $data = null): string
+    /**
+     * Determine whether a browser user agent is blacklisted.
+     *
+     * @param string $ua user agent (defaults to the current request)
+     * @return bool true when blacklisted
+     */
+    public static function isBrowserBlacklisted(string $ua = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
     {
     }
-    public static function sanitizeHtml(?string $text = null): string
-    {
-    }
-    public static function sanitizeUrl(mixed $url): string
-    {
-    }
+    /**
+     * Accept the CORS token when the caller IP, its ASN, or an admin signature matches.
+     *
+     * @param ?string $token encrypted client token
+     * @param ?ServerRequestInterface $request current request, used for the admin check
+     * @return bool true when validation is disabled, bypassed by p2p, or the token matches
+     */
     public static function isCorsTokenValid(?string $token = null, ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
     {
     }
+    /**
+     * Determine whether the visitor's country is blacklisted.
+     *
+     * @return bool true when blacklisted
+     */
+    public static function isCountryBlacklisted(): bool
+    {
+    }
+    /**
+     * Determine whether a request domain/referer is blacklisted.
+     *
+     * @param string $referer referer URL (defaults to the current request)
+     * @return bool true when blacklisted
+     */
+    public static function isDomainBlacklisted(string $referer = ''): bool
+    {
+    }
+    /**
+     * Determine whether a request domain/referer is whitelisted.
+     *
+     * @param string $referer referer URL (defaults to the current request)
+     * @return bool true when whitelisted
+     */
+    public static function isDomainWhitelisted(string $referer = ''): bool
+    {
+    }
+    /**
+     * Determine whether the visitor is behind a blacklisted proxy/VPN.
+     *
+     * @return bool true when blacklisted
+     */
+    public static function isProxyVPNBlacklisted(): bool
+    {
+    }
+    /**
+     * Verify a reCAPTCHA answer against Google's siteverify endpoint.
+     *
+     * @param ?string $captcha answer submitted by the client
+     * @return bool true when no secret key is configured or Google accepts the answer
+     */
     public static function isRecaptchaValid(?string $captcha = null): bool
     {
     }
-}
-namespace GDPlayer\Helper;
-
-/**
- * Detects Smart TV user agents (brands and generic TV keywords).
- */
-class SmartTVDetector
-{
     /**
-     * @param null|string $userAgent user agent to inspect (defaults to the current request)
-     */
-    public function __construct(?string $userAgent = null, ?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-    /**
-     * @return string|null Brand name or null if not a Smart TV
-     */
-    public function detectBrand(): ?string
-    {
-    }
-    /**
-     * Determine whether the user agent belongs to a Smart TV.
+     * Determine whether a request referer is blacklisted.
      *
-     * @return bool true when a Smart TV is detected
+     * @param string $referer referer URL (defaults to the current request)
+     * @return bool true when blacklisted
      */
-    public function isSmartTV(): bool
+    public static function isRefererBlacklisted(string $referer = ''): bool
+    {
+    }
+    /**
+     * Determine whether a video title matches the DMCA/title blacklist.
+     *
+     * @param string $title video title to check
+     * @return bool true when blacklisted
+     */
+    public static function isTitleBlacklisted(string $title = ''): bool
+    {
+    }
+    /**
+     * Decrypt a legacy `data::iv` payload built by the old cipher.
+     *
+     * @param ?string $data raw URL-encoded `data::iv` string
+     * @return string decrypted plaintext, or '' when decoding fails
+     */
+    public static function legacyDecode(?string $data = null): string
+    {
+    }
+    /**
+     * Escape a string for HTML output using UTF-8 and quoted entities.
+     *
+     * @param ?string $text text to escape; null is treated as an empty string
+     * @return string escaped text safe to echo into HTML
+     */
+    public static function sanitizeHtml(?string $text = null): string
+    {
+    }
+    /**
+     * Validate a URL and percent-encode the characters browsers reject.
+     *
+     * @param mixed $url candidate URL
+     * @return string sanitised URL, or '' when the input is not a valid URL
+     */
+    public static function sanitizeUrl(mixed $url): string
+    {
+    }
+    /**
+     * Convert a mixed value to a string without triggering "Array to string conversion".
+     */
+    public static function text(mixed $value, string $default = ''): string
+    {
+    }
+    /**
+     * Return the value as a float when it is numeric, otherwise the fallback.
+     *
+     * @param mixed $value raw value
+     * @param float $default value returned for non-numeric input
+     * @return float
+     */
+    public static function toFloat(mixed $value, float $default = 0.0): float
+    {
+    }
+    /**
+     * Return the value as an int when it is numeric, otherwise the fallback.
+     *
+     * @param mixed $value raw value
+     * @param int $default value returned for non-numeric input
+     * @return int
+     */
+    public static function toInt(mixed $value, int $default = 0): int
+    {
+    }
+    /**
+     * @return list<string>
+     */
+    public static function toStringList(mixed $value): array
     {
     }
 }
-class SourceHelper
-{
-    /**
-     * @param array<array<string,mixed>> $sources
-     * @return array<array<string,mixed>>
-     */
-    public static function filterSources(array $sources = []): array
-    {
-    }
-    /**
-     * @param string $url
-     * @return array<string,mixed>
-     */
-    public static function getCustomHeaders(string $url): array
-    {
-    }
-    public static function getMimeType(string $file = ''): string
-    {
-    }
-    public static function getRealMimeType(string $file = ''): string
-    {
-    }
-    /**
-     * @param null|string $videoHost
-     * @param null|string $videoId
-     * @param int $maxRetries
-     * @return bool
-     */
-    public static function hasVideoAttemptFailed(?string $videoHost, ?string $videoId, int $maxRetries = 5): bool
-    {
-    }
-    /**
-     * @return string[]
-     */
-    public static function rateLimitHosts(): array
-    {
-    }
-    /**
-     * @param array<array<string,mixed>> $sources
-     * @return array<array<string,mixed>>
-     */
-    public static function reorderSources(array $sources = []): array
-    {
-    }
-}
+
 namespace GDPlayer\Helper\Stream;
 
 final class StreamConfig
 {
     /**
+     * List hosts that stream directly instead of being proxied.
+     *
+     * Hosts removed from the bypass list are the direct ones, so the result is
+     * every known host minus the bypassed set.
+     *
      * @return list<string>
      */
     public static function getDirectHosts(): array
     {
     }
     /**
+     * Read the configured proxy list, one entry per line.
+     *
      * @return list<string>
      */
     public static function getProxyList(): array
     {
     }
+    /**
+     * Pick the least loaded load balancer link for this client.
+     *
+     * Candidates whose `disallow_hosts` or `disallow_continent` match the client
+     * are filtered out, ordering is by connections or playbacks according to
+     * config, and BASE_URL is the fallback when nothing qualifies.
+     *
+     * @param string $host host being requested, matched against the deny list
+     * @param string $excludeUrl link to skip, usually the current one
+     * @return string balancer link, or BASE_URL
+     */
     public static function getRandomLoadBalancerUrl(string $host = '', string $excludeUrl = ''): string
     {
     }
     /**
-     * @return array<string, mixed>|null
+     * Return one random proxy from the pool, or null when proxying is off.
+     *
+     * @return array<string, mixed>|null parsed proxy parts, or null when unavailable
      */
     public static function getRandomProxy(): ?array
     {
     }
     /**
-     * @return array<string, mixed>|false
+     * Find the load balancer row matching the current BASE_URL.
+     *
+     * @return array<string, mixed>|false row data, or false when this host is not one
      */
     public static function isCurrentHostLoadBalancer(): false|array
     {
     }
+    /**
+     * Report whether this request should be served Google's HLS variant.
+     *
+     * Only Google Drive and Google Photos have the variant, it must be enabled
+     * per host in config, and downloads never use it.
+     *
+     * @param string $vHost resolved video host
+     * @param bool $dl true for a download request
+     * @return bool
+     */
     public static function isGoogleHls(string $vHost = '', bool $dl = false): bool
     {
     }
+    /**
+     * Report whether the host is listed in `host-list.json`.
+     *
+     * Any host that is not in the list is rejected, so a forged or malformed
+     * value can never reach a path built from it.
+     *
+     * @param string $vHost resolved video host
+     * @return bool
+     */
+    public static function isKnownHost(string $vHost = ''): bool
+    {
+    }
+    /**
+     * Report whether the `enable_proxy` setting lets outbound paths use the proxy pool.
+     *
+     * Shared by every outbound path (HTTP fetch and yt-dlp) so one switch controls all.
+     * A missing key reads as false, so the proxy stays off until it is enabled.
+     *
+     * @return bool
+     */
+    public static function isProxyEnabled(): bool
+    {
+    }
 }
+
+/**
+ * Pure policy for the stream upstream guard.
+ *
+ * Every decision is a function of the upstream response, never of shared mutable state:
+ * the caller persists the result. State is deliberately kept out so the policy is unit
+ * testable and the same score applies to MP4, HLS and MPD.
+ */
+final class StreamGuard
+{
+    /** First cooldown, doubled per strike. */
+    private const COOLDOWN_BASE = 5;
+    /** Upper bound for any single cooldown, keeping a stuck file recoverable. */
+    private const COOLDOWN_MAX = 120;
+    /** Distinct media ids that must be throttled before a host is reported as suspicious. */
+    private const HOST_CORRELATE_MIN = 3;
+    /** Window in seconds used for that correlation. */
+    private const HOST_WINDOW = 60;
+    /** Kept entries in the correlation ledger. */
+    private const LEDGER_MAX = 20;
+    /** cURL errors typical of a proxy dropping the connection (empty reply, RST, TLS). */
+    private const TRANSPORT_ERRNOS = [35, 52, 56];
+    /** Window in which one client request chain may only add one strike. */
+    public const DEDUPE_TTL = 5;
+    /** TTL of the strike memory, longer than any cooldown so the backoff keeps growing. */
+    public const STATE_TTL = 300;
+    /** Score at which a response counts as throttling. */
+    public const THRESHOLD = 3;
+    /**
+     * Cooldown for the next attempt of one media id.
+     *
+     * @param int $strikes consecutive throttle observations for that id
+     * @param string $retryAfter raw `Retry-After` value, empty when absent
+     * @return int seconds, at least 1
+     */
+    public static function cooldown(int $strikes, string $retryAfter = ''): int
+    {
+    }
+    /**
+     * Report whether distinct media ids were throttled across the window: only then may the
+     * host be reported suspicious. One throttled file among healthy ones never qualifies.
+     *
+     * @param array<string,int> $ledger media id => observation timestamp
+     * @param int $now current unix timestamp
+     * @return bool true when the host itself looks throttled
+     */
+    public static function isHostThrottled(array $ledger, int $now): bool
+    {
+    }
+    /**
+     * Report whether one upstream header is worth keeping for the throttle score.
+     *
+     * @param string $name lowercase header name
+     * @return bool true for the known throttle carriers
+     */
+    public static function isRelevantHeader(string $name): bool
+    {
+    }
+    /**
+     * Report whether the response is throttling rather than a genuine missing file.
+     *
+     * @param int $status upstream HTTP status
+     * @param array<string,string> $headers lowercase response headers
+     * @param int $errno cURL error number
+     * @return bool true when the response must count as throttling
+     */
+    public static function isThrottle(int $status, array $headers, int $errno = 0): bool
+    {
+    }
+    /**
+     * Drop stale ledger entries and cap the ledger size.
+     *
+     * @param array<string,int> $ledger media id => observation timestamp
+     * @param int $now current unix timestamp
+     * @return array<string,int> fresh entries only
+     */
+    public static function pruneLedger(array $ledger, int $now): array
+    {
+    }
+    /**
+     * Weight the response against known throttle carriers, including responses with no
+     * rate-limit header at all (Cloudflare and reverse proxies usually omit them).
+     *
+     * @param int $status upstream HTTP status
+     * @param array<string,string> $headers lowercase response headers
+     * @param int $errno cURL error number
+     * @return int score, 0 when the response carries no throttle signal
+     */
+    public static function score(int $status, array $headers, int $errno = 0): int
+    {
+    }
+}
+
 /**
  * Helpers for building stream responses and error bodies.
  */
@@ -5641,6 +7488,7 @@ class StreamHelper
     {
     }
 }
+
 /**
  * Host connectivity & stability telemetry (RAM-to-DB periodic flushing).
  */
@@ -5692,75 +7540,7 @@ final class StreamTelemetry
     {
     }
 }
-namespace GDPlayer\Helper;
 
-final class StringUtil
-{
-    public static function between(string $string, string $start, string $end): string
-    {
-    }
-    /**
-     * @param array<int|string, mixed> $data
-     * @return list<string>
-     */
-    public static function cleanArray(array $data): array
-    {
-    }
-    public static function createHash(mixed $data): string
-    {
-    }
-    public static function createUniqueSlug(int $length = 5, string $slug = ''): string
-    {
-    }
-    /**
-     * @return array<int|string,mixed>|(string|int|float|mixed)[]
-     */
-    public static function decodeJson(mixed $input): array
-    {
-    }
-    public static function decodeUnicodeEscape(string $string): string
-    {
-    }
-    public static function durationToTimeFormat(int $seconds = 0): string
-    {
-    }
-    /**
-     * @return array{red: int, green: int, blue: int}|string|false
-     */
-    public static function hexToRgb(?string $hexStr, bool $returnAsString = false, string $separator = ','): array|string|false
-    {
-    }
-    public static function keyFilter(string $key): string
-    {
-    }
-    public static function random(int $length = 5): string
-    {
-    }
-    public static function slugify(string $str = '', string $delimiter = '-'): string
-    {
-    }
-}
-final class Validation
-{
-    public static function isPrivateUrl(string $url = ''): bool
-    {
-    }
-    public static function sanitizeEmail(?string $email = null): string
-    {
-    }
-    public static function isTrue(mixed $data = null): bool
-    {
-    }
-    public static function isEmail(?string $email = null): bool
-    {
-    }
-    public static function validateIp(?string $ip = null): string|false
-    {
-    }
-    public static function isUrl(mixed $url): bool
-    {
-    }
-}
 namespace GDPlayer\Hook;
 
 /**
@@ -5776,6 +7556,7 @@ interface HookInterface
      */
     public function handle(array $hookData): array;
 }
+
 /**
  * Plugin-owned API response filter (replaces the `api.response.filter` file).
  */
@@ -5788,6 +7569,7 @@ interface ResponseFilterInterface
      */
     public function filter(array $responseData, array $queryData): array;
 }
+
 namespace GDPlayer\Hosting;
 
 /**
@@ -5795,6 +7577,7 @@ namespace GDPlayer\Hosting;
  */
 final class Amazon extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://www.amazon.com';
     /**
      * @param string $id host-specific media identifier
      */
@@ -5802,127 +7585,83 @@ final class Amazon extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Aparat.
  */
 final class Aparat extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source extractor for Archive.
  */
 final class Archive extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source extractor for Blogger.
  */
 final class Blogger extends \GDPlayer\Core\Extractor\Extractor
 {
     /**
+     * Resolve the Blogger target URL and extract its sources right away.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source extractor for Cloud Mail.ru.
  */
 final class Cloudmailru extends \GDPlayer\Core\Extractor\Extractor
 {
     /**
+     * Extract the stream as soon as a media id is supplied.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source YetiShare-based host for Cyberfile.
  */
 final class Cyberfile extends \GDPlayer\Core\Hosting\YetiShare
 {
 }
+
 /**
- * HTTP fetch + browser header helpers for the DaddyHD pipeline.
- *
- * Split out of `Daddyhd` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Daddyhd` through this trait.
+ * Video source extractor for DaddyHD.
  */
-trait DaddyhdHttpTrait
+final class Daddyhd extends \GDPlayer\Core\Extractor\Extractor
 {
+    public const BASE_URL_MAIN = 'https://dlive.sx/';
     private string $defaultPlayerUrl = 'https://hamis.romponalis.st/premiumtv/daddy.php?id=%s';
     private string $streamPageUrl = 'https://dlive.sx/stream/stream-%s.php';
     private string $vertexApiUrl = 'https://vertex.st/api/player.php?id=%s';
     private string $vertexRefererUrl = 'https://vertex.st/';
     private string $watchRefererUrl = 'https://dlive.sx/watch.php?id=%s';
     /**
-     * @param array<string, string> $overrides key-value pairs to add/override
-     * @return array<int, string> flat array of "Header-Name: value" strings
-     */
-    private function createBrowserHeaders(array $overrides = []): array
-    {
-    }
-    private function fetchEmbedUrl(string $safeId): ?string
-    {
-    }
-    private function fetchIframePlayerUrl(string $channelId): string
-    {
-    }
-    /**
-     * @param string $url
-     * @param array<int, string> $headers
-     * @return ?string
-     */
-    private function fetchUrl(string $url = '', array $headers = []): ?string
-    {
-    }
-}
-/**
- * HTML/JSON parsing helpers for the DaddyHD pipeline.
- *
- * Split out of `Daddyhd` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Daddyhd` through this trait.
- */
-trait DaddyhdParseTrait
-{
-    private function extractSafeId(string $html, string $fallbackChannelId = ''): string
-    {
-    }
-    private function extractStreamUrlFromEmbed(string $embedHtml): ?string
-    {
-    }
-    private function extractVertexFromHtml(string $html, string $fallbackChannelId = ''): ?string
-    {
-    }
-    private function parseHlsFromPlayerHtml(string $html, string $channelId): string
-    {
-    }
-    private function resolveChannelId(): string
-    {
-    }
-}
-/**
- * Video source extractor for DaddyHD.
- */
-final class Daddyhd extends \GDPlayer\Core\Extractor\Extractor
-{
-    use \GDPlayer\Hosting\DaddyhdHttpTrait;
-    use \GDPlayer\Hosting\DaddyhdParseTrait;
-    public const BASE_URL_MAIN = 'https://dlive.sx/';
-    /**
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source extractor for Dailymotion (https://www.dailymotion.com/).
  */
 final class Dailymotion extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://www.dailymotion.com/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -5930,11 +7669,13 @@ final class Dailymotion extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Direct.
  */
 final class Direct extends \GDPlayer\Core\Extractor\Extractor
 {
+    private string $label = 'Original';
     /**
      * @param string $id host-specific media identifier
      */
@@ -5942,23 +7683,31 @@ final class Direct extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Dood (https://playmogo.com/).
  */
 final class Dood extends \GDPlayer\Core\Extractor\Extractor
 {
+    /** Endpoint path that returns the video base URL. */
+    private const PASS_MD5_PATH = 'pass_md5/';
+    protected string $baseURL = 'https://playmogo.com/';
     /**
+     * Bind the media identifier and extract the sources straight away.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source extractor for Dropbox (https://www.dropbox.com/).
  */
 final class Dropbox extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://www.dropbox.com/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -5966,11 +7715,13 @@ final class Dropbox extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Dzen (https://dzen.ru/).
  */
 final class Dzen extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://dzen.ru/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -5978,6 +7729,7 @@ final class Dzen extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source XVFS-style embed parser for Earnvids (https://morencius.com/).
  */
@@ -5991,41 +7743,51 @@ class Earnvids extends \GDPlayer\Core\Hosting\XVFSParser
     {
     }
 }
+
 /**
  * Video source extractor for Embedtv.
  */
 final class Embedtv extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source extractor for Embedtv2.
  */
 final class Embedtv2 extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source extractor for Facebook (https://www.facebook.com/).
  */
 final class Facebook extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://www.facebook.com/';
     /**
+     * Resolve the Facebook URL, try yt-dlp first and fall back to the Chrome parser.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source extractor for Filemail.
  */
 final class Filemail extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source extractor for Filemoon (https://filemoon.to/).
  */
 final class Filemoon extends \GDPlayer\Core\Extractor\Extractor
 {
+    private string $error = '';
+    protected string $baseURL = 'https://filemoon.to/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6033,6 +7795,7 @@ final class Filemoon extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Files.fm.
  */
@@ -6045,18 +7808,7 @@ final class Filesfm extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
-/**
- * Video source XVFS-style embed parser for Fileupload (https://www.file-upload.org/).
- */
-final class Fileupload extends \GDPlayer\Core\Hosting\XVFSParser
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
+
 /**
  * Video source extractor for Fireload.
  */
@@ -6069,24 +7821,36 @@ final class Fireload extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Firevideoplayer.
  */
 final class Firevideoplayer extends \GDPlayer\Core\Extractor\Extractor
 {
     /**
+     * Extract the player configuration from the packed page source.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source extractor for Google Drive.
  */
 final class Gdrive extends \GDPlayer\Core\Extractor\Extractor
 {
+    private ?string $apiKey = null;
+    private string $apiURL = 'https://docs.google.com/u/0/get_video_info?docid=%s';
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Model\GDriveQueue $gdQueue;
+    protected string $referer = 'https://youtube.googleapis.com/';
     /**
+     * Apply the Google Drive HLS overrides, then initialise the API clients when an id is given.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
@@ -6110,18 +7874,7 @@ final class Gdrive extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
-/**
- * Video source XVFS-style embed parser for Goodstream (https://goodstream.one/).
- */
-final class Goodstream extends \GDPlayer\Core\Hosting\XVFSParser
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
+
 /**
  * Video source extractor for Google Photos (https://photos.google.com/).
  */
@@ -6142,17 +7895,21 @@ final class Googlephotos extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source XVFS-style embed parser for Hexupload.
  */
 final class Hexupload extends \GDPlayer\Core\Hosting\XVFSParser
 {
 }
+
 /**
  * Video source extractor for HxFile (https://hxfile.co/).
  */
 final class Hxfile extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://hxfile.co/';
+    protected bool $usingProxy = true;
     /**
      * @param string $id host-specific media identifier
      */
@@ -6160,35 +7917,42 @@ final class Hxfile extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source YetiShare-based host for Iceyfile.
  */
 final class Iceyfile extends \GDPlayer\Core\Hosting\YetiShare
 {
 }
+
 /**
  * Video source XVFS-style embed parser for Krakenfiles.
  */
 final class Krakenfiles extends \GDPlayer\Core\Hosting\XVFSParser
 {
 }
+
 /**
  * Video source XVFS-style embed parser for Lulustream.
  */
 final class Lulustream extends \GDPlayer\Core\Hosting\XVFSParser
 {
 }
+
 /**
  * Video source XVFS-style embed parser for MediaCM.
  */
 final class Mediacm extends \GDPlayer\Core\Hosting\XVFSParser
 {
 }
+
 /**
  * Video source extractor for Mediafire (https://www.mediafire.com/).
  */
 final class Mediafire extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://www.mediafire.com/';
+    protected string $url = '';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6196,11 +7960,13 @@ final class Mediafire extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source XVFS-style embed parser for Mixdrop (https://mixdrop.ag/).
  */
 final class Mixdrop extends \GDPlayer\Core\Hosting\XVFSParser
 {
+    protected string $baseURL = 'https://mixdrop.ag/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6208,11 +7974,13 @@ final class Mixdrop extends \GDPlayer\Core\Hosting\XVFSParser
     {
     }
 }
+
 /**
  * Video source XVFS-style embed parser for Mp4Upload (https://www.mp4upload.com/).
  */
 final class Mp4upload extends \GDPlayer\Core\Hosting\XVFSParser
 {
+    protected string $baseURL = 'https://www.mp4upload.com/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6220,42 +7988,61 @@ final class Mp4upload extends \GDPlayer\Core\Hosting\XVFSParser
     {
     }
 }
+
 /**
  * Video source extractor for Mstream.
  */
 final class Mstream extends \GDPlayer\Core\Extractor\Extractor
 {
     /**
+     * Resolve the effective URL of the media identifier and its cookies.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source extractor for My Mail.ru.
  */
 final class Mymailru extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source extractor for Nossoplayer.
  */
 final class Nossoplayer extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $referer = 'https://rdcplayer.online/';
 }
+
 /**
  * Video source extractor for OK.ru (https://ok.ru/).
  */
 final class Okru extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://ok.ru/';
     /**
+     * Parse the supplied sources, or fetch and parse the embed page when there are none.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
+    /**
+     * Register the video tracks, labelling each one by its language.
+     *
+     * @param list<array{language?: string, url?: string}> $tracks
+     */
+    protected function okruParseTracks(array $tracks = []): void
+    {
+    }
 }
+
 /**
  * Video source extractor for Pcloud.
  */
@@ -6268,11 +8055,13 @@ final class Pcloud extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Pixeldrain (https://pixeldrain.com/api/file/).
  */
 final class Pixeldrain extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://pixeldrain.com/api/file/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6280,11 +8069,13 @@ final class Pixeldrain extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source XVFS-style embed parser for Playnow (https://sdnsty.store/).
  */
 final class Playnow extends \GDPlayer\Core\Hosting\XVFSParser
 {
+    protected string $baseURL = 'https://sdnsty.store/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6292,29 +8083,37 @@ final class Playnow extends \GDPlayer\Core\Hosting\XVFSParser
     {
     }
 }
+
 /**
  * Video source extractor for Rumble (https://rumble.com/).
  */
 final class Rumble extends \GDPlayer\Core\Extractor\Extractor
 {
+    private ?string $videoId = null;
+    protected string $baseURL = 'https://rumble.com/';
     /**
+     * Resolve the Rumble video id, then fetch and parse the embed payload.
+     *
      * @param string $id host-specific media identifier
      */
     public function __construct(string $id = '')
     {
     }
 }
+
 /**
  * Video source XVFS-style embed parser for Sendvid.
  */
 final class Sendvid extends \GDPlayer\Core\Hosting\XVFSParser
 {
 }
+
 /**
  * Video source extractor for Sibnet (https://video.sibnet.ru/).
  */
 final class Sibnet extends \GDPlayer\Core\Extractor\Extractor
 {
+    protected string $baseURL = 'https://video.sibnet.ru/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6322,11 +8121,14 @@ final class Sibnet extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for SoundCloud.
  */
 final class Soundcloud extends \GDPlayer\Core\Extractor\Extractor
 {
+    private string $clientId = '';
+    protected string $referer = 'https://w.soundcloud.com/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6334,17 +8136,22 @@ final class Soundcloud extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Streamable.
  */
 final class Streamable extends \GDPlayer\Core\Extractor\Extractor
 {
 }
+
 /**
  * Video source XVFS-style embed parser for Streamhg (https://hgcloud.to/).
  */
 final class Streamhg extends \GDPlayer\Core\Hosting\XVFSParser
 {
+    /** @var string[] $baseDomains */
+    private array $baseDomains = [];
+    protected string $baseURL = 'https://audinifer.com/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6352,11 +8159,14 @@ final class Streamhg extends \GDPlayer\Core\Hosting\XVFSParser
     {
     }
 }
+
 /**
  * Video source extractor for Streamtape (https://tapeadvertisement.com/).
  */
 final class Streamtape extends \GDPlayer\Core\Extractor\Extractor
 {
+    private string $videoURL = '';
+    protected string $baseURL = 'https://tapeadvertisement.com/';
     /**
      * @param string $id host-specific media identifier
      */
@@ -6364,6 +8174,7 @@ final class Streamtape extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
  * Video source extractor for Tiktok.
  */
@@ -6376,27 +8187,290 @@ final class Tiktok extends \GDPlayer\Core\Extractor\Extractor
     {
     }
 }
+
 /**
- * Opsi yt-dlp: tipe output, proxy, dan penyusunan argumen.
- *
- * Split out of `Ytdlp` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Ytdlp` through this trait.
+ * Video source yt-dlp backed extractor for Twitch.
  */
-trait YtdlpOptionTrait
+final class Twitch extends \GDPlayer\Hosting\Ytdlp
 {
-    protected static function formatProxy(string $proxy): string
+    /**
+     * Custom yt-dlp options can be applied via {@see Ytdlp::addOption()},
+     * {@see Ytdlp::disableCookie()} and {@see Ytdlp::disableProxy()}
+     *
+     * @param string $url media URL to resolve
+     */
+    public function __construct(string $url = '')
     {
     }
-    protected function getType(string $videoUrl = ''): string
+}
+
+/**
+ * Video source YetiShare-based host for Udrop.
+ */
+final class Udrop extends \GDPlayer\Core\Hosting\YetiShare
+{
+}
+
+/**
+ * Video source XVFS-style embed parser for Uqload (https://uqload.net/).
+ */
+final class Uqload extends \GDPlayer\Core\Hosting\XVFSParser
+{
+    protected string $baseURL = 'https://uqload.vc/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source extractor for Vidara.
+ */
+final class Vidara extends \GDPlayer\Core\Extractor\Extractor
+{
+}
+
+/**
+ * Video source XVFS-style embed parser for Vidmoly (https://vidmoly.org/).
+ */
+final class Vidmoly extends \GDPlayer\Core\Hosting\XVFSParser
+{
+    protected string $baseURL = 'https://vidmoly.org/';
+    /**
+     * Build the embed URL for the given media id and pre-parse its tracks.
+     *
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source XVFS-style embed parser for Vidoza (https://videzz.net/).
+ */
+final class Vidoza extends \GDPlayer\Core\Hosting\XVFSParser
+{
+    protected string $baseURL = 'https://videzz.net/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source XVFS-style embed parser for Vidtube (https://vidtube.one/).
+ */
+final class Vidtube extends \GDPlayer\Core\Hosting\XVFSParser
+{
+    protected string $baseURL = 'https://vidtube.one/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source extractor for Vidyard.
+ */
+final class Vidyard extends \GDPlayer\Core\Extractor\Extractor
+{
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source extractor for Vimeo (https://vimeo.com/).
+ */
+final class Vimeo extends \GDPlayer\Core\Extractor\Extractor
+{
+    protected string $baseURL = 'https://vimeo.com/';
+}
+
+/**
+ * Video source extractor for VK (https://vk.com/).
+ */
+final class Vk extends \GDPlayer\Core\Extractor\Extractor
+{
+    protected string $baseURL = 'https://vk.com/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
     {
     }
     /**
+     * Fetch and parse the original VK video sources.
+     *
+     * @return void
+     */
+    public function getOriginalSources(): void
+    {
+    }
+}
+
+/**
+ * Video source extractor for Voe (https://voe.sx/).
+ */
+final class Voe extends \GDPlayer\Core\Extractor\Extractor
+{
+    protected string $baseURL = 'https://voe.sx/';
+    /**
+     * Resolve the media URL and extract the sources and caption tracks with the headless browser.
+     *
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source XVFS-style embed parser for Vtube (https://vtube.network/).
+ */
+final class Vtube extends \GDPlayer\Core\Hosting\XVFSParser
+{
+    protected string $baseURL = 'https://vtube.network/';
+}
+
+/**
+ * Video source extractor for Wetransfer.
+ */
+final class Wetransfer extends \GDPlayer\Core\Extractor\Extractor
+{
+    private const BRPATH = 'board/';
+    private const COLLECT_URL = 'https://collect.wetransfer.com/';
+    private const DLPATH = 'downloads/';
+    private const NORMAL_URL = 'https://wetransfer.com/';
+    private const PORTAL_URL = 'https://portals.wetransfer.com/';
+    private const PTPATH = 'reviews/';
+    private const SHORT_URL = 'https://we.tl/';
+    private bool $isCollect = false;
+    private bool $isPortals = false;
+    /**
+     * Pick the Wetransfer URL layout from the id and start the source extraction.
+     *
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source XVFS-style embed parser for Xvs.
+ */
+final class Xvs extends \GDPlayer\Core\Hosting\XVFSParser
+{
+}
+
+/**
+ * Video source extractor for Yandex Disk (https://disk.yandex.com/).
+ */
+final class Yadisk extends \GDPlayer\Core\Extractor\Extractor
+{
+    protected string $baseURL = 'https://disk.yandex.com/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source extractor for Yourupload (https://www.yourupload.com/).
+ */
+final class Yourupload extends \GDPlayer\Core\Extractor\Extractor
+{
+    protected string $baseURL = 'https://www.yourupload.com/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source extractor for YouTube (https://www.youtube.com/).
+ */
+final class Youtube extends \GDPlayer\Core\Extractor\Extractor
+{
+    protected string $baseURL = 'https://www.youtube.com/';
+    /** @var string[] $headers */
+    protected array $headers = [];
+    protected string $referer = 'https://youtube.googleapis.com/';
+    protected string $thirdPartyAPIUrl = 'https://yt1s.com/';
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+}
+
+/**
+ * Video source extractor for yt-dlp.
+ */
+class Ytdlp extends \GDPlayer\Helper\Core\CoreHelper
+{
+    private string $logDir = '';
+    private string $logFile = '';
+    private string $ytdlpApp = '';
+    private bool $ytdlpDisableProxy = false;
+    private string $ytdlpError = '';
+    private string $ytdlpProxy = '';
+    protected bool $ytdlpDisableCookie = false;
+    /** @var string[] $ytdlpOptions */
+    protected array $ytdlpOptions = [];
+    /**
+     * @param string $id host-specific media identifier
+     */
+    public function __construct(string $id = '')
+    {
+    }
+    /**
+     * @param string $command
+     * @return array<string,mixed>
+     */
+    protected function exec(string $command = ''): array
+    {
+    }
+    /**
+     * Turn one stored proxy entry (ip:port,user:pass,type) into a yt-dlp proxy URL.
+     *
+     * @param string $proxy comma separated proxy entry
+     * @return string proxy URL, always ending with a slash
+     */
+    protected static function formatProxy(string $proxy): string
+    {
+    }
+    /**
+     * Collect the always-on options: cookie header plus the caller supplied flags.
+     *
      * @return list<string>
      */
     protected function prepareBaseOptions(): array
     {
     }
     /**
+     * Build the proxy list to rotate through, the preferred proxy first, then a direct attempt.
+     *
+     * Proxying is skipped entirely when the caller turns it off or the `enable_proxy`
+     * setting is not enabled. The empty entry at the end means "no --proxy", so a dead
+     * proxy pool falls back to a direct connection instead of failing the extraction.
+     *
      * @return list<string>
      */
     protected function resolveProxies(): array
@@ -6427,29 +8501,6 @@ trait YtdlpOptionTrait
     public function disableProxy(): self
     {
     }
-}
-/**
- * Video source extractor for yt-dlp.
- */
-class Ytdlp extends \GDPlayer\Helper\Core\CoreHelper
-{
-    use \GDPlayer\Hosting\YtdlpOptionTrait;
-    protected bool $ytdlpDisableCookie = false;
-    /** @var string[] $ytdlpOptions */
-    protected array $ytdlpOptions = [];
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-    /**
-     * @param string $command
-     * @return array<string,mixed>
-     */
-    protected function exec(string $command = ''): array
-    {
-    }
     /**
      * @return list<array<string,mixed>>
      */
@@ -6457,544 +8508,337 @@ class Ytdlp extends \GDPlayer\Helper\Core\CoreHelper
     {
     }
 }
+
 /**
- * Video source yt-dlp backed extractor for Twitch.
- */
-final class Twitch extends \GDPlayer\Hosting\Ytdlp
-{
-    /**
-     * Custom yt-dlp options can be applied via {@see Ytdlp::addOption()},
-     * {@see Ytdlp::disableCookie()} and {@see Ytdlp::disableProxy()}
-     *
-     * @param string $url media URL to resolve
-     */
-    public function __construct(string $url = '')
-    {
-    }
-}
-/**
- * Video source YetiShare-based host for Udrop.
- */
-final class Udrop extends \GDPlayer\Core\Hosting\YetiShare
-{
-}
-/**
- * Video source XVFS-style embed parser for Uqload (https://uqload.net/).
- */
-final class Uqload extends \GDPlayer\Core\Hosting\XVFSParser
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source extractor for Vidara.
- */
-final class Vidara extends \GDPlayer\Core\Extractor\Extractor
-{
-}
-/**
- * Video source XVFS-style embed parser for Vidmoly (https://vidmoly.org/).
- */
-final class Vidmoly extends \GDPlayer\Core\Hosting\XVFSParser
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source XVFS-style embed parser for Vidoza (https://videzz.net/).
- */
-final class Vidoza extends \GDPlayer\Core\Hosting\XVFSParser
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source XVFS-style embed parser for Vidtube (https://vidtube.one/).
- */
-final class Vidtube extends \GDPlayer\Core\Hosting\XVFSParser
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source extractor for Vidyard.
- */
-final class Vidyard extends \GDPlayer\Core\Extractor\Extractor
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source extractor for Vimeo (https://vimeo.com/).
- */
-final class Vimeo extends \GDPlayer\Core\Extractor\Extractor
-{
-}
-/**
- * Video source extractor for VK (https://vk.com/).
- */
-final class Vk extends \GDPlayer\Core\Extractor\Extractor
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-    /**
-     * Fetch and parse the original VK video sources.
-     *
-     * @return void
-     */
-    public function getOriginalSources(): void
-    {
-    }
-}
-/**
- * Video source extractor for Voe (https://voe.sx/).
- */
-final class Voe extends \GDPlayer\Core\Extractor\Extractor
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source XVFS-style embed parser for Vtube (https://vtube.network/).
- */
-final class Vtube extends \GDPlayer\Core\Hosting\XVFSParser
-{
-}
-/**
- * Video source extractor for Wetransfer.
- */
-final class Wetransfer extends \GDPlayer\Core\Extractor\Extractor
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source XVFS-style embed parser for Xvs.
- */
-final class Xvs extends \GDPlayer\Core\Hosting\XVFSParser
-{
-}
-/**
- * Video source extractor for Yandex Disk (https://disk.yandex.com/).
- */
-final class Yadisk extends \GDPlayer\Core\Extractor\Extractor
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Video source extractor for Yourupload (https://www.yourupload.com/).
- */
-final class Yourupload extends \GDPlayer\Core\Extractor\Extractor
-{
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
-/**
- * Third-party (yt1s) fallback pipeline for YouTube sources.
+ * Parse yt-dlp JSON into sources and subtitle tracks.
  *
- * Split out of `Youtube` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Youtube` through this trait.
+ * Extracted from `Ytdlp` (rule php:S2042: at most 150 lines per class). The parser only
+ * reads its constructor inputs and returns plain arrays, so `Ytdlp` keeps owning the state.
  */
-trait YoutubeThirdPartyTrait
+final class YtdlpFormatParser
 {
-    /** @var string[] $headers */
-    protected array $headers = [];
-    protected string $thirdPartyAPIUrl = 'https://yt1s.com/';
+    public function __construct(private \GDPlayer\Helper\Core\CoreHelperOptions $options)
+    {
+    }
     /**
-     * Proxy for the convert wave: use the rotation proxy that is already active when present, otherwise
-     * WARP for this host — legacy order (WARP first, rotation overrides) with one value for
-     * all requests, not a fresh draw per request.
+     * Parse one yt-dlp `--dump-json` payload.
      *
-     * @return array{proxy: string, type: int, usrpwd: string}|null
+     * @param array<string,mixed> $ytdlpData decoded yt-dlp metadata
+     * @return array{title: string, image: string, sources: list<array<string,mixed>>,
+     *     tracks: list<array<string,mixed>>, ok: bool} parsed payload and the `ok` flag
      */
-    private function convertProxy(): ?array
-    {
-    }
-    private function getThirdPartySources(): void
-    {
-    }
-    private function thirdPartySources(string $response = ''): void
-    {
-    }
-    /**
-     * @param string[] $keys
-     * @param string $videoId
-     * @return void
-     */
-    private function thirdPartySourcesConvert(array $keys = [], string $videoId = ''): void
-    {
-    }
-    /**
-     * @param array<array<string,mixed>> $sources
-     * @return void
-     */
-    private function thirdPartySourcesParser(array $sources = []): void
+    public function parse(array $ytdlpData): array
     {
     }
 }
-/**
- * Video source extractor for YouTube (https://www.youtube.com/).
- */
-final class Youtube extends \GDPlayer\Core\Extractor\Extractor
-{
-    use \GDPlayer\Hosting\YoutubeThirdPartyTrait;
-    /**
-     * @param string $id host-specific media identifier
-     */
-    public function __construct(string $id = '')
-    {
-    }
-}
+
 namespace GDPlayer\Http;
 
 /**
- * Akses `Swoole\Coroutine::getContext()` tanpa bergantung pada ekstensi Swoole.
+ * Access `Swoole\Coroutine::getContext()` without depending on the Swoole extension.
  *
- * Kelas Swoole dicek sebagai string supaya core tetap bisa dipakai di SAPI/RoadRunner
- * yang tidak punya ekstensi tersebut. Di luar coroutine hasilnya null, sehingga pemanggil
- * jatuh ke penyimpanan statis biasa (satu request per proses).
+ * The Swoole class is checked as a string so the core still runs under SAPI/RoadRunner,
+ * which lack that extension. Outside a coroutine the result is null, so callers fall back
+ * to plain static storage (one request per process).
  */
 final class CoroutineStore
 {
+    private const COROUTINE_CLASS = 'Swoole\Coroutine';
     /**
-     * @return \ArrayAccess<string, mixed>|null context coroutine aktif; null di luar coroutine
+     * @return ArrayAccess<string, mixed>|null active coroutine context; null outside a coroutine
      */
     public static function get(): ?\ArrayAccess
     {
     }
 }
-namespace GDPlayer\Http\Emitter;
 
 /**
- * The single point where a response is sent to the client, one implementation per runtime.
- *
- * The kernel produces pure PSR-7; this class is the rightful owner of `header()`/`echo()` (SAPI) or
- * `Response::end()` (Swoole/RoadRunner). With this split, application code no longer
- * calls SAPI functions directly.
+ * PSR-17/PSR-7 factory for creating server requests and responses.
  */
-interface EmitterInterface
+class HttpFactory
+{
+    private static ?\Nyholm\Psr7\Factory\Psr17Factory $psr17Factory = null;
+    /**
+     * Create a server request from the PHP superglobals.
+     *
+     * @return ServerRequestInterface PSR-7 server request
+     */
+    public static function createRequestFromGlobals(): \Psr\Http\Message\ServerRequestInterface
+    {
+    }
+    /**
+     * Create a PSR-7 response with the given status.
+     *
+     * @param int    $code         HTTP status code
+     * @param string $reasonPhrase optional reason phrase
+     * @return ResponseInterface PSR-7 response
+     */
+    public static function createResponse(int $code = 200, string $reasonPhrase = ''): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Build a PSR-7 body stream from a string.
+     *
+     * @param string $content body content
+     * @return StreamInterface
+     */
+    public static function createStream(string $content = ''): \Psr\Http\Message\StreamInterface
+    {
+    }
+    /**
+     * Return the shared PSR-17 factory instance.
+     *
+     * @return Psr17Factory PSR-17 factory
+     */
+    public static function getPsr17Factory(): \Nyholm\Psr7\Factory\Psr17Factory
+    {
+    }
+}
+
+/**
+ * Carries a ResponseInterface out of code that cannot `return` yet (e.g. a guard inside a view).
+ *
+ * Used as a bridge until every view becomes a class: the caller throws this exception,
+ * the front controller catches it and sends the response. Replaces the `... ; exit;` pattern.
+ */
+final class HttpResponseException extends \RuntimeException
 {
     /**
-     * Send the response to the client.
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response ready-to-send response
-     * @return void
+     * @param ResponseInterface $response response that must be sent to the client
+     * @param Throwable|null $previous originating exception, if any
      */
-    public function emit(\Psr\Http\Message\ResponseInterface $response): void;
+    public function __construct(private readonly \Psr\Http\Message\ResponseInterface $response, ?\Throwable $previous = null)
+    {
+    }
+    /**
+     * @return ResponseInterface the response carried by the exception
+     */
+    public function getResponse(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
+/**
+ * Request/response context for one request cycle.
+ *
+ * This is a bridge (not the final architecture): legacy classes that do not yet receive PSR-7 by parameter
+ * read this context. Storage lives in {@see RequestContext} so that in Swoole the context
+ * does not leak across coroutines; {@see reset()} MUST still be called at the end of every request.
+ */
+final class State
+{
+    /**
+     * Return the parsed form/post body of the active request.
+     *
+     * @return array<string, mixed> active request body (form/POST); empty outside a request cycle
+     */
+    public static function body(): array
+    {
+    }
+    /**
+     * Return the cookie parameters of the active request.
+     *
+     * @return array<string, mixed> active request cookies (empty outside a request cycle)
+     */
+    public static function cookies(): array
+    {
+    }
+    /**
+     * Return the request of the current cycle.
+     *
+     * @return ServerRequestInterface|null active request, or null outside a request cycle
+     */
+    public static function getRequest(): ?\Psr\Http\Message\ServerRequestInterface
+    {
+    }
+    /**
+     * Return the response being built for the current cycle.
+     *
+     * @return ResponseInterface|null active response, or null outside a request cycle
+     */
+    public static function getResponse(): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Return the query string parameters of the active request.
+     *
+     * @return array<string, mixed> active request query string (empty outside a request cycle)
+     */
+    public static function query(): array
+    {
+    }
+    /**
+     * Release all request state (required at the end of the request in a long-running worker).
+     */
+    public static function reset(): void
+    {
+    }
+    /**
+     * One server parameter from the active request (e.g. `REMOTE_ADDR`, `HTTPS`, `REQUEST_URI`).
+     *
+     * Replacement for `$_SERVER[...]` in classes called on the request path (F10.1).
+     *
+     * @param string $key parameter name ($_SERVER style)
+     * @param string $default value when absent / outside a request cycle
+     */
+    public static function server(string $key, string $default = ''): string
+    {
+    }
+    /**
+     * Bind the request/response pair of the current cycle.
+     *
+     * @param ServerRequestInterface $request incoming request
+     * @param ResponseInterface $response response being built for it
+     */
+    public static function set(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response): void
+    {
+    }
+    /**
+     * Replace the response being built (used by {@see ResponseEmitter} when writing
+     * status/header/cookie in a long-running runtime).
+     */
+    public static function setResponse(\Psr\Http\Message\ResponseInterface $response): void
+    {
+    }
+}
+
+namespace GDPlayer\Http\Emitter;
+
 /**
  * Emitter for SAPI (PHP-FPM, Apache, CLI server): headers + echo.
  *
  * The only class in `src/` allowed to call `header()` and `echo` for the response body.
  */
-final class SapiEmitter implements \GDPlayer\Http\Emitter\EmitterInterface
+final class SapiEmitter
 {
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response response being sent
+     * @param ResponseInterface $response response being sent
      * @return void
      */
     public function emit(\Psr\Http\Message\ResponseInterface $response): void
     {
     }
 }
+
 namespace GDPlayer\Http\Fetcher;
 
 /**
- * Penerapan opsi per-request: method, proxy, sink, progres.
+ * The result of one outgoing HTTP request.
  *
- * Split out of `Fetcher` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Fetcher` through this trait.
+ * Callers need not touch the cURL handle or read CURLINFO_* themselves:
+ * status, headers, body, error, and duration are already normalised here.
+ * Header names are stored lowercase so lookups are not case-sensitive.
  */
-trait ApplyTrait
+final class FetchResult
 {
     /**
-     * Non-GET method from withMethod(); 'GET' means keep the cURL default.
-     *
-     * @param array<string, mixed> $request
+     * @param array<string, string> $headers
+     * @param string $redirectUrl redirect target that was NOT followed (CURLINFO_REDIRECT_URL),
+     *                            only filled when the caller turned follow-location off
      */
-    protected function applyMethod(\CurlHandle $handle, array $request): void
+    public function __construct(private int $status = 0, private string $body = '', private array $headers = [], private string $error = '', private string $effectiveUrl = '', private float $durationMs = 0.0, private int $contentLength = 0, private int $errorNo = 0, private string $redirectUrl = '')
     {
     }
     /**
-     * Progress callback, when the caller installs one.
+     * Return the raw response body.
      *
-     * Callback contract: fn(int $status, int $dlsize, int $dl) — the caller need not
-     * hold a CurlHandle just to read the status. cURL's 3rd/5th arguments
-     * (ulsize/ul) are not forwarded because nothing consumes them.
+     * @return string decoded (or binary) response body
      */
-    protected function applyProgressCallback(\CurlHandle $handle): void
+    public function body(): string
     {
     }
     /**
-     * Per-request proxy; the provider seam rotates it per attempt.
+     * Content length per the server (CURLINFO_CONTENT_LENGTH_DOWNLOAD), 0 when not reported.
      */
-    protected function applyProxy(\CurlHandle $handle): void
+    public function contentLength(): int
     {
     }
     /**
-     * Where the body goes: file (download()), caller callback (onWrite()), or memory.
+     * Return the total transfer time.
      *
-     * @param array<string, mixed> $request
+     * @return float elapsed time in milliseconds
      */
-    protected function applySink(\CurlHandle $handle, array $request): void
+    public function durationMs(): float
+    {
+    }
+    /**
+     * Return the final URL after redirects (CURLINFO_EFFECTIVE_URL).
+     *
+     * @return string URL that actually served the response
+     */
+    public function effectiveUrl(): string
+    {
+    }
+    /**
+     * Return the cURL error message, empty when the transfer succeeded.
+     *
+     * @return string error text or an empty string
+     */
+    public function error(): string
+    {
+    }
+    /**
+     * cURL error number (0 = no error). CURLE_WRITE_ERROR(23) means the transfer was
+     * stopped by the caller's callback, not a network failure.
+     */
+    public function errorNo(): int
+    {
+    }
+    /**
+     * Report whether the transfer produced an error.
+     *
+     * @return bool true when an error message was recorded
+     */
+    public function hasError(): bool
+    {
+    }
+    /**
+     * Header value (case-insensitive), or null when absent.
+     */
+    public function header(string $name): ?string
+    {
+    }
+    /**
+     * Return every response header, keyed by lowercase name.
+     *
+     * @return array<string, string>
+     */
+    public function headers(): array
+    {
+    }
+    /**
+     * Report whether the status code is 2xx.
+     *
+     * @return bool true for 200-299
+     */
+    public function isOk(): bool
+    {
+    }
+    /**
+     * Body as an array. A body that is not JSON, or JSON that is not an object/array,
+     * yields an empty array, not an exception.
+     *
+     * @return array<string, mixed>
+     */
+    public function json(): array
+    {
+    }
+    /**
+     * Redirect target that was not followed (empty when follow-location is on or it is not a redirect).
+     */
+    public function redirectUrl(): string
+    {
+    }
+    /**
+     * Return the HTTP status code, 0 when no response was received.
+     *
+     * @return int status code
+     */
+    public function status(): int
     {
     }
 }
-/**
- * Options for one HTTP request: proxy, hooks, method, visible sink, connect timeout.
- *
- * Split out of `Fetcher` so that class only holds execution and result normalisation
- * (rule: <=20 methods per class). The properties here flatten into `Fetcher` when the trait is used,
- * so no other class may use this trait.
- */
-trait OptionsTrait
-{
-    private string $body = '';
-    private int $bufferSize = 0;
-    /** Connect timeout in milliseconds (0 = not set). */
-    private int $connectTimeoutMs = 0;
-    /** Explicit CURLOPT_ENCODING value (null = inherited from getCurlDefaultConfig). */
-    private ?string $encoding = null;
-    private bool $followLocation = true;
-    private int $httpVersion = \CURL_HTTP_VERSION_NONE;
-    /** Outgoing interface; '' and null both mean inherited from getCurlDefaultConfig. */
-    private ?string $interface = null;
-    private int $keepAliveIdle = 0;
-    private int $keepAliveInterval = 0;
-    /** Abort bila transfer lebih lambat dari N byte/detik selama M detik (0 = nonaktif). */
-    private int $lowSpeedLimit = 0;
-    private int $lowSpeedTime = 0;
-    private int $maxRedirects = 20;
-    /** @var non-empty-string */
-    private string $method = 'GET';
-    /** @var null|callable(\CurlHandle, string): int */
-    private $onHeader;
-    /** @var null|callable */
-    private $onProgress;
-    /** @var null|callable(string): (int|void) */
-    private $onWrite;
-    /** @var array{proxy: string, type: int, usrpwd: string}|null */
-    private ?array $proxy = null;
-    /** @var string[] `host:port:ip` pairs for CURLOPT_RESOLVE */
-    private array $resolve = [];
-    /** @var resource|null CURLOPT_STDERR target when verbose is enabled */
-    private $verboseStream;
-    /**
-     * Bagian path relatif dari sebuah redirect (Location tanpa skema/host).
-     *
-     * @param string $base URL hop saat ini
-     * @param string $target nilai header Location
-     * @return string path absolut hasil resolusi
-     */
-    private static function relativeRedirectPath(string $base, string $target): string
-    {
-    }
-    /**
-     * Absolutkan nilai header Location terhadap URL hop saat ini.
-     *
-     * @param string $base URL hop yang sedang diproses
-     * @param string $target nilai header Location
-     * @return string URL absolut tujuan redirect
-     */
-    private static function resolveRedirectUrl(string $base, string $target): string
-    {
-    }
-    /**
-     * Copy with an extra caller-owned header collector (cookies, Location, etc.).
-     *
-     * @param null|callable(\CurlHandle, string): int $callback
-     */
-    public function onHeader(?callable $callback): self
-    {
-    }
-    /**
-     * Copy that invokes $callback for every body chunk (progress / custom write).
-     * An int < 0 return from the callback aborts the transfer (same as the cURL write callback).
-     *
-     * @param null|callable(string): (int|void) $callback
-     */
-    public function onWrite(?callable $callback): self
-    {
-    }
-    public function withBufferSize(int $bytes): self
-    {
-    }
-    /**
-     * Connect timeout in milliseconds (CURLOPT_CONNECTTIMEOUT_MS), for control
-     * pings whose budget is under one second. Overrides the ctor connectTimeout.
-     */
-    public function withConnectTimeoutMs(int $milliseconds): self
-    {
-    }
-    /**
-     * Copy with an explicit CURLOPT_ENCODING ('identity' = do not ask for compression,
-     * 'gzip' = ask for gzip). Without it the option is inherited from getCurlDefaultConfig.
-     */
-    public function withEncoding(string $encoding): self
-    {
-    }
-    public function withFollowLocation(bool $follow): self
-    {
-    }
-    /**
-     * Copy with a pinned HTTP version (e.g. CURL_HTTP_VERSION_1_1).
-     */
-    public function withHttpVersion(int $version): self
-    {
-    }
-    /**
-     * Copy that binds the outgoing connection to a specific address (engine host loopback ping).
-     * getCurlDefaultConfig() rotates CURLOPT_INTERFACE from EXTRA_IP; that value can only be
-     * replaced, not cleared with '' (cURL fails to bind), so the loopback address must be
-     * named explicitly. '' / not called = inherited.
-     */
-    public function withInterface(string $interface): self
-    {
-    }
-    /**
-     * Copy with TCP keep-alive tuning (0 = leave the transport default).
-     */
-    public function withKeepAlive(int $idle, int $interval): self
-    {
-    }
-    /**
-     * Copy that follows (default) or does not follow redirects.
-     * Callers that must read `Location` themselves (e.g. Mediafire) pass false.
-     */
-    /**
-     * Abort stalled transfers (CURLOPT_LOW_SPEED_LIMIT/TIME) so a long-running worker is not
-     * held by a dead upstream.
-     */
-    public function withLowSpeed(int $bytesPerSecond, int $seconds): self
-    {
-    }
-    /**
-     * Copy with a redirect limit (transport default: 20).
-     */
-    public function withMaxRedirects(int $max): self
-    {
-    }
-    /**
-     * Copy with a non-GET method (custom POST/PUT/HEAD) and an optional body.
-     */
-    public function withMethod(string $method, string $body = ''): self
-    {
-    }
-    /**
-     * Copy with a progress callback (large downloads: reported per update).
-     *
-     * Callback contract: `fn(int $status, int $dlsize, int $dl): mixed` — the HTTP status is read by
-     * `Fetcher` so the caller need not hold a CurlHandle.
-     *
-     * @param null|callable $callback normalised progress callback
-     */
-    public function withProgress(?callable $callback): self
-    {
-    }
-    /**
-     * Copy with its own proxy (used by the provider seam that rotates proxies per request).
-     *
-     * @param array{proxy: string, type: int, usrpwd: string}|null $proxy
-     */
-    public function withProxy(?array $proxy): self
-    {
-    }
-    /**
-     * Copy that rolls the cURL conversation (CURLOPT_VERBOSE) into this file.
-     * The caller opens and closes the file itself.
-     */
-    /**
-     * Pin `host:port` to a specific IP (CURLOPT_RESOLVE) — bypasses DNS without changing the URL.
-     *
-     * @param string[] $entries `host:port:ip` pairs
-     */
-    public function withResolve(array $entries): self
-    {
-    }
-    public function withVerbose(mixed $stream): self
-    {
-    }
-}
-/**
- * Konfigurasi transport: payload, versi protokol, dan handle.
- *
- * Split out of `Fetcher` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Fetcher` through this trait.
- */
-trait TransportTrait
-{
-    /**
-     * Request-scoped options: HEAD-only, body, basic auth, and header list.
-     *
-     * @param array<int|string, string> $headers
-     * @param array<string, mixed>      $request
-     */
-    protected function applyPayloadOptions(\CurlHandle $handle, array $headers, bool $headOnly, array $request): void
-    {
-    }
-    /**
-     * TCP keep-alive, encoding, verbose, and outgoing interface.
-     */
-    protected function applyTransportOptions(\CurlHandle $handle): void
-    {
-    }
-    /**
-     * HTTP version + connect/buffer timeouts + DNS resolution list.
-     */
-    protected function applyVersionOptions(\CurlHandle $handle): void
-    {
-    }
-    /**
-     * @param non-empty-string      $url
-     * @param array<int|string, string> $headers
-     * @param array<string, mixed>  $request body, basicAuth, stream (see method body)
-     * @param array<string, string> $collected filled by the header callback below
-     */
-    protected function configure(\CurlHandle $handle, string $url, array $headers, bool $headOnly, array $request, array &$collected): void
-    {
-    }
-}
+
 /**
  * Single place for outgoing HTTP requests (GET, HEAD, POST).
  *
@@ -7008,15 +8852,33 @@ trait TransportTrait
  */
 final class Fetcher
 {
-    use \GDPlayer\Http\Fetcher\ApplyTrait;
-    use \GDPlayer\Http\Fetcher\OptionsTrait;
-    use \GDPlayer\Http\Fetcher\TransportTrait;
+    use \GDPlayer\Http\Fetcher\FetcherTransportTrait;
     /**
      * @param int $timeout      time budget for one attempt (seconds)
      * @param int $retries      retries after the first attempt (0 = never)
      * @param int $retryDelayMs delay between retries (milliseconds)
      */
     public function __construct(protected int $timeout = 30, private int $retries = 0, private int $retryDelayMs = 250, protected int $connectTimeout = 0)
+    {
+    }
+    /**
+     * Keep the headers of the last hop: the previous redirect block is dropped as soon as a new
+     * status line appears, so what is read is the final response.
+     *
+     * @param array<string, string> $collected
+     */
+    protected function collectHeader(string $line, array &$collected): int
+    {
+    }
+    /**
+     * Accepts a map (`['Name' => 'value']`) as well as the legacy list style (`['Name: value']`);
+     * the list is forwarded as-is so legacy callers keep their shape.
+     *
+     * @param array<int|string, string> $headers
+     *
+     * @return list<string>
+     */
+    protected function formatHeaders(array $headers): array
     {
     }
     /**
@@ -7033,7 +8895,7 @@ final class Fetcher
      * @param array<int|string, string> $headers
      * @param array<string, mixed>      $request body/basicAuth/stream (lihat configure())
      * @param array<string, string>     $collected filled by the header collector while the handle runs
-     * @return null|\CurlHandle null when the handle cannot be created
+     * @return null|CurlHandle null when the handle cannot be created
      */
     public function createHandle(string $url, array $headers, bool $headOnly, array $request, array &$collected): ?\CurlHandle
     {
@@ -7083,6 +8945,7 @@ final class Fetcher
     {
     }
 }
+
 /**
  * A batch of HTTP requests run concurrently (cURL multi).
  *
@@ -7093,6 +8956,17 @@ final class Fetcher
  */
 final class FetcherPool
 {
+    /** The wave was aborted from inside `onTick`; unfinished transfers are not awaited. */
+    private bool $aborted = false;
+    /**
+     * @var array<int|string, array<string, string>> collected headers per key
+     *      (filled by the Fetcher header collector)
+     */
+    private array $collected = [];
+    /** @var array<int|string, string> handle creation failure messages, per key */
+    private array $failures = [];
+    /** @var array<int|string, array{handle: CurlHandle, fetcher: Fetcher, url: string, started: float}> */
+    private array $items = [];
     /**
      * Stop the wave in flight (used by the `onTick` callback).
      *
@@ -7130,218 +9004,250 @@ final class FetcherPool
     {
     }
 }
-/**
- * The result of one outgoing HTTP request.
- *
- * Callers need not touch the cURL handle or read CURLINFO_* themselves:
- * status, headers, body, error, and duration are already normalised here.
- * Header names are stored lowercase so lookups are not case-sensitive.
- */
-final class FetchResult
-{
-    /**
-     * @param array<string, string> $headers
-     * @param string $redirectUrl redirect target that was NOT followed (CURLINFO_REDIRECT_URL),
-     *                            only filled when the caller turned follow-location off
-     */
-    public function __construct(private int $status = 0, private string $body = '', private array $headers = [], private string $error = '', private string $effectiveUrl = '', private float $durationMs = 0.0, private int $contentLength = 0, private int $errorNo = 0, private string $redirectUrl = '')
-    {
-    }
-    public function body(): string
-    {
-    }
-    /**
-     * Content length per the server (CURLINFO_CONTENT_LENGTH_DOWNLOAD), 0 when not reported.
-     */
-    public function contentLength(): int
-    {
-    }
-    public function durationMs(): float
-    {
-    }
-    public function effectiveUrl(): string
-    {
-    }
-    public function error(): string
-    {
-    }
-    /**
-     * cURL error number (0 = no error). CURLE_WRITE_ERROR(23) means the transfer was
-     * stopped by the caller's callback, not a network failure.
-     */
-    public function errorNo(): int
-    {
-    }
-    public function hasError(): bool
-    {
-    }
-    /**
-     * Header value (case-insensitive), or null when absent.
-     */
-    public function header(string $name): ?string
-    {
-    }
-    /**
-     * @return array<string, string>
-     */
-    public function headers(): array
-    {
-    }
-    public function isOk(): bool
-    {
-    }
-    /**
-     * Body as an array. A body that is not JSON, or JSON that is not an object/array,
-     * yields an empty array, not an exception.
-     *
-     * @return array<string, mixed>
-     */
-    public function json(): array
-    {
-    }
-    /**
-     * Redirect target that was not followed (empty when follow-location is on or it is not a redirect).
-     */
-    public function redirectUrl(): string
-    {
-    }
-    public function status(): int
-    {
-    }
-}
-namespace GDPlayer\Http;
 
 /**
- * PSR-17/PSR-7 factory for creating server requests and responses.
- */
-class HttpFactory
-{
-    /**
-     * Create a server request from the PHP superglobals.
-     *
-     * @return \Psr\Http\Message\ServerRequestInterface PSR-7 server request
-     */
-    public static function createRequestFromGlobals(): \Psr\Http\Message\ServerRequestInterface
-    {
-    }
-    /**
-     * Create a PSR-7 response with the given status.
-     *
-     * @param int    $code         HTTP status code
-     * @param string $reasonPhrase optional reason phrase
-     * @return \Psr\Http\Message\ResponseInterface PSR-7 response
-     */
-    public static function createResponse(int $code = 200, string $reasonPhrase = ''): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Build a PSR-7 body stream from a string.
-     *
-     * @param string $content body content
-     * @return \Psr\Http\Message\StreamInterface
-     */
-    public static function createStream(string $content = ''): \Psr\Http\Message\StreamInterface
-    {
-    }
-    /**
-     * Return the shared PSR-17 factory instance.
-     *
-     * @return \Nyholm\Psr7\Factory\Psr17Factory PSR-17 factory
-     */
-    public static function getPsr17Factory(): \Nyholm\Psr7\Factory\Psr17Factory
-    {
-    }
-}
-/**
- * Carries a ResponseInterface out of code that cannot `return` yet (e.g. a guard inside a view).
+ * Request options (fluent with*()/on*()) plus the cURL transport configuration.
  *
- * Used as a bridge until every view becomes a class: the caller throws this exception,
- * the front controller catches it and sends the response. Replaces the `... ; exit;` pattern.
+ * Merge of the former `OptionsTrait`, `ApplyTrait` and `TransportTrait` (Batch F in
+ * `docs/plan/PLAN-REDUCE-TRAITS.md`): the fluent API keeps `Fetcher` above 20 methods, so one
+ * trait carries both halves instead of three. Behaviour is unchanged; the API stays on `Fetcher`.
+ *
+ * @method list<string> formatHeaders(array<int|string, string> $headers)
+ * @method int collectHeader(string $line, array<string, string> $collected)
+ * @method static string resolveRedirectUrl(string $base, string $target)
+ * @property int $timeout declared by the consuming class (constructor)
+ * @property int $connectTimeout declared by the consuming class (constructor)
  */
-final class HttpResponseException extends \RuntimeException
+trait FetcherTransportTrait
 {
+    private string $body = '';
+    private int $bufferSize = 0;
+    /** Connect timeout in milliseconds (0 = not set). */
+    private int $connectTimeoutMs = 0;
+    /** Explicit CURLOPT_ENCODING value (null = inherited from getCurlDefaultConfig). */
+    private ?string $encoding = null;
+    private bool $followLocation = true;
+    private int $httpVersion = \CURL_HTTP_VERSION_NONE;
+    /** Outgoing interface; '' and null both mean inherited from getCurlDefaultConfig. */
+    private ?string $interface = null;
+    private int $keepAliveIdle = 0;
+    private int $keepAliveInterval = 0;
+    /** Abort when the transfer drops below N bytes/second for M seconds (0 = disabled). */
+    private int $lowSpeedLimit = 0;
+    private int $lowSpeedTime = 0;
+    private int $maxRedirects = 20;
+    /** @var non-empty-string */
+    private string $method = 'GET';
+    /** @var null|callable(CurlHandle, string): int */
+    private $onHeader;
+    /** @var callable|null */
+    private $onProgress;
+    /** @var callable|null */
+    private $onWrite;
+    /** @var array{proxy: string, type: int, usrpwd: string}|null */
+    private ?array $proxy = null;
+    /** @var string[] `host:port:ip` pairs for CURLOPT_RESOLVE */
+    private array $resolve = [];
+    /** @var resource|null CURLOPT_STDERR target when verbose is enabled */
+    private $verboseStream;
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response response that must be sent to the client
-     * @param \Throwable|null $previous originating exception, if any
+     * Non-GET method from withMethod(); 'GET' means keep the cURL default.
+     *
+     * @param array<string, mixed> $request
      */
-    public function __construct(private readonly \Psr\Http\Message\ResponseInterface $response, ?\Throwable $previous = null)
+    protected function applyMethod(\CurlHandle $handle, array $request): void
     {
     }
     /**
-     * @return \Psr\Http\Message\ResponseInterface the response carried by the exception
+     * Request-scoped options: HEAD-only, body, basic auth, and header list.
+     *
+     * @param array<int|string, string> $headers
+     * @param array<string, mixed>      $request
      */
-    public function getResponse(): \Psr\Http\Message\ResponseInterface
+    protected function applyPayloadOptions(\CurlHandle $handle, array $headers, bool $headOnly, array $request): void
+    {
+    }
+    /**
+     * Progress callback, when the caller installs one.
+     *
+     * Callback contract: fn(int $status, int $dlsize, int $dl) — the caller need not
+     * hold a CurlHandle just to read the status. cURL's 3rd/5th arguments
+     * (ulsize/ul) are not forwarded because nothing consumes them.
+     */
+    protected function applyProgressCallback(\CurlHandle $handle): void
+    {
+    }
+    /**
+     * Per-request proxy; the provider seam rotates it per attempt.
+     */
+    protected function applyProxy(\CurlHandle $handle): void
+    {
+    }
+    /**
+     * Where the body goes: file (download()), caller callback (onWrite()), or memory.
+     *
+     * @param array<string, mixed> $request
+     */
+    protected function applySink(\CurlHandle $handle, array $request): void
+    {
+    }
+    /**
+     * TCP keep-alive, encoding, verbose, and outgoing interface.
+     */
+    protected function applyTransportOptions(\CurlHandle $handle): void
+    {
+    }
+    /**
+     * HTTP version + connect/buffer timeouts + DNS resolution list.
+     */
+    protected function applyVersionOptions(\CurlHandle $handle): void
+    {
+    }
+    /**
+     * Apply every option of the request to the handle and install the header collector.
+     *
+     * @param CurlHandle            $handle handle to configure
+     * @param non-empty-string      $url
+     * @param array<int|string, string> $headers
+     * @param bool                  $headOnly send a HEAD request without a body
+     * @param array<string, mixed>  $request body, basicAuth, stream (see method body)
+     * @param array<string, string> $collected filled by the header callback below
+     */
+    protected function configure(\CurlHandle $handle, string $url, array $headers, bool $headOnly, array $request, array &$collected): void
+    {
+    }
+    /**
+     * Copy with an extra caller-owned header collector (cookies, Location, etc.).
+     *
+     * @param null|callable(CurlHandle, string): int $callback
+     */
+    public function onHeader(?callable $callback): self
+    {
+    }
+    /**
+     * Copy that invokes $callback for every body chunk (progress / custom write).
+     * An int < 0 return from the callback aborts the transfer (same as the cURL write callback).
+     *
+     * @param null|callable(string): (int|void) $callback
+     */
+    public function onWrite(?callable $callback): self
+    {
+    }
+    /**
+     * Copy that records the chunk size used by the streaming write callback.
+     * Set the per-read buffer size on this instance (mutates, no copy).
+     *
+     * @param int $bytes Chunk size in bytes
+     * @return self Cloned instance
+     */
+    public function withBufferSize(int $bytes): self
+    {
+    }
+    /**
+     * Connect timeout in milliseconds (CURLOPT_CONNECTTIMEOUT_MS), for control
+     * pings whose budget is under one second. Overrides the ctor connectTimeout.
+     */
+    public function withConnectTimeoutMs(int $milliseconds): self
+    {
+    }
+    /**
+     * Copy with an explicit CURLOPT_ENCODING ('identity' = do not ask for compression,
+     * 'gzip' = ask for gzip). Without it the option is inherited from getCurlDefaultConfig.
+     */
+    public function withEncoding(string $encoding): self
+    {
+    }
+    /**
+     * Copy that follows (default) or does not follow redirects.
+     * Callers that must read `Location` themselves (e.g. Mediafire) pass false.
+     *
+     * @param bool $follow Whether cURL follows redirects
+     * @return self Cloned instance
+     */
+    public function withFollowLocation(bool $follow): self
+    {
+    }
+    /**
+     * Copy with a pinned HTTP version (e.g. CURL_HTTP_VERSION_1_1).
+     */
+    public function withHttpVersion(int $version): self
+    {
+    }
+    /**
+     * Copy that binds the outgoing connection to a specific address (engine host loopback ping).
+     * getCurlDefaultConfig() rotates CURLOPT_INTERFACE from EXTRA_IP; that value can only be
+     * replaced, not cleared with '' (cURL fails to bind), so the loopback address must be
+     * named explicitly. '' / not called = inherited.
+     */
+    public function withInterface(string $interface): self
+    {
+    }
+    /**
+     * Copy with TCP keep-alive tuning (0 = leave the transport default).
+     */
+    public function withKeepAlive(int $idle, int $interval): self
+    {
+    }
+    /**
+     * Abort stalled transfers (CURLOPT_LOW_SPEED_LIMIT/TIME) so a long-running worker is not
+     * held by a dead upstream.
+     */
+    public function withLowSpeed(int $bytesPerSecond, int $seconds): self
+    {
+    }
+    /**
+     * Copy with a redirect limit (transport default: 20).
+     */
+    public function withMaxRedirects(int $max): self
+    {
+    }
+    /**
+     * Copy with a non-GET method (custom POST/PUT/HEAD) and an optional body.
+     */
+    public function withMethod(string $method, string $body = ''): self
+    {
+    }
+    /**
+     * Copy with a progress callback (large downloads: reported per update).
+     *
+     * Callback contract: `fn(int $status, int $dlsize, int $dl): mixed` — the HTTP status is read by
+     * `Fetcher` so the caller need not hold a CurlHandle.
+     *
+     * @param null|callable $callback normalised progress callback
+     */
+    public function withProgress(?callable $callback): self
+    {
+    }
+    /**
+     * Copy with its own proxy (used by the provider seam that rotates proxies per request).
+     *
+     * @param array{proxy: string, type: int, usrpwd: string}|null $proxy
+     */
+    public function withProxy(?array $proxy): self
+    {
+    }
+    /**
+     * Pin `host:port` to a specific IP (CURLOPT_RESOLVE) — bypasses DNS without changing the URL.
+     *
+     * @param string[] $entries `host:port:ip` pairs
+     */
+    public function withResolve(array $entries): self
+    {
+    }
+    /**
+     * Copy that streams cURL verbose output into the given resource.
+     * The caller opens and closes the stream itself.
+     *
+     * @param mixed $stream Writable stream resource, ignored when not a resource
+     * @return self Cloned instance
+     */
+    public function withVerbose(mixed $stream): self
     {
     }
 }
+
 namespace GDPlayer\Http\Request;
 
-/**
- * Set-Cookie value builders (build, add, clear).
- *
- * Split out of `ResponseEmitter` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the public API stays on `ResponseEmitter` via this trait.
- */
-trait CookieTrait
-{
-    /**
-     * @param string $name cookie name
-     * @param string $value cookie value
-     * @param array<string, bool|int|string> $options cookie options
-     * @return string Set-Cookie header value
-     */
-    private static function buildCookie(string $name, string $value, array $options): string
-    {
-    }
-    /**
-     * Tell the browser to delete a cookie (Set-Cookie with an expires in the past).
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response base response
-     * @param string $name cookie name
-     * @param array<string, bool|int|string> $options cookie options (path/domain must match the set call)
-     * @return \Psr\Http\Message\ResponseInterface response with the Set-Cookie header
-     */
-    public static function clearCookie(\Psr\Http\Message\ResponseInterface $response, string $name, array $options = []): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Append one cookie to the response (Set-Cookie).
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response base response
-     * @param string $name cookie name
-     * @param string $value cookie value
-     * @param array<string, bool|int|string> $options options: expires, path, domain, secure, httponly, samesite
-     * @return \Psr\Http\Message\ResponseInterface response with the Set-Cookie header
-     */
-    public static function withCookie(\Psr\Http\Message\ResponseInterface $response, string $name, string $value, array $options = []): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Header line parsing/normalising helpers ('Name: value' lists).
- *
- * Split out of `ResponseEmitter` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the public API stays on `ResponseEmitter` via this trait.
- */
-trait HeaderTrait
-{
-    /**
-     * Turn a 'Name: value' header list into a name => value map.
-     *
-     * @param array<int|string, string> $headerLines header list
-     * @return array<string, string> header map
-     */
-    protected static function parseHeaderLines(array $headerLines): array
-    {
-    }
-    /**
-     * @param array<int|string, string> $headers
-     * @return list<string>
-     */
-    public static function normalizeHeaders(array $headers = []): array
-    {
-    }
-}
 /**
  * Per-execution, runtime-aware request/response context.
  *
@@ -7354,9 +9260,22 @@ trait HeaderTrait
  */
 final class RequestContext
 {
+    private const STORE_KEY = 'gdplayer.request';
+    private static ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    private static ?\Psr\Http\Message\ResponseInterface $response = null;
+    /**
+     * Current PSR-7 request for this execution.
+     *
+     * @return ServerRequestInterface|null request instance, or null when none is bound
+     */
     public static function getRequest(): ?\Psr\Http\Message\ServerRequestInterface
     {
     }
+    /**
+     * Current PSR-7 response for this execution.
+     *
+     * @return ResponseInterface|null response instance, or null when none is bound
+     */
     public static function getResponse(): ?\Psr\Http\Message\ResponseInterface
     {
     }
@@ -7366,16 +9285,33 @@ final class RequestContext
     public static function reset(): void
     {
     }
+    /**
+     * Bind both the request and the response for the current execution.
+     *
+     * @param ServerRequestInterface $request incoming request
+     * @param ResponseInterface $response outgoing response
+     */
     public static function set(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response): void
     {
     }
+    /**
+     * Bind or clear only the request, leaving any stored response untouched.
+     *
+     * @param ServerRequestInterface|null $request request to store, or null to clear it
+     */
     public static function setRequest(?\Psr\Http\Message\ServerRequestInterface $request): void
     {
     }
+    /**
+     * Replace the stored response for the current execution.
+     *
+     * @param ResponseInterface $response outgoing response
+     */
     public static function setResponse(\Psr\Http\Message\ResponseInterface $response): void
     {
     }
 }
+
 namespace GDPlayer\Http\Response;
 
 /**
@@ -7385,23 +9321,34 @@ namespace GDPlayer\Http\Response;
  * {@see status()}, {@see isCookieStored()}) write to the PSR-7 context in {@see State}
  * when running in a long-running runtime (Swoole/RoadRunner) and still write to the
  * SAPI for the PHP/FPM path. {@see emit()} is the final sink of the SAPI path.
- *
- * Pure value builders live in {@see CookieTrait} and {@see HeaderTrait}.
  */
 class ResponseEmitter
 {
-    use \GDPlayer\Http\Request\CookieTrait;
-    use \GDPlayer\Http\Request\HeaderTrait;
+    /** First half of the header list exposed to the browser. */
+    private const EXPOSE_HEADERS_HEAD = 'Authorization, Content-Disposition, Content-Encoding, ';
+    /** Media size headers exposed for players that read them. */
+    private const EXPOSE_HEADERS_MEDIA = 'X-Content-Length, X-File-Size, X-Total-Length';
+    /** Second half of the header list exposed to the browser. */
+    private const EXPOSE_HEADERS_TAIL = 'Content-Range, ETag, Vary, Location, ';
     /** Access-Control-Expose-Headers value for the PHP path. */
-    public const EXPOSE_HEADERS = self::EXPOSE_HEADERS_HEAD . self::EXPOSE_HEADERS_TAIL;
+    public const EXPOSE_HEADERS = self::EXPOSE_HEADERS_HEAD . self::EXPOSE_HEADERS_TAIL . self::EXPOSE_HEADERS_MEDIA;
+    /**
+     * Turn a 'Name: value' header list into a name => value map.
+     *
+     * @param array<int|string, string> $headerLines header list
+     * @return array<string, string> header map
+     */
+    protected static function parseHeaderLines(array $headerLines): array
+    {
+    }
     /**
      * Guarantee CORS headers on a response built outside {@see createHeaders()}.
      *
      * Single choke point for the kernel: every core response passes through here, so a handler
      * (or error page) that forgot CORS can no longer produce a browser-blocking reply.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response response to complete
-     * @return \Psr\Http\Message\ResponseInterface response with CORS headers when they are missing
+     * @param ResponseInterface $response response to complete
+     * @return ResponseInterface response with CORS headers when they are missing
      */
     public static function applyCorsHeaders(\Psr\Http\Message\ResponseInterface $response): \Psr\Http\Message\ResponseInterface
     {
@@ -7412,10 +9359,10 @@ class ResponseEmitter
      * Used by new code (controllers) so headers (Cache-Control + CORS) match the
      * legacy path, without calling header() directly.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response base response
+     * @param ResponseInterface $response base response
      * @param bool $enableCache true for responses that may be cached
      * @param int $cacheMaxAge max-age when caching is enabled
-     * @return \Psr\Http\Message\ResponseInterface response with default headers
+     * @return ResponseInterface response with default headers
      */
     public static function applyDefaultHeaders(\Psr\Http\Message\ResponseInterface $response, bool $enableCache = false, int $cacheMaxAge = 3600): \Psr\Http\Message\ResponseInterface
     {
@@ -7429,6 +9376,17 @@ class ResponseEmitter
      * @return string Cache-Control value
      */
     public static function cacheControl(bool $enableCache, int $cacheMaxAge, int $statusCode): string
+    {
+    }
+    /**
+     * Tell the browser to delete a cookie (Set-Cookie with an expires in the past).
+     *
+     * @param ResponseInterface $response base response
+     * @param string $name cookie name
+     * @param array<string, bool|int|string> $options cookie options (path/domain must match the set call)
+     * @return ResponseInterface response with the Set-Cookie header
+     */
+    public static function clearCookie(\Psr\Http\Message\ResponseInterface $response, string $name, array $options = []): \Psr\Http\Message\ResponseInterface
     {
     }
     /**
@@ -7477,9 +9435,9 @@ class ResponseEmitter
     /**
      * Send the response through the SAPI emitter (legacy caller compatibility).
      *
-     * New code uses {@see SapiEmitter}/EmitterInterface of its respective runtime.
+     * New code uses {@see SapiEmitter}.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response response being sent
+     * @param ResponseInterface $response response being sent
      */
     public static function emit(\Psr\Http\Message\ResponseInterface $response): void
     {
@@ -7495,9 +9453,32 @@ class ResponseEmitter
     public static function isCookieStored(string $name, string $value, array $options = []): bool
     {
     }
+    /**
+     * Report whether a status code counts as a successful response.
+     *
+     * The accepted range is 200 to 399, so redirects pass and errors do not.
+     *
+     * @param int $status HTTP status to test
+     * @return bool
+     */
     public static function isValidResponse(int $status = 0): bool
     {
     }
+    /**
+     * @param array<int|string, string> $headers
+     * @return list<string>
+     */
+    public static function normalizeHeaders(array $headers = []): array
+    {
+    }
+    /**
+     * Hand a redirect to the front controller by throwing a response exception.
+     *
+     * Legacy callers keep calling `redirect(...)` without returning; the
+     * exception carries the same 302 (or 404 for an empty URL) response.
+     *
+     * @param string $newURL target URL
+     */
     public static function redirect(string $newURL = ''): never
     {
     }
@@ -7508,7 +9489,7 @@ class ResponseEmitter
      * stays until all its legacy callers are migrated.
      *
      * @param string $newURL target URL
-     * @return \Psr\Http\Message\ResponseInterface ready-to-send redirect response
+     * @return ResponseInterface ready-to-send redirect response
      */
     public static function redirectResponse(string $newURL = ''): \Psr\Http\Message\ResponseInterface
     {
@@ -7536,7 +9517,20 @@ class ResponseEmitter
     public static function status(int $code): void
     {
     }
+    /**
+     * Append one cookie to the response (Set-Cookie).
+     *
+     * @param ResponseInterface $response base response
+     * @param string $name cookie name
+     * @param string $value cookie value
+     * @param array<string, bool|int|string> $options options: expires, path, domain, secure, httponly, samesite
+     * @return ResponseInterface response with the Set-Cookie header
+     */
+    public static function withCookie(\Psr\Http\Message\ResponseInterface $response, string $name, string $value, array $options = []): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Pure response policy (no SAPI): early responses, default headers, and deciding which body
  * is streamed directly instead of being buffered by the output buffer.
@@ -7546,17 +9540,27 @@ class ResponseEmitter
  */
 final class ResponsePolicy
 {
+    /** Plugin API prefix: the plugin answers its own preflight (CORS `*`), not the core. */
+    private const PLUGIN_API_PREFIX = '/api/v1';
+    /** Prefixes whose body is streamed directly by a streaming handler (not the output buffer). */
+    private const STREAMING_PREFIXES = ['/filmstrip', '/hls', '/mpd', '/poster', '/seg/', '/stream-seg', '/stream-ts', '/stream-vid', '/subtitle', '/ts/', '/vid/'];
     /**
      * Response for OPTIONS/HEAD before the router runs (legacy behaviour preserved).
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
-     * @return \Psr\Http\Message\ResponseInterface|null early response; null when the request continues to the router
+     * An OPTIONS request outside the plugin API gets a 204 with default headers;
+     * a HEAD request gets an empty 200 typed for the streaming routes (or DASH XML for `mpd/`).
+     *
+     * @param ServerRequestInterface $request active request
+     * @return ResponseInterface|null early response; null when the request continues to the router
      */
     public static function earlyResponse(\Psr\Http\Message\ServerRequestInterface $request): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
-     * Is this request's body streamed directly by a streaming handler (not through a buffer)?
+     * Report whether this request's body is streamed directly by a handler.
+     *
+     * Matching is a case-insensitive prefix test against the streaming routes,
+     * so those bodies must not be buffered.
      *
      * @param string $requestTarget request target (path + query)
      * @return bool true when the body must not be buffered
@@ -7567,23 +9571,25 @@ final class ResponsePolicy
     /**
      * Mimic the SAPI default: a response without an explicit Content-Type is sent as text/html UTF-8.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response dispatched response
-     * @return \Psr\Http\Message\ResponseInterface response with Content-Type filled in
+     * @param ResponseInterface $response dispatched response
+     * @return ResponseInterface response with Content-Type filled in
      */
     public static function withDefaultContentType(\Psr\Http\Message\ResponseInterface $response): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
  * Runtime sink refuses further bytes (client disconnected): the producer must abort the transfer.
  *
- * Dilempar ke fiber streaming, bukan dengan menghancurkan fiber-nya: fiber yang masih suspend
- * berada di dalam callback tulis cURL, dan menghancurkannya memaksa unwind melewati frame C
- * libcurl sehingga PHP mencetak "curl_exec(): Could not call the CURLOPT_WRITEFUNCTION".
+ * Thrown into the streaming fiber instead of destroying it: a fiber that is still suspended
+ * sits inside the cURL write callback, and destroying it forces an unwind through the C frame
+ * of libcurl, which makes PHP print "curl_exec(): Could not call the CURLOPT_WRITEFUNCTION".
  */
 final class StreamAborted extends \RuntimeException
 {
 }
+
 /**
  * Streaming byte sink for bodies that must not be buffered by the output buffer.
  *
@@ -7594,7 +9600,14 @@ final class StreamAborted extends \RuntimeException
  */
 final class StreamSink
 {
+    /** Chunk size when streaming a file. */
+    private const CHUNK_SIZE = 65535;
+    /** Output-buffer depth owned by the host runtime; buffers below it are left untouched. */
+    private static int $bufferLevel = 0;
+    private static ?\Closure $writer = null;
     /**
+     * Install the runtime writer, or drop it to fall back to the SAPI output buffer.
+     *
      * @param callable(string): void|null $writer runtime writer; null reverts to SAPI
      */
     public static function bind(?callable $writer): void
@@ -7606,6 +9619,11 @@ final class StreamSink
     public static function flush(): void
     {
     }
+    /**
+     * Tell whether a runtime writer is installed.
+     *
+     * @return bool true when a writer owns the output
+     */
     public static function isBound(): bool
     {
     }
@@ -7633,69 +9651,7 @@ final class StreamSink
     {
     }
 }
-namespace GDPlayer\Http;
 
-/**
- * Request/response context for one request cycle.
- *
- * This is a bridge (not the final architecture): legacy classes that do not yet receive PSR-7 by parameter
- * read this context. Storage lives in {@see RequestContext} so that in Swoole the context
- * does not leak across coroutines; {@see reset()} MUST still be called at the end of every request.
- */
-final class State
-{
-    /**
-     * @return array<string, mixed> active request body (form/POST); empty outside a request cycle
-     */
-    public static function body(): array
-    {
-    }
-    /**
-     * @return array<string, mixed> active request cookies (empty outside a request cycle)
-     */
-    public static function cookies(): array
-    {
-    }
-    public static function getRequest(): ?\Psr\Http\Message\ServerRequestInterface
-    {
-    }
-    public static function getResponse(): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * @return array<string, mixed> active request query string (empty outside a request cycle)
-     */
-    public static function query(): array
-    {
-    }
-    /**
-     * Release all request state (required at the end of the request in a long-running worker).
-     */
-    public static function reset(): void
-    {
-    }
-    /**
-     * One server parameter from the active request (e.g. `REMOTE_ADDR`, `HTTPS`, `REQUEST_URI`).
-     *
-     * Replacement for `$_SERVER[...]` in classes called on the request path (F10.1).
-     *
-     * @param string $key parameter name ($_SERVER style)
-     * @param string $default value when absent / outside a request cycle
-     */
-    public static function server(string $key, string $default = ''): string
-    {
-    }
-    public static function set(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response): void
-    {
-    }
-    /**
-     * Replace the response being built (used by {@see ResponseEmitter} when writing
-     * status/header/cookie in a long-running runtime).
-     */
-    public static function setResponse(\Psr\Http\Message\ResponseInterface $response): void
-    {
-    }
-}
 namespace GDPlayer\Logging;
 
 /**
@@ -7703,12 +9659,33 @@ namespace GDPlayer\Logging;
  */
 final class Logger
 {
+    /** Minimum gap between log-directory cleanups. */
+    private const CLEANUP_INTERVAL = 300;
+    /** Error channel: only real failures may go into the *.error.log file */
+    private const LEVEL_ERROR = 'error';
+    /** Info channel: normal events (not errors) are separated into the plain *.log file */
+    private const LEVEL_INFO = 'info';
+    // configuration -- adjust as needed
+    private const LOG_DIR = \GDPlayer\Config\App::LOG_PATH;
+    /** Log file retention (hours). Increase it if you want a longer history. */
+    private const RETENTION_HOURS = 72;
+    /** Client IP cached for the current request (reset by setRequest). */
+    private static ?string $clientIp = null;
+    /** Last log-directory cleanup (seconds); scanning the dir per log line is too expensive. */
+    private static int $lastCleanup = 0;
     /**
+     * Expose the application info instead of the logger internals when dumping the object.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
     {
     }
+    /**
+     * Return the PSR-7 request bound to the current runtime.
+     *
+     * @return null|ServerRequestInterface active request, null outside a request
+     */
     public static function getRequest(): ?\Psr\Http\Message\ServerRequestInterface
     {
     }
@@ -7731,10 +9708,16 @@ final class Logger
     public static function log(string $message, array $context = []): void
     {
     }
+    /**
+     * Bind the request and drop the per-request caches built from the previous one.
+     *
+     * @param null|ServerRequestInterface $request request to bind, null to unbind
+     */
     public static function setRequest(?\Psr\Http\Message\ServerRequestInterface $request): void
     {
     }
 }
+
 namespace GDPlayer\Model;
 
 /**
@@ -7749,6 +9732,7 @@ class GDriveAuth extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the Google Drive duplicate-detection table (`tb_gdrive_duplicate`).
  */
@@ -7761,6 +9745,7 @@ class GDriveDuplicate extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the Google Drive mirror accounts table (`tb_gdrive_mirrors`).
  */
@@ -7781,6 +9766,7 @@ class GDriveMirror extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the Google Drive mirror queue table (`tb_gdrive_queue`).
  */
@@ -7793,6 +9779,7 @@ class GDriveQueue extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the load balancer nodes table (`tb_loadbalancers`).
  */
@@ -7814,6 +9801,7 @@ class LoadBalancer extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the MaxMind IP geolocation table (`tb_maxmind`).
  */
@@ -7826,6 +9814,7 @@ class Maxmind extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the MaxMind ASN table (`tb_maxmind_asn`).
  */
@@ -7838,6 +9827,7 @@ class MaxmindAsn extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the plugin page routes table (`tb_plugin_routes`).
  */
@@ -7850,6 +9840,7 @@ class PluginRoutes extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the installed plugins table (`tb_plugins`).
  */
@@ -7862,6 +9853,7 @@ class Plugins extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the user sessions table (`tb_sessions`).
  */
@@ -7874,6 +9866,7 @@ class Session extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the application settings table (`tb_settings`).
  */
@@ -7886,6 +9879,7 @@ class Setting extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the traffic statistics table (`tb_stats`).
  */
@@ -7898,6 +9892,7 @@ class Stat extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the user-agent statistics table (`tb_stats_ua`).
  */
@@ -7910,6 +9905,7 @@ class StatUA extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the video subtitles table (`tb_subtitles`).
  */
@@ -7922,11 +9918,13 @@ class Subtitle extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the subtitle library (`tb_subtitle_manager`), including multi-file/URL upload handling.
  */
 class SubtitleManager extends \GDPlayer\Database\MySQL\Model
 {
+    private string $defaultSubtitleLanguage = 'Unknown CC';
     /**
      * Bind the model to the `tb_subtitle_manager` table.
      */
@@ -7936,6 +9934,8 @@ class SubtitleManager extends \GDPlayer\Database\MySQL\Model
     /**
      * ​​$_POST['multiSubUrls'] with language in the filename
      *
+     * Parse the textarea lines of `multiSubUrls` into file/label pairs.
+     *
      * @return array<array<string,mixed>>
      */
     public function saveMultipleSubtitlesUrls(?\Psr\Http\Message\ServerRequestInterface $request = null): array
@@ -7943,6 +9943,8 @@ class SubtitleManager extends \GDPlayer\Database\MySQL\Model
     }
     /**
      * $_POST['sub-url'] and $_POST['lang-url']
+     *
+     * Pair `sub-url` entries with their `lang-url` label, resolving sub-scene links first.
      *
      * @return array<array<string,mixed>>
      */
@@ -7952,6 +9954,8 @@ class SubtitleManager extends \GDPlayer\Database\MySQL\Model
     /**
      * multi upload subtitle files with $_FILES['multiSubFiles']
      *
+     * Store every uploaded `multiSubFiles` entry with the language read from its name.
+     *
      * @return array<array<string,mixed>>
      */
     public function uploadMultipleSubtitlesFiles(?\Psr\Http\Message\ServerRequestInterface $request = null): array
@@ -7960,12 +9964,15 @@ class SubtitleManager extends \GDPlayer\Database\MySQL\Model
     /**
      * ​​$_FILES['sub-file'] and $_POST['lang-file']
      *
+     * Store every uploaded `sub-file` entry with its matching `lang-file` label.
+     *
      * @return array<array<string,mixed>>
      */
     public function uploadMultipleSubtitlesFiles2(?\Psr\Http\Message\ServerRequestInterface $request = null): array
     {
     }
 }
+
 /**
  * Model for the temporary video source queue (`tmp_videos_sources`).
  */
@@ -7978,6 +9985,7 @@ class TmpVideoSource extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the users table (`tb_users`), including credential/field validation helpers.
  */
@@ -8024,6 +10032,7 @@ class User extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the videos table (`tb_videos`), including subtitle persistence helpers.
  */
@@ -8053,6 +10062,7 @@ class Video extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the video alternative sources table (`tb_videos_alternatives`).
  */
@@ -8067,7 +10077,7 @@ class VideoAlternative extends \GDPlayer\Database\MySQL\Model
     /**
      * Replace all alternatives for a video with the given links.
      *
-     * @param \GDPlayer\Core\Hosting\Hosting  $hostingService hosting resolver used to parse each link
+     * @param Hosting  $hostingService hosting resolver used to parse each link
      * @param int      $videoId        video id
      * @param string[] $alternatives   alternative source URLs
      * @return void
@@ -8076,6 +10086,7 @@ class VideoAlternative extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the video hash lookup table (`tb_videos_hash`).
  */
@@ -8088,11 +10099,13 @@ class VideoHash extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Model for the resolved video sources table (`tb_videos_sources`), including cached source fetching.
  */
 class VideoSource extends \GDPlayer\Database\MySQL\Model
 {
+    private const MAX_RETRY = 3;
     /**
      * Bind the model to the `tb_videos_sources` table.
      */
@@ -8120,6 +10133,7 @@ class VideoSource extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Read-only view model for load balancers (`vw_loadbalancers`).
  */
@@ -8132,6 +10146,7 @@ class ViewLoadBalancer extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Read-only view model for the subtitle library (`vw_subtitle_manager`).
  */
@@ -8144,6 +10159,7 @@ class ViewSubtitleManager extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Read-only view model for users (`vw_users`).
  */
@@ -8156,6 +10172,7 @@ class ViewUser extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 /**
  * Read-only view model for videos (`vw_videos`).
  */
@@ -8168,6 +10185,7 @@ class ViewVideo extends \GDPlayer\Database\MySQL\Model
     {
     }
 }
+
 namespace GDPlayer\Modules;
 
 /**
@@ -8206,7 +10224,7 @@ abstract class AbstractAjaxController
      */
     protected const LOG_DENIED_ACTION = '';
     protected const MESSAGE_BAD_REQUEST = 'Bad request';
-    protected const MESSAGE_UNAUTHORIZE = 'You are not authorized to access this feature';
+    protected const MESSAGE_UNAUTHORIZE = \GDPlayer\Modules\AjaxCatalog::MESSAGE_UNAUTHORIZE;
     /** Whether the action is admin-only (role 0); public endpoints set this to false. */
     protected const REQUIRE_ADMIN = true;
     /** Whether the action requires login; public endpoints set this to false. */
@@ -8214,13 +10232,26 @@ abstract class AbstractAjaxController
     protected string $action = '';
     protected \GDPlayer\Config\BinFile $binConfig;
     protected \GDPlayer\Config\Config $config;
-    /** @var null|array<string,mixed> */
-    protected ?array $currentUser = null;
+    /**
+     * The logged-in user of the active request.
+     *
+     * Readonly: resolved once in the constructor by {@see AjaxBaseTrait::resolveCurrentUser()}
+     * and never changed afterwards.
+     *
+     * @var null|array<string,string|int|float|null>
+     */
+    protected readonly ?array $currentUser;
+    /**
+     * The id of the logged-in user of the active request; 0 when anonymous.
+     *
+     * Readonly: derived from {@see $currentUser} once, in the constructor.
+     */
+    protected readonly int $currentUserId;
     /** @var array<string,mixed> */
     protected array $data;
     protected int $draw = 0;
     protected mixed $epeMelemek = false;
-    /** @var array<string,\Nyholm\Psr7\UploadedFile|null> */
+    /** @var array<string,UploadedFile|null> */
     protected array $files = [];
     protected bool $isAdmin = false;
     protected bool $isAdminShowUserData = false;
@@ -8271,7 +10302,7 @@ abstract class AbstractAjaxController
      * Run a single action and wrap it into a JSON response.
      *
      * @param string $action action name (must exist in ACTIONS)
-     * @return \Psr\Http\Message\ResponseInterface JSON response
+     * @return ResponseInterface JSON response
      */
     final public function handle(string $action): \Psr\Http\Message\ResponseInterface
     {
@@ -8279,7 +10310,7 @@ abstract class AbstractAjaxController
     /**
      * Run the entity's `list()` then wrap it into a JSON response.
      *
-     * @return \Psr\Http\Message\ResponseInterface JSON response
+     * @return ResponseInterface JSON response
      */
     final public function handleList(): \Psr\Http\Message\ResponseInterface
     {
@@ -8293,14 +10324,238 @@ abstract class AbstractAjaxController
     {
     }
 }
+
+/**
+ * Shared base for AjaxHelper (legacy) & AbstractAjaxController (new).
+ *
+ * Removes duplicated identical methods: request normalization + token/user resolution,
+ * JSON/DataTables responses, logging, DataTables query extraction, and table validation.
+ * @property array<string,mixed> $data
+ * @property array<string,mixed> $files
+ * @property string $action
+ * @property int $draw
+ * @property BinFile $binConfig
+ * @property Config $config
+ * @property Security $security
+ * @property mixed $epeMelemek
+ * @property string $token
+ * @property null|array<string,string|int|float|null> $currentUser
+ * @property int $currentUserId
+ * @property bool $isAdmin
+ * @property bool $isAdminShowUserData
+ * @property bool $isUserShowTheirData
+ */
+trait AjaxBaseTrait
+{
+    /**
+     * The id of the logged-in user of the active request; 0 when anonymous.
+     *
+     * Readonly: derived from {@see $currentUser} once, in the constructor, so every
+     * consumer reads the same integer instead of casting the raw array value.
+     */
+    protected \Psr\Http\Message\ServerRequestInterface $request;
+    /**
+     * @param ServerRequestInterface $request request aktif
+     */
+    public function __construct(\Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * @param array<int|string, array<string, mixed>> $data
+     * @param int $recordsTotal
+     * @param int $recordsFiltered
+     * @param array<string, mixed> $customData
+     * @return string
+     */
+    protected function createDataTableResponse(array $data = [], int $recordsTotal = 0, int $recordsFiltered = 0, array $customData = []): string
+    {
+    }
+    /**
+     * Encode the standard Ajax envelope (status, message, result) as JSON.
+     *
+     * @param int $status 1 becomes 'ok', every other value becomes 'fail'
+     * @param string $msg message shown to the client
+     * @param mixed $result optional payload; null when the caller returns nothing
+     * @return string JSON body, or '{}' when encoding fails
+     */
+    protected function createDefaultResponse(int $status = 0, string $msg = '', mixed $result = null): string
+    {
+    }
+    /**
+     * @param string $message
+     * @param array<string, mixed> $context
+     */
+    protected function createLog(string $message = 'Admin only access denied', array $context = []): void
+    {
+    }
+    /**
+     * @param array<string,mixed> $get
+     * @param string[] $columns
+     * @param string $defaultOrderBy
+     * @param string $defaultOrderDir
+     * @return array{draw:int,start:int,length:int,search:string,orderBy:string,orderDir:string}
+     */
+    protected function extractDatatablesQry(array $get, array $columns, string $defaultOrderBy = '', string $defaultOrderDir = 'asc'): array
+    {
+    }
+    /**
+     * Read the first element of a list as an array.
+     *
+     * @param mixed $value candidate list
+     * @return array<string,mixed> first element, or an empty array
+     */
+    protected function firstArray(mixed $value): array
+    {
+    }
+    /**
+     * Read a request body value as an integer, falling back on non-scalar input.
+     *
+     * @param string $key request body key
+     * @param int $default value used when the key is absent or not scalar
+     * @return int
+     */
+    protected function inputInt(string $key, int $default = 0): int
+    {
+    }
+    /**
+     * Read a request body value as a string, falling back on non-scalar input.
+     *
+     * @param string $key request body key
+     * @param string $default value used when the key is absent or not scalar
+     * @return string
+     */
+    protected function inputString(string $key, string $default = ''): string
+    {
+    }
+    /**
+     * Resolve the logged-in user for the active request.
+     *
+     * Called exactly once, from the constructor: the outcome is stored in the
+     * readonly {@see $currentUser} and can never change afterwards, so one request
+     * can never be re-scoped to another user halfway through its lifecycle.
+     *
+     * A subclass may override this to read the identity from another source. An
+     * override runs during construction, so it must not depend on state that is
+     * initialized after the parent constructor.
+     *
+     * @return null|array<string,string|int|float|null> the logged-in user, or null when anonymous
+     */
+    protected function resolveCurrentUser(): ?array
+    {
+    }
+    /**
+     * Scope a row lookup by id to the row owner unless the caller is an admin.
+     *
+     * @param string $id id value to match
+     * @param string $colId column holding the id
+     * @param Model $table model that receives the criteria
+     * @return Model the same instance, now carrying the criteria
+     */
+    protected function tableValidation(string $id, string $colId, \GDPlayer\Database\MySQL\Model $table): \GDPlayer\Database\MySQL\Model
+    {
+    }
+    /**
+     * Cast any scalar to integer, falling back on anything else.
+     *
+     * @param mixed $value raw value
+     * @param int $default value used when not scalar
+     * @return int
+     */
+    protected function toInt(mixed $value, int $default = 0): int
+    {
+    }
+    /**
+     * Cast any scalar to string, falling back on anything else.
+     *
+     * @param mixed $value raw value
+     * @param string $default value used when not scalar
+     * @return string
+     */
+    protected function toStr(mixed $value, string $default = ''): string
+    {
+    }
+}
+
+/**
+ * Shared constants for the Ajax/HTTP traits: response messages, SQL truncate, view paths.
+ *
+ * PHP 8.1 traits cannot have `const`, and Intelephense does not inherit consumer
+ * class constants from inside a trait (P1012). Values are centralised here;
+ * consumer classes still expose their old names as aliases so legacy callers
+ * stay unchanged. When one name holds a different value per domain, the name
+ * gets a domain prefix (PUBLIC_*, SETTINGS_*).
+ */
+final class AjaxCatalog
+{
+    public const MESSAGE_CREATE_PLAYER_FAIL = 'Insert the video URL first';
+    public const MESSAGE_DEPENDENCY_SUCCESS = 'Supported php functions and applications have been enabled/installed';
+    public const MESSAGE_FEATURE_DISABLE = 'This feature is disabled';
+    public const MESSAGE_FILE_DELETE_FAIL = 'The file/folder failed to delete';
+    public const MESSAGE_FILE_DELETE_SUCCESS = 'The file/folder has been successfully deleted';
+    public const MESSAGE_FILE_IMPORT_FAIL = 'The file failed to import';
+    public const MESSAGE_FILE_IMPORT_SUCCESS = 'The file has been successfully imported';
+    public const MESSAGE_FILE_UPDATE_FAIL = 'The file/folder failed to update';
+    public const MESSAGE_FILE_UPDATE_SUCCESS = 'The file/folder has been successfully updated';
+    public const MESSAGE_FILE_UPLOAD_FAIL = 'The subtitle file failed to upload';
+    public const MESSAGE_FILE_UPLOAD_SUCCESS = 'The subtitle file has been uploaded successfully';
+    public const MESSAGE_FOLDER_CREATE_FAIL = 'The new file/folder failed to create';
+    public const MESSAGE_FOLDER_CREATE_SUCCESS = 'The new file/folder has been created successfully';
+    public const MESSAGE_GDRIVE_BYPASS_FAIL = 'Cannot bypass the file, try later';
+    public const MESSAGE_GDRIVE_BYPASS_SUCCESS = 'The file has been successfully bypassed';
+    public const MESSAGE_MIGRATE_FAIL = 'Migration of those subtitle files failed';
+    public const MESSAGE_MIGRATE_SUCCESS = 'Migration of the subtitle files has been successful';
+    public const MESSAGE_MIRROR_FILE_DELETE_FAIL = 'The mirror file failed to delete';
+    public const MESSAGE_MIRROR_FILE_DELETE_SUCCESS = 'The mirror file has been successfully deleted';
+    public const MESSAGE_NEW_LOCATION_INVALID = 'The new location is invalid';
+    public const MESSAGE_NOT_FOUND = 'The subtitle was not found';
+    public const MESSAGE_OLD_LOCATION_EMPTY = 'Old location required';
+    public const MESSAGE_POSTER_REMOVE_FAIL = 'The poster failed to remove';
+    public const MESSAGE_POSTER_REMOVE_SUCCESS = 'The poster has been successfully removed';
+    public const MESSAGE_REMOVE_DUPLICATE_FILES_FAIL = 'Duplicate files failed to remove';
+    public const MESSAGE_REMOVE_DUPLICATE_FILES_SUCCESS = 'Duplicate files have been successfully removed';
+    public const MESSAGE_RENAME_DUPLICATED = 'The filename is already in use';
+    public const MESSAGE_RENAME_FAIL = 'The subtitle failed to be renamed';
+    public const MESSAGE_RENAME_SUCCESS = 'The subtitle has been successfully renamed';
+    public const MESSAGE_RESET_FAIL = 'The bypassed hosts failed to reset';
+    public const MESSAGE_RESET_SUCCESS = 'The bypassed hosts have been successfully reset';
+    public const MESSAGE_STAT_FAIL = 'Total daily visits have been exceeded';
+    public const MESSAGE_STAT_SUCCESS = 'Total daily visits successfully created';
+    public const MESSAGE_UNAUTHORIZE = 'You are not authorized to access this feature';
+    public const MESSAGE_VAST_CREATE_FAIL = 'VAST ad file failed to generate';
+    public const MESSAGE_VAST_CREATE_SUCCESS = 'VAST ad file has been generated successfully';
+    public const MESSAGE_VAST_DELETE_FAIL = 'The VAST ad file failed to delete';
+    public const MESSAGE_VAST_DELETE_SUCCESS = 'The VAST ad file has been successfully deleted';
+    public const MESSAGE_VIDEO_DELETE_FAIL = 'The video failed to delete';
+    public const MESSAGE_VIDEO_DELETE_SUCCESS = 'The video has been successfully deleted';
+    public const MESSAGE_VIDEO_NOT_FOUND = 'The video was not found';
+    public const MESSAGE_VIDEO_RENAME_EMPTY = 'The video title is invalid';
+    public const MESSAGE_VIDEO_SAVE_FAIL = 'The new video failed to save';
+    public const MESSAGE_VIDEO_SAVE_SUCCESS = 'The new video has been saved successfully';
+    public const MESSAGE_VIDEO_UPDATE_FAIL = 'The video failed to update';
+    public const MESSAGE_VIDEO_UPDATE_SUCCESS = 'The video has been successfully updated';
+    public const PUBLIC_CACHE_CLEAR_FAIL = 'Failed to clear the cache of the video or the video does not exist';
+    public const PUBLIC_CACHE_CLEAR_SUCCESS = 'The video cache cleared successfully';
+    public const SETTINGS_CACHE_CLEAR_FAIL = 'The cache failed to clear';
+    public const SETTINGS_CACHE_CLEAR_SUCCESS = 'The cache has been cleared successfully';
+    public const SETTINGS_TEMPLATE_DIR = 'backend/settings/';
+    public const TRUNCATE_SOURCES = 'TRUNCATE `tb_videos_sources`;';
+    public const TRUNCATE_TMP = 'TRUNCATE `tmp_videos_sources`;';
+}
+
 namespace GDPlayer\Modules\Auth;
 
 /**
- * Path halaman panel admin yang dipakai alur login/register/reset password.
+ * Admin panel paths used by the login, register, and password-reset flows.
  *
- * Enum (bukan kelas konstanta) supaya nilai tetap bisa dilacak IDE dari file mana pun,
- * termasuk dari dalam trait: konstanta milik kelas pemakai tidak terlihat saat trait
- * dibaca sendiri.
+ * An enum rather than class constants so any file can reference the value in the
+ * IDE, traits included: constants owned by the consuming class are invisible when
+ * a trait is read on its own.
  */
 enum AuthAdminPath : string
 {
@@ -8309,112 +10564,120 @@ enum AuthAdminPath : string
     case Register = 'register/';
     case ResetPassword = 'reset-password/';
 }
+
 /**
- * Teks email dan pesan alert pada alur login/register/reset password.
+ * Email text and alert messages for the login, register and password reset flow.
  *
- * Enum (bukan kelas konstanta) supaya nilai tetap bisa dilacak IDE dari file mana pun,
- * termasuk dari dalam trait: konstanta milik kelas pemakai tidak terlihat saat trait
- * dibaca sendiri.
+ * An enum (not a constant class) so the IDE can trace the values from any file,
+ * including from inside a trait: constants of the consuming class are not visible when
+ * the trait is analysed on its own.
  */
 enum AuthMailText : string
 {
     /**
-     * Badan pesan sukses setelah email konfirmasi terkirim.
+     * Success message body shown after the confirmation email is sent.
      *
-     * Nilainya kosong karena teksnya panjang: dirakit di message() supaya tiap baris
-     * tetap <= 120 kolom tanpa menyambung dua literal (aturan Sonar S2005).
+     * The value is empty because the text is long: it is assembled in message() so every
+     * line stays within 120 columns without adjacent string concatenation (Sonar S2005).
      */
     case ConfirmationBody = '';
-    /** Pesan saat email belum terdaftar. */
+    /** Message shown when the email address is not registered. */
     case NotRegistered = 'The account is not registered';
-    /** Pesan saat token reset kedaluwarsa atau diubah. */
+    /** Message shown when the reset token expired or was tampered with. */
     case ResetTokenInvalid = 'The reset link is invalid or has expired. Please request a new one.';
-    /** Format subject email konfirmasi: (nama situs, nama penerima). */
+    /** Confirmation email subject format: (site name, recipient name). */
     case SubjectFormat = 'Confirmation email (%s) | %s';
-    /** Query string pembawa token aktivasi/reset di URL. */
+    /** Query string carrying the activation/reset token in the URL. */
     case TokenQuery = '?token=';
     /**
-     * Teks pesan untuk case ini (default: nilai enum apa adanya).
+     * Message text for this case (default: the raw enum value).
+     *
+     * @return string text ready to show to the user
      */
     public function message(): string
     {
     }
 }
+
 namespace GDPlayer\Modules\Auth\Controllers;
 
 /**
- * Guard login: status, user, recaptcha, early response.
- *
- * Split out of `AuthPageSupportTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `AuthPageSupportTrait` through this trait.
+ * Pages login.php, register.php, reset-password.php.
  */
-trait AuthLoginGuardTrait
+final class AuthPageController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * Dispatch the request to the matching auth page.
+     *
+     * @return string|ResponseInterface rendered page, or a redirect response
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+}
+
+namespace GDPlayer\Modules\Auth\Services;
+
+/**
+ * Page login.php: early branches, state redirect, form submit and logout.
+ */
+final class LoginService
+{
+    public function __construct(private \Psr\Http\Message\ServerRequestInterface $request, private \GDPlayer\Modules\Auth\Services\MailConfirmation $mail = new \GDPlayer\Modules\Auth\Services\MailConfirmation())
+    {
+    }
+    /**
+     * Activate the account through a token (status=1) when token validation succeeds.
+     *
+     * @return ResponseInterface|null response, or null when nothing was processed
+     */
+    public function activateLoginToken(bool $checked, \GDPlayer\Model\User $users, string $email, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * `?token=` branch of the login page: account activation / resend the confirmation email.
+     *
+     * @return ResponseInterface|null response, or null when nothing was processed
+     */
+    public function loginConfirmToken(string $tokenParam, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
     /**
      * Initial login page branch: token activation / logout.
      *
      * @param array<string,mixed> $queryParams query string
-     * @return \Psr\Http\Message\ResponseInterface|null response, or null when no branch applies
+     * @return ResponseInterface|null response, or null when no branch applies
      */
-    protected function loginEarlyResponse(array $queryParams, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    public function loginEarlyResponse(array $queryParams, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Logout branch of the login page.
+     *
+     * @param Login $login        login service that owns the session
+     * @param string $loginURL     redirect target on success
+     * @param string $dashboardURL redirect target when the logout fails
+     * @return ResponseInterface redirect response with the result alert
+     */
+    public function loginLogout(\GDPlayer\Service\Login $login, string $loginURL, string $dashboardURL): \Psr\Http\Message\ResponseInterface
     {
     }
     /**
      * reCAPTCHA & login field completeness guard.
      *
      * @param array<string,mixed> $body form data
-     * @return \Psr\Http\Message\ResponseInterface|null denial response, or null to continue
+     * @return ResponseInterface|null denial response, or null to continue
      */
-    protected function loginRecaptchaGuard(array $body, string $username, \GDPlayer\Service\Login $login, string $loginURL): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Account status guard (2 = awaiting confirmation, 0 = inactive).
-     *
-     * @param array<string,mixed> $userData user row
-     * @return \Psr\Http\Message\ResponseInterface|null denial response, or null when the status may log in
-     */
-    protected function loginStatusGuard(array $userData, \GDPlayer\Core\Security\Security $security, \GDPlayer\Service\Login $login, string $loginURL): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * User existence & password match guard.
-     *
-     * @param array<string,mixed> $userData user row from the query
-     * @return \Psr\Http\Message\ResponseInterface|null denial response, or null when the credentials match
-     */
-    protected function loginUserGuard(array $userData, string $password, string $username, \GDPlayer\Service\Login $login, string $loginURL): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Token login dan respons status.
- *
- * Split out of `AuthPageSupportTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `AuthPageSupportTrait` through this trait.
- */
-trait AuthLoginSupportTrait
-{
-    /**
-     * Activate the account through a token (status=1) when token validation succeeds.
-     *
-     * @return \Psr\Http\Message\ResponseInterface|null response, or null when nothing was processed
-     */
-    protected function activateLoginToken(bool $checked, \GDPlayer\Model\User $users, string $email, string $loginURL): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * `?token=` branch of the login page: account activation / resend the confirmation email.
-     */
-    protected function loginConfirmToken(string $tokenParam, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    public function loginRecaptchaGuard(array $body, string $username, \GDPlayer\Service\Login $login, string $loginURL): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
      * Determine the redirect when the user is already logged in or the query carries raw credentials.
      *
      * @param array<string,mixed> $queryParams query string
+     * @return ResponseInterface|null redirect, or null when the form must be rendered
      */
-    protected function loginRedirectTarget(array $queryParams, string $loginURL, string $dashboardURL): ?\Psr\Http\Message\ResponseInterface
+    public function loginRedirectTarget(array $queryParams, string $loginURL, string $dashboardURL): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
@@ -8422,272 +10685,146 @@ trait AuthLoginSupportTrait
      *
      * @param array<string,mixed> $queryParams query string
      * @param array<string,mixed> $body form data
-     * @return \Psr\Http\Message\ResponseInterface|null response, or null when the page must be rendered
+     * @return ResponseInterface|null response, or null when the page must be rendered
      */
-    protected function loginStateResponse(array $queryParams, array $body, \GDPlayer\Service\Login $login, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL, string $dashboardURL): ?\Psr\Http\Message\ResponseInterface
+    public function loginStateResponse(array $queryParams, array $body, \GDPlayer\Service\Login $login, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL, string $dashboardURL): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Account status guard (2 = awaiting confirmation, 0 = inactive).
+     *
+     * @param array<string,mixed> $userData user row
+     * @return ResponseInterface|null denial response, or null when the status may log in
+     */
+    public function loginStatusGuard(array $userData, \GDPlayer\Core\Security\Security $security, \GDPlayer\Service\Login $login, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Login form submit branch (reCAPTCHA verification, account status, store the session).
+     *
+     * @param array<string,mixed> $body
+     * @return ResponseInterface redirect response with the result alert
+     */
+    public function loginSubmit(array $body, \GDPlayer\Service\Login $login, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL, string $dashboardURL): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * User existence & password match guard.
+     *
+     * @param array<string,mixed> $userData user row from the query
+     * @return ResponseInterface|null denial response, or null when the credentials match
+     */
+    public function loginUserGuard(array $userData, string $password, string $username, \GDPlayer\Service\Login $login, string $loginURL): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Page login.php.
+     *
+     * @return string|ResponseInterface
+     */
+    public function page(): string|\Psr\Http\Message\ResponseInterface
     {
     }
 }
-namespace GDPlayer\View;
 
 /**
- * Base class for HTML views.
- *
- * Request & response are injected via the constructor (user request). Output from old views that still
- * use `echo` is captured through the output buffer, so templates do not need to be rewritten; new views
- * simply `return` a ResponseInterface from {@see render()}.
- *
- * Content-Type is deliberately NOT set so PHP uses the same default mimetype+charset as the
- * old path (byte-for-byte parity).
+ * Email confirmation shared by login, register and reset flows.
  */
-abstract class AbstractView implements \Psr\Http\Server\RequestHandlerInterface
-{
-    /** Response marker: the handler already sent its own output (skip emit). */
-    public const STREAMED_HEADER = 'X-GD-Streamed';
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request active request
-     * @param \Psr\Http\Message\ResponseInterface $response response being built (for status/header/cookie)
-     * @param string $action action name for controllers serving several pages
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request, protected \Psr\Http\Message\ResponseInterface $response, protected readonly string $action = '')
-    {
-    }
-    /**
-     * Apply the default headers (Cache-Control + CORS) to this request's response.
-     *
-     * @param bool $enableCache true for responses that may be cached
-     * @param int $cacheMaxAge max-age when caching is enabled
-     * @return void
-     */
-    protected function applyDefaultHeaders(bool $enableCache = false, int $cacheMaxAge = 3600): void
-    {
-    }
-    /**
-     * Whether view output must be captured by the output buffer (default) or sent directly.
-     *
-     * When false: the string returned by {@see render()} is considered already sent by the
-     * handler (marked with the X-GD-Streamed header, emit is skipped), while a ResponseInterface is still
-     * emitted as usual (used by the redirect/error branch of a streaming handler).
-     *
-     * @return bool
-     */
-    protected function isBufferingOutput(): bool
-    {
-    }
-    /**
-     * Render a Twig template into a string (does not print to the output).
-     *
-     * @param string $template absolute template path
-     * @return string rendered markup
-     */
-    protected function loadTemplate(string $template): string
-    {
-    }
-    /**
-     * View logic. May `echo` (bridge) or return a string/ResponseInterface.
-     *
-     * @return string|\Psr\Http\Message\ResponseInterface
-     */
-    abstract protected function render(): string|\Psr\Http\Message\ResponseInterface;
-    /**
-     * Render a Twig template into a string (does not print to the output).
-     *
-     * @param string $template absolute template path
-     * @param array<string, mixed> $context template data
-     * @param bool $frontend true for the frontend layout, false for the backend layout
-     * @return string rendered markup
-     */
-    protected function renderTemplate(string $template, array $context = [], bool $frontend = true): string
-    {
-    }
-    /**
-     * Admin guard inside the controller (same semantics as the old Views::adminValidation).
-     *
-     * @return \Psr\Http\Message\ResponseInterface|null 401/403 response when not allowed, null when allowed to continue
-     */
-    protected function requireAdmin(): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Login guard inside the controller.
-     *
-     * @return \Psr\Http\Message\ResponseInterface|null 401 response when not logged in, null when allowed to continue
-     */
-    protected function requireLogin(): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Render the view then turn its output into a response.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request active request from PSR-15 (may differ from the one in the constructor
-     *                                        when middleware replaced it, so the latest version is always used)
-     * @return \Psr\Http\Message\ResponseInterface response ready to send
-     */
-    final public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-namespace GDPlayer\Modules\Auth\Controllers;
-
-/**
- * Email pendaftaran dan pengiriman ulang konfirmasi.
- *
- * Split out of `AuthRegisterSupportTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `AuthRegisterSupportTrait` through this trait.
- */
-trait AuthRegisterMailTrait
+final class MailConfirmation
 {
     /**
-     * Resend the confirmation email when the user is not active & it was not sent in the last 60 seconds.
+     * Send the confirmation email then mark the user status=2 on success.
+     *
+     * @param array<string, mixed> $userData user row (name/status/updated)
+     * @return ResponseInterface send result response
      */
-    protected function resendConfirmationMail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $email, string $loginURL): \Psr\Http\Message\ResponseInterface
+    public function deliverConfirmationMail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $email, array $userData, string $loginURL): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Whether email confirmation is enabled (disable_confirm=false + smtp filled in).
+     */
+    public function isMailConfirmationEnabled(\GDPlayer\Config\Config $config): bool
+    {
+    }
+    /**
+     * Resend the confirmation email when the account is inactive and no mail went out recently.
+     *
+     * @param Mailer $mailer    mail transport
+     * @param Security $security security helper encrypting the confirmation token
+     * @param User $users       user model
+     * @param string $email     registered address to resend to
+     * @param string $loginURL  redirect target
+     * @return ResponseInterface alert redirect describing the outcome
+     */
+    public function resendConfirmationMail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $email, string $loginURL): \Psr\Http\Message\ResponseInterface
     {
     }
     /**
      * Send the registration confirmation email.
      *
-     * @return \Psr\Http\Message\ResponseInterface send result response
+     * The token is `email|expires`, encrypted for the URL and valid for ten minutes. Any transport
+     * exception is reported as a warning, because the account itself was already created.
+     *
+     * @param Mailer $mailer      mail transport
+     * @param Security $security  security helper encrypting the confirmation token
+     * @param string $email       recipient address
+     * @param string $name        recipient display name
+     * @param string $loginURL    redirect target on failure
+     * @param string $registerURL base confirmation URL
+     * @return ResponseInterface alert redirect describing the outcome
      */
-    protected function sendRegistrationEmail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, string $email, string $name, string $loginURL, string $registerURL): \Psr\Http\Message\ResponseInterface
+    public function sendRegistrationEmail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, string $email, string $name, string $loginURL, string $registerURL): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
- * Registrasi: validasi, konfirmasi, dan pengiriman email.
- *
- * Split out of `AuthPageSupportTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `AuthPageSupportTrait` through this trait.
+ * Page register.php: token activation, form validation and account storage.
  */
-trait AuthRegisterSupportTrait
+final class RegisterService
 {
-    use \GDPlayer\Modules\Auth\Controllers\AuthRegisterMailTrait;
+    public function __construct(private \Psr\Http\Message\ServerRequestInterface $request, private \GDPlayer\Modules\Auth\Services\MailConfirmation $mail = new \GDPlayer\Modules\Auth\Services\MailConfirmation())
+    {
+    }
+    /**
+     * Page register.php.
+     *
+     * @return string|ResponseInterface
+     */
+    public function page(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
     /**
      * `?token=` branch of the register page: activate the account after email confirmation.
      */
-    protected function registerConfirmToken(string $tokenParam, \GDPlayer\Core\Security\Security $security, \GDPlayer\Service\Login $login, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): ?\Psr\Http\Message\ResponseInterface
+    public function registerConfirmToken(string $tokenParam, \GDPlayer\Core\Security\Security $security, \GDPlayer\Service\Login $login, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
      * Initial register page branch: token activation, state redirect, or continue rendering.
      *
      * @param array<string,mixed> $queryParams query string
-     * @return \Psr\Http\Message\ResponseInterface|null response, or null when the form must be rendered
+     * @return ResponseInterface|null response, or null when the form must be rendered
      */
-    protected function registerEarlyResponse(array $queryParams, bool $enableRegistration, \GDPlayer\Core\Security\Security $security, \GDPlayer\Service\Login $login, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Register page redirect when the user is already logged in / registration is disabled.
-     *
-     * @return \Psr\Http\Message\ResponseInterface|null redirect response, or null when rendering must continue
-     */
-    protected function registerRedirectTarget(bool $enableRegistration, string $loginURL, string $dashboardURL): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Build the register form validation alert message ('' when everything is valid).
-     *
-     * @param array<string,mixed> $body form data
-     */
-    protected function registerValidationAlert(array $body, string $username, string $email, string $password, string $retypedPassword, \GDPlayer\Model\User $users, \GDPlayer\Service\Login $login): string
-    {
-    }
-    /**
-     * Email confirmation registration path: store the user status=2 then send the confirmation email.
-     *
-     * @param array<string,mixed> $newUserData user data ready to insert
-     * @return \Psr\Http\Message\ResponseInterface registration result response
-     */
-    protected function registerWithConfirmation(array $newUserData, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Reset password: konfirmasi, submit, dan email.
- *
- * Split out of `AuthPageSupportTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `AuthPageSupportTrait` through this trait.
- */
-trait AuthResetSupportTrait
-{
-    /**
-     * Send the password reset email to the user.
-     *
-     * @param array<string,mixed> $userData user row
-     */
-    protected function deliverResetEmail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, array $userData, string $resetPasswordURL): string
-    {
-    }
-    /**
-     * Confirm branch: send the reset email (when allowed) or redirect to step 2.
-     *
-     * @param array<string,mixed> $body form data
-     * @return string|\Psr\Http\Message\ResponseInterface HTML alert, or redirect response
-     */
-    protected function handleResetConfirm(array $body, \GDPlayer\Config\Config $config, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users): string|\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Process the reset password form submit (confirm link sends email / save new password).
-     *
-     * @param array<string,mixed> $body form data
-     * @return string|\Psr\Http\Message\ResponseInterface HTML alert, or redirect response
-     */
-    protected function handleResetSubmit(array $body, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $email): string|\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Whether email confirmation is enabled (disable_confirm=false + smtp filled in).
-     */
-    protected function isMailConfirmationEnabled(\GDPlayer\Config\Config $config): bool
-    {
-    }
-}
-/**
- * Login/register/reset-password flow helpers (guards, email sending, form validation).
- *
- * Split out of AuthPageController so the main class stays <=20 methods
- * (rule `.agents/rules/php-code-quality.md`).
- */
-trait AuthPageSupportTrait
-{
-    use \GDPlayer\Modules\Auth\Controllers\AuthLoginGuardTrait;
-    use \GDPlayer\Modules\Auth\Controllers\AuthLoginSupportTrait;
-    use \GDPlayer\Modules\Auth\Controllers\AuthRegisterSupportTrait;
-    use \GDPlayer\Modules\Auth\Controllers\AuthResetSupportTrait;
-    /**
-     * Send the confirmation email then mark the user status=2 on success.
-     *
-     * @param array<string, mixed> $userData user row (name/status/updated)
-     * @return \Psr\Http\Message\ResponseInterface send result response
-     */
-    private function deliverConfirmationMail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $email, array $userData, string $loginURL): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Halaman pendaftaran pengguna (form, plain, submit).
- *
- * Split out of `AuthPageController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `AuthPageController` through this trait.
- */
-trait AuthRegisterPageTrait
-{
-    /**
-     * Page register.php.
-     *
-     * @return string|\Psr\Http\Message\ResponseInterface
-     */
-    protected function registerPage(): string|\Psr\Http\Message\ResponseInterface
+    public function registerEarlyResponse(array $queryParams, bool $enableRegistration, \GDPlayer\Core\Security\Security $security, \GDPlayer\Service\Login $login, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
      * Store the user without email confirmation (status active immediately).
      *
      * @param array<string,mixed> $newUserData user data ready to insert
-     * @return \Psr\Http\Message\ResponseInterface registration result response
+     * @return ResponseInterface registration result response
      */
-    protected function registerPlain(array $newUserData, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): \Psr\Http\Message\ResponseInterface
+    public function registerPlain(array $newUserData, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Register page redirect when the user is already logged in / registration is disabled.
+     *
+     * @return ResponseInterface|null redirect response, or null when rendering must continue
+     */
+    public function registerRedirectTarget(bool $enableRegistration, string $loginURL, string $dashboardURL): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
@@ -8695,33 +10832,123 @@ trait AuthRegisterPageTrait
      *
      * @param array<string,mixed> $body
      */
-    protected function registerSubmit(array $body, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users): \Psr\Http\Message\ResponseInterface
+    public function registerSubmit(array $body, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Build the register form validation alert message ('' when everything is valid).
+     *
+     * @param array<string,mixed> $body form data
+     */
+    public function registerValidationAlert(array $body, string $username, string $email, string $password, string $retypedPassword, \GDPlayer\Model\User $users, \GDPlayer\Service\Login $login): string
+    {
+    }
+    /**
+     * Email confirmation registration path: store the user status=2 then send the confirmation email.
+     *
+     * @param array<string,mixed> $newUserData user data ready to insert
+     * @return ResponseInterface registration result response
+     */
+    public function registerWithConfirmation(array $newUserData, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $loginURL, string $registerURL): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
- * Pages login.php, register.php, reset-password.php.
- *
- * Method yang satu-satunya pemanggilnya ada di AuthPageSupportTrait memakai `protected`:
- * Intelephense (P1003) tidak menghitung pemakaian di dalam trait sebagai pemakaian method
- * kelas, jadi `private` akan salah dilaporkan "declared but not used". Kelas ini `final`,
- * sehingga `protected` setara `private` saat runtime.
+ * Pages reset-password step 1 & 2: request link, send mail, store the new password.
  */
-final class AuthPageController extends \GDPlayer\View\AbstractView
+final class ResetService
 {
-    use \GDPlayer\Modules\Auth\Controllers\AuthPageSupportTrait;
-    use \GDPlayer\Modules\Auth\Controllers\AuthRegisterPageTrait;
+    public function __construct(private \Psr\Http\Message\ServerRequestInterface $request, private \GDPlayer\Modules\Auth\Services\MailConfirmation $mail = new \GDPlayer\Modules\Auth\Services\MailConfirmation())
+    {
+    }
+    /**
+     * Send the password reset email to the user.
+     *
+     * The link carries the address plus a ten-minute expiry, encrypted into the token.
+     *
+     * @param Mailer $mailer          mailer driver
+     * @param Security $security      encryptor used to sign the reset token
+     * @param User $users             user model, read for its last error
+     * @param array<string,mixed> $userData user row
+     * @param string $resetPasswordURL base reset-password URL
+     * @return string HTML alert describing the outcome
+     */
+    public function deliverResetEmail(\GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, array $userData, string $resetPasswordURL): string
+    {
+    }
+    /**
+     * Confirm branch: send the reset email (when allowed) or redirect to step 2.
+     *
+     * @param array<string,mixed> $body form data
+     * @return string|ResponseInterface HTML alert, or redirect response
+     */
+    public function handleResetConfirm(array $body, \GDPlayer\Config\Config $config, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Save branch: store a new password through a valid token.
+     *
+     * @param array<string,mixed> $body form data
+     * @return string|ResponseInterface HTML alert, or redirect response
+     */
+    public function handleResetSave(array $body, \GDPlayer\Service\Login $login, \GDPlayer\Model\User $users, string $email): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Process the reset password form submit (confirm link sends email / save new password).
+     *
+     * @param array<string,mixed> $body form data
+     * @return string|ResponseInterface HTML alert, or redirect response
+     */
+    public function handleResetSubmit(array $body, \GDPlayer\Config\Config $config, \GDPlayer\Service\Login $login, \GDPlayer\External\Mailer $mailer, \GDPlayer\Core\Security\Security $security, \GDPlayer\Model\User $users, string $email): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Page reset-password.php.
+     *
+     * @return string|ResponseInterface
+     */
+    public function page(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Dashboard\Controllers;
 
 /**
- * Filter tanggal, cache key, dan where statistik.
+ * Dashboard widgets and statistics endpoint.
  *
- * Split out of `DashboardAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DashboardAjaxController` through this trait.
+ * Replacement for Ajax\DashboardAjax (actions run by AbstractAjaxController, no ReflectionMethod).
  */
-trait DashboardFilterTrait
+final class DashboardAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    protected const ACTIONS = ['popularASN', 'popularBrowsers', 'popularCountries', 'popularVideos', 'recentVideos', 'serversStatus', 'videosStatus', 'views'];
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Model\LoadBalancer $balancer;
+    private string $baseUrl = '';
+    /** @var array<string,string> $createdSql */
+    private array $createdSql = [];
+    private string $filter = 'today';
+    private \GDPlayer\Model\GDriveAuth $gdriveAuth;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private string $slugDownload = '';
+    private string $slugEmbed = '';
+    private \GDPlayer\Model\Stat $stat;
+    private string $userTimezone = 'UTC';
+    private \GDPlayer\Model\VideoSource $vSources;
+    private \GDPlayer\Model\Video $videos;
+    protected array $data;
+    protected bool $isAdmin = false;
+    protected bool $isAdminShowUserData = false;
+    protected bool $isUserShowTheirData = false;
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
     /**
      * Build date filter SQL map safely without mutating global PHP timezone.
      *
@@ -8746,27 +10973,42 @@ trait DashboardFilterTrait
     {
     }
     /**
-     * @return array{sqlWhere:string,sqlParams:array<mixed>,sqlOrder:string}
-     */
-    protected function statsHelper(): array
-    {
-    }
-}
-/**
- * Statistik populer (ASN, browser, negara, video).
- *
- * Split out of `DashboardAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DashboardAjaxController` through this trait.
- */
-trait DashboardPopularTrait
-{
-    /**
      * @param string $sql
      * @param array<mixed> $params
      * @param string $tag
      * @return array<string|int, array<string,mixed>>
      */
     protected function getPopularData(string $sql, array $params, string $tag): array
+    {
+    }
+    /**
+     * Count the popular-viewer groups of the active filter, cached per tag.
+     *
+     * @param string $tag grouping dimension: `asn`, `ua` or `country`
+     * @return int number of distinct groups
+     */
+    protected function getRecordsTotal(string $tag): int
+    {
+    }
+    /**
+     * Return the formatted video list, served from the instance cache when available.
+     *
+     * @param string $sql
+     * @param null|array<mixed> $params
+     * @param string $tag
+     * @return list<array<string,mixed>>
+     */
+    protected function getVideoList(string $sql, ?array $params, string $tag): array
+    {
+    }
+    /**
+     * Run the query and decorate every row with links, flags and action URLs.
+     *
+     * @param string $sql
+     * @param null|array<mixed> $params
+     * @return list<array<string,mixed>>
+     */
+    protected function getVideoListFromDB(string $sql, ?array $params): array
     {
     }
     /**
@@ -8801,85 +11043,59 @@ trait DashboardPopularTrait
     protected function popularVideos(): string
     {
     }
-}
-/**
- * Video terbaru dan status server.
- *
- * Split out of `DashboardAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DashboardAjaxController` through this trait.
- */
-trait DashboardRecentTrait
-{
     /**
-     * This method is called with an ajax request according to the value of the post/get action
+     * Return the last ten videos visible to the current user as a DataTable payload.
      *
-     * @return string
+     * @return string JSON response
      */
     protected function recentVideos(): string
     {
     }
     /**
-     * This method is called with an ajax request according to the value of the post/get action
+     * Return the video count per server, the main server first.
      *
-     * @return string
+     * @return string JSON response, an authorisation error for non admins
      */
     protected function serversStatus(): string
     {
     }
-}
-/**
- * Daftar video dashboard (total, data, DB).
- *
- * Split out of `DashboardAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `DashboardAjaxController` through this trait.
- */
-trait DashboardVideoListTrait
-{
-    protected function getRecordsTotal(string $tag): int
+    /**
+     * @return array{sqlWhere:string,sqlParams:array<mixed>,sqlOrder:string}
+     */
+    protected function statsHelper(): array
     {
     }
     /**
-     * @param string $sql
-     * @param null|array<mixed> $params
-     * @param string $tag
-     * @return list<array<string,mixed>>
+     * This method is called with an ajax request according to the value of the post/get action
+     *
+     * @return string
      */
-    protected function getVideoList(string $sql, ?array $params, string $tag): array
+    protected function videosStatus(): string
     {
     }
     /**
-     * @param string $sql
-     * @param null|array<mixed> $params
-     * @return list<array<string,mixed>>
+     * This method is called with an ajax request according to the value of the post/get action
+     *
+     * @return string
      */
-    protected function getVideoListFromDB(string $sql, ?array $params): array
+    protected function views(): string
     {
     }
 }
-/**
- * Dashboard widgets and statistics endpoint.
- *
- * Replacement for Ajax\DashboardAjax (actions run by AbstractAjaxController, no ReflectionMethod).
- */
-final class DashboardAjaxController extends \GDPlayer\Modules\AbstractAjaxController
-{
-    use \GDPlayer\Modules\Dashboard\Controllers\DashboardFilterTrait;
-    use \GDPlayer\Modules\Dashboard\Controllers\DashboardPopularTrait;
-    use \GDPlayer\Modules\Dashboard\Controllers\DashboardRecentTrait;
-    use \GDPlayer\Modules\Dashboard\Controllers\DashboardVideoListTrait;
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-}
+
 /**
  * Page /administrator/dashboard (login required).
  */
 final class DashboardController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Frontend\Controllers;
 
 /**
@@ -8890,7 +11106,22 @@ namespace GDPlayer\Modules\Frontend\Controllers;
  */
 final class AdController extends \GDPlayer\View\AbstractView
 {
+    private const HEIGHT = 300;
+    private const WIDTH = 300;
+    /**
+     * @return bool
+     */
+    protected function isBufferingOutput(): bool
+    {
+    }
+    /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
 }
+
 /**
  * Frontend API endpoints: /api (Core\API payload) and /api-config (player/embed configuration).
  *
@@ -8898,7 +11129,24 @@ final class AdController extends \GDPlayer\View\AbstractView
  */
 final class ApiController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * Reply when the payload cannot be built (extractor/Chromium failure).
+     * Encrypted like a normal payload: it is the only body shape the player can read —
+     * a non-ciphertext body triggers "Malformed UTF-8 data" in the browser.
+     */
+    private const FAILED_BODY = '{"status":"fail","message":"Failed to load the video source."}';
+    /** 403 reply when the HMAC is invalid, legacy shape kept as-is. */
+    private const FORBIDDEN_BODY = '{"status":"fail","message":"Forbidden"}';
+    /**
+     * Serve the API response for the action named on the query string.
+     *
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * /direct/{type}/{slug}/{...} endpoint: look up the video then redirect to hls/mpd/stream-vid.
  *
@@ -8906,17 +11154,84 @@ final class ApiController extends \GDPlayer\View\AbstractView
  */
 final class DirectController extends \GDPlayer\View\AbstractView
 {
-}
-/**
- * Halaman embed2 (/r) beserta query param dan guard-nya.
- *
- * Split out of `EmbedController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `EmbedController` through this trait.
- */
-trait EmbedSecondTrait
-{
     /**
-     * @return string|\Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
+}
+
+/**
+ * Public player pages: embed (/e), download (/d), and embed2 (/r).
+ *
+ * The slugs used by the installation are read from configuration (slug_embed/slug_download/slug_request);
+ * the slug -> class mapping lives in RouteRegistry.
+ */
+final class EmbedController extends \GDPlayer\View\AbstractView
+{
+    /** Query string forwarded to the embed page (legacy order preserved). */
+    protected const ALLOWED_QUERIES = ['source', 'host', 'id', 'ahost', 'aid', 'subs', 'sub', 'lang', 'poster', 'uid', 'download', 'onlylink', 'email'];
+    /** embed2 page skeleton; argument order: lang, base, loader, action, referer. */
+    protected const EMBED2_HTML = <<<'HTML'
+    
+    <!DOCTYPE html>
+    <html lang="%s">
+    
+    <head>
+        <base href="%s">
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="referrer" content="no-referrer">
+        <meta name="robots" content="noindex">
+        <meta name="googlebot" content="noindex">
+        <title>Redirecting...</title>
+        <style>
+            body {
+                padding: 0;
+                margin: 0;
+                overflow: 0;
+                box-sizing: border-box;
+                border-radius: 0;
+                border: 0;
+                background: #000;
+                color: #fff;
+                text-align: center;
+            }
+    
+            #loader {
+                position: absolute;
+                top: 50%%;
+                left: 50%%;
+                transform: translate(-50%%, -50%%);
+                padding: 0;
+                margin: 0;
+                width: auto;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div id="loader">%s</div>
+        <form id="frmValidation" action="%s" method="post">
+            <input type="hidden" id="referer" name="referer" value="%s" required>
+        </form>
+        <script type="text/javascript" src="assets/vendor/jquery/3.7.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#frmValidation").trigger("submit");
+            });
+        </script>
+    </body>
+    
+    </html>
+    
+    HTML;
+    protected \Psr\Http\Message\ServerRequestInterface $request;
+    protected \Psr\Http\Message\ResponseInterface $response;
+    /**
+     * @return string|ResponseInterface
      */
     protected function embed2Page(): string|\Psr\Http\Message\ResponseInterface
     {
@@ -8924,7 +11239,7 @@ trait EmbedSecondTrait
     /**
      * Filter the allowed query then complete host/id/uid (null = source+id combination without uid).
      *
-     * @param \GDPlayer\Config\Config $config site configuration
+     * @param Config $config site configuration
      * @return array<string, mixed>|null query ready to use, or null when a 403 is required
      */
     protected function embed2QueryParams(\GDPlayer\Config\Config $config): ?array
@@ -8933,9 +11248,9 @@ trait EmbedSecondTrait
     /**
      * Build the destination URL (embed/download) from the encrypted query, or the embed2 player HTML.
      *
-     * @param \GDPlayer\Config\Config $config site configuration
+     * @param Config $config site configuration
      * @param array<string, mixed> $queryParams filtered & completed query
-     * @return string|\Psr\Http\Message\ResponseInterface plain URL, redirect, or embed2 page
+     * @return string|ResponseInterface plain URL, redirect, or embed2 page
      */
     protected function embed2Response(\GDPlayer\Config\Config $config, array $queryParams): string|\Psr\Http\Message\ResponseInterface
     {
@@ -8943,7 +11258,7 @@ trait EmbedSecondTrait
     /**
      * Placeholder values for the embed2 page.
      *
-     * @param \GDPlayer\Config\Config $config site configuration
+     * @param Config $config site configuration
      * @param string $embedURL encrypted embed URL
      * @return list<string> lang, BASE_URL, loader, embedURL, referer
      */
@@ -8953,35 +11268,80 @@ trait EmbedSecondTrait
     /**
      * Whether the embed2 page must be blocked (browser blacklist / request-url feature disabled).
      *
-     * @param \GDPlayer\Config\Config $config site configuration
+     * @param Config $config site configuration
      * @return bool true when the request must be answered with 403
      */
     protected function isEmbed2Blocked(\GDPlayer\Config\Config $config): bool
     {
     }
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
-/**
- * Public player pages: embed (/e), download (/d), and embed2 (/r).
- *
- * The slugs used by the installation are read from configuration (slug_embed/slug_download/slug_request);
- * the slug -> class mapping lives in RouteRegistry.
- */
-final class EmbedController extends \GDPlayer\View\AbstractView
-{
-    use \GDPlayer\Modules\Frontend\Controllers\EmbedSecondTrait;
-}
+
 /**
  * Static frontend pages: /changelog, /sharer, and /sitemap(.xml).
  */
 final class PageController extends \GDPlayer\View\AbstractView
 {
+    /** Sitemap contents; %1$s is replaced with BASE_URL without the trailing slash. */
+    private const SITEMAP_XML = <<<'XML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+        <url>
+            <loc>%1$s</loc>
+            <lastmod>2021-11-19T07:47:44+00:00</lastmod>
+            <priority>1.00</priority>
+        </url>
+        <url>
+            <loc>%1$s/sharer/</loc>
+            <lastmod>2021-11-19T07:47:44+00:00</lastmod>
+            <priority>0.80</priority>
+        </url>
+        <url>
+            <loc>%1$s/changelog/</loc>
+            <lastmod>2021-11-19T07:47:44+00:00</lastmod>
+            <priority>0.80</priority>
+        </url>
+        <url>
+            <loc>%1$s/terms/</loc>
+            <lastmod>2021-11-19T07:47:44+00:00</lastmod>
+            <priority>0.80</priority>
+        </url>
+        <url>
+            <loc>%1$s/privacy/</loc>
+            <lastmod>2021-11-19T07:47:44+00:00</lastmod>
+            <priority>0.80</priority>
+        </url>
+    </urlset>
+    XML;
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Endpoint /redirect/{encrypted}/{path...}: decrypt the destination then redirect.
  */
 final class RedirectController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * /telemetry endpoint: receive player TTFB reports then reply with JSON.
  *
@@ -8990,7 +11350,14 @@ final class RedirectController extends \GDPlayer\View\AbstractView
  */
 final class TelemetryController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\GDrive\Controllers;
 
 /**
@@ -9000,10 +11367,47 @@ namespace GDPlayer\Modules\GDrive\Controllers;
  */
 final class GDriveAccountAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_DELETE_FAIL = 'The account failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The account has been deleted successfully';
+    private const MESSAGE_STATUS_UPDATE_FAIL = 'The account status failed to update';
+    private const MESSAGE_STATUS_UPDATE_SUCCESS = 'The account status has been successfully updated';
+    protected const ACTIONS = ['delete', 'updateBypass', 'updateStatus'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Google Drive account';
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Model\GDriveMirror $gdMirror;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'email', 'bypass', 'status', 'created', 'updated'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete an account, its mirrored files and the cached Drive listings.
+     *
+     * @return string JSON response
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Toggle the bypass flag through the shared status update path.
+     *
+     * @return string JSON response
+     */
+    protected function updateBypass(): string
+    {
+    }
+    /**
+     * Update the `status` or `bypass` column of an account.
+     *
+     * @return string JSON response
+     */
+    protected function updateStatus(): string
     {
     }
     /**
@@ -9015,58 +11419,7 @@ final class GDriveAccountAjaxController extends \GDPlayer\Modules\AbstractAjaxCo
     {
     }
 }
-/**
- * Pembersihan berkas duplikat di Drive.
- *
- * Split out of `GDriveFileAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GDriveFileAjaxController` through this trait.
- */
-trait GDriveDuplicateTrait
-{
-    protected function removeDuplicateFiles(): string
-    {
-    }
-    /**
-     * @param array<string,mixed> $driveFileItem
-     * @param string $sha1
-     * @param string $sha256
-     * @param string $description
-     * @return bool|string
-     */
-    protected function removeDuplicateFilesByData(array $driveFileItem = [], string $sha1 = '', string $sha256 = '', string $description = ''): bool|string
-    {
-    }
-}
-/**
- * Aksi berkas Drive: folder baru, hapus, impor, rename, status.
- *
- * Split out of `GDriveFileAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `GDriveFileAjaxController` through this trait.
- */
-trait GDriveFileActionTrait
-{
-    protected function createNewFolder(): string
-    {
-    }
-    protected function delete(): string
-    {
-    }
-    protected function deleteMirror(): string
-    {
-    }
-    protected function gdriveImport(): string
-    {
-    }
-    protected function getSharedDrives(): string
-    {
-    }
-    protected function renameFileFolder(): string
-    {
-    }
-    protected function updateStatus(): string
-    {
-    }
-}
+
 /**
  * Google Drive file browser endpoint (list, mirror, delete).
  *
@@ -9074,12 +11427,124 @@ trait GDriveFileActionTrait
  */
 final class GDriveFileAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
-    use \GDPlayer\Modules\GDrive\Controllers\GDriveDuplicateTrait;
-    use \GDPlayer\Modules\GDrive\Controllers\GDriveFileActionTrait;
+    protected const ACTIONS = ['createDataList', 'createNewFolder', 'delete', 'deleteMirror', 'gdriveImport', 'getSharedDrives', 'removeDuplicateFiles', 'removeDuplicateFilesByData', 'renameFileFolder', 'updateStatus'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Google Drive files';
+    protected const MESSAGE_FILE_DELETE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_DELETE_FAIL;
+    protected const MESSAGE_FILE_DELETE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_DELETE_SUCCESS;
+    protected const MESSAGE_FILE_IMPORT_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_IMPORT_FAIL;
+    protected const MESSAGE_FILE_IMPORT_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_IMPORT_SUCCESS;
+    protected const MESSAGE_FILE_UPDATE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_UPDATE_FAIL;
+    protected const MESSAGE_FILE_UPDATE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_UPDATE_SUCCESS;
+    protected const MESSAGE_FOLDER_CREATE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FOLDER_CREATE_FAIL;
+    protected const MESSAGE_FOLDER_CREATE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FOLDER_CREATE_SUCCESS;
+    protected const MESSAGE_MIRROR_FILE_DELETE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_MIRROR_FILE_DELETE_FAIL;
+    protected const MESSAGE_MIRROR_FILE_DELETE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_MIRROR_FILE_DELETE_SUCCESS;
+    protected const MESSAGE_REMOVE_DUPLICATE_FILES_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_REMOVE_DUPLICATE_FILES_FAIL;
+    protected const MESSAGE_REMOVE_DUPLICATE_FILES_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_REMOVE_DUPLICATE_FILES_SUCCESS;
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveDuplicate $gdDuplicate;
+    private \GDPlayer\Model\GDriveMirror $gdMirror;
+    private \GDPlayer\Model\Video $videoModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'title', 'description', 'shared', 'modifiedDate'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * @param list<array<string,mixed>> $rawDriveFiles
+     * @param string $email
+     * @return list<array<string,mixed>>
+     */
+    protected function createDataList(array $rawDriveFiles = [], string $email = ''): array
+    {
+    }
+    /**
+     * Create a Drive folder under an optional parent and clear the cached file list.
+     *
+     * @return string JSON response carrying the Ajax status and message
+     */
+    protected function createNewFolder(): string
+    {
+    }
+    /**
+     * Delete the Drive file named by `id` and invalidate the cached file list.
+     *
+     * @return string JSON response carrying the Ajax status and message
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Delete the mirror row only; the underlying Drive file stays untouched.
+     *
+     * @return string JSON response carrying the Ajax status and message
+     */
+    protected function deleteMirror(): string
+    {
+    }
+    /**
+     * Insert a new video row from the Drive file metadata and return its slug.
+     *
+     * @return string JSON response with the new video id, title and slug
+     */
+    protected function gdriveImport(): string
+    {
+    }
+    /**
+     * List the shared drives visible to the given Google account.
+     *
+     * @return string JSON response whose data holds the shared drive list
+     */
+    protected function getSharedDrives(): string
+    {
+    }
+    /**
+     * Sweep one page of Drive files and remove the ones already recorded as duplicates.
+     *
+     * The request carries an email and a page token; the token is echoed back so
+     * the client can continue with the next page.
+     *
+     * @return string JSON response with the next page token
+     */
+    protected function removeDuplicateFiles(): string
+    {
+    }
+    /**
+     * Decide the fate of one Drive file: delete it, record it, or leave it alone.
+     *
+     * A match on size plus checksums plus title/description means the file is a
+     * duplicate elsewhere and gets deleted; otherwise the row is inserted into
+     * the duplicate table, and an existing row is reported as false.
+     *
+     * @param array<string,mixed> $driveFileItem file metadata from the Drive API
+     * @param string $sha1 sanitised SHA-1 checksum
+     * @param string $sha256 sanitised SHA-256 checksum
+     * @param string $description sanitised file description
+     * @return bool|string delete/insert result, or false when the row already exists
+     */
+    protected function removeDuplicateFilesByData(array $driveFileItem = [], string $sha1 = '', string $sha256 = '', string $description = ''): bool|string
+    {
+    }
+    /**
+     * Rename a Drive file or folder and invalidate the cached file list.
+     *
+     * @return string JSON response carrying the Ajax status and message
+     */
+    protected function renameFileFolder(): string
+    {
+    }
+    /**
+     * Grant or revoke public read permission on the Drive file.
+     *
+     * @return string JSON response carrying the Ajax status and message
+     */
+    protected function updateStatus(): string
     {
     }
     /**
@@ -9091,12 +11556,20 @@ final class GDriveFileAjaxController extends \GDPlayer\Modules\AbstractAjaxContr
     {
     }
 }
+
 /**
  * Page gdrive/files.php (retired once this controller was proven identical).
  */
 final class GDriveFileController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
 }
+
 /**
  * Google Drive mirror management endpoint (list, add, remove).
  *
@@ -9104,10 +11577,33 @@ final class GDriveFileController extends \GDPlayer\View\AbstractView
  */
 final class GDriveMirrorAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_DELETE_FAIL = 'The backup file failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The backup file has been successfully deleted';
+    protected const ACTIONS = ['delete'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Google Drive mirror';
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveMirror $gdMirror;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'gdrive_id', 'mirror_id', 'mirror_email', 'created'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Bind the Drive client and the mirror model to the request.
+     *
+     * @param ServerRequestInterface $request current HTTP request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Delete a mirror row and the Drive copy it points at.
+     *
+     * The remote file is removed first; the row is only deleted when that call did not throw.
+     *
+     * @return string JSON response with the deletion status
+     */
+    protected function delete(): string
     {
     }
     /**
@@ -9119,12 +11615,20 @@ final class GDriveMirrorAjaxController extends \GDPlayer\Modules\AbstractAjaxCon
     {
     }
 }
+
 /**
  * Pages gdrive/list.php, gdrive/backup-files.php, gdrive/backup-queue.php, gdrive/edit.php, gdrive/new.php.
  */
 final class GDrivePageController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Google Drive mirror queue endpoint (list, enqueue, clear).
  *
@@ -9132,10 +11636,41 @@ final class GDrivePageController extends \GDPlayer\View\AbstractView
  */
 final class GDriveQueueAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_DELETE_FAIL = 'The backup queue failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The backup queue has been successfully deleted';
+    private const MESSAGE_GDRIVE_COPY_FAIL = 'Cannot copy the file! Try again later';
+    protected const ACTIONS = ['copy', 'delete'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Google Drive queue';
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\External\GoogleDriveRestAPI $gdAPI;
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Model\GDriveQueue $gdQueue;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'gdrive_id'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Bind the request and instantiate the Drive models and REST client.
+     *
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Copy a Drive file into the first active account that accepts the copy.
+     *
+     * @return string JSON response holding the new file link and id on success
+     */
+    protected function copy(): string
+    {
+    }
+    /**
+     * Remove one item from the mirror queue.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function delete(): string
     {
     }
     /**
@@ -9147,6 +11682,7 @@ final class GDriveQueueAjaxController extends \GDPlayer\Modules\AbstractAjaxCont
     {
     }
 }
+
 namespace GDPlayer\Modules\LoadBalancers\Controllers;
 
 /**
@@ -9154,10 +11690,37 @@ namespace GDPlayer\Modules\LoadBalancers\Controllers;
  */
 final class LoadBalancerAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_DELETE_FAIL = 'The load balancer server failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The load balancer server deleted successfully';
+    private const MESSAGE_UPDATE_FAIL = 'The load balancer server failed to update';
+    private const MESSAGE_UPDATE_SUCCESS = 'The load balancer server has been successfully updated';
+    protected const ACTIONS = ['delete', 'updateStatus'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Load Balancer';
+    private \GDPlayer\Model\LoadBalancer $balancerModel;
+    private \GDPlayer\Model\ViewLoadBalancer $viewBalancerModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['name', 'link', 'connections', 'playbacks', 'status', 'created', 'updated', 'public', 'id'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
+     * @param ServerRequestInterface $request request aktif
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Soft-delete one load balancer server and report success or failure as JSON.
+     *
+     * @return string ajax status plus message
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Flip the active flag of one load balancer server.
+     *
+     * @return string ajax status plus message
+     */
+    protected function updateStatus(): string
     {
     }
     /**
@@ -9169,12 +11732,20 @@ final class LoadBalancerAjaxController extends \GDPlayer\Modules\AbstractAjaxCon
     {
     }
 }
+
 /**
  * Pages load-balancers/list.php, load-balancers/edit.php, load-balancers/new.php.
  */
 final class LoadBalancerController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Logs\Controllers;
 
 /**
@@ -9182,7 +11753,15 @@ namespace GDPlayer\Modules\Logs\Controllers;
  */
 final class LogController extends \GDPlayer\View\AbstractView
 {
+    private const JSON_TYPE = 'application/json';
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Plugins\Controllers;
 
 /**
@@ -9191,20 +11770,31 @@ namespace GDPlayer\Modules\Plugins\Controllers;
  */
 final class PluginConfigController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Plugins page: list (page + DataTables endpoint) and uninstall (JSON endpoint).
  */
 final class PluginController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
- * Ekstraksi arsip plugin, registrasi rute, dan penyimpanan record.
- *
- * Split out of `PluginInstallController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginInstallController` through this trait.
+ * Endpoint /administrator/plugins/install: upload & install a plugin from ZIP (JSON).
  */
-trait PluginInstallRecordTrait
+final class PluginInstallController extends \GDPlayer\View\AbstractView
 {
     /**
      * Write stage: determine the target, extract, store the record, sync routes.
@@ -9214,12 +11804,6 @@ trait PluginInstallRecordTrait
     protected function completePluginInstall(array $prepared): \Psr\Http\Message\ResponseInterface
     {
     }
-    /**
-     * Determine the plugin installation target folder (reused when the version differs).
-     *
-     * @param array<string,mixed> $pluginJson
-     * @return array<string,mixed>|ResponseInterface response = same version already installed
-     */
     /**
      * Evaluate plugin folder collisions.
      *
@@ -9235,46 +11819,57 @@ trait PluginInstallRecordTrait
      *
      * @param array<string, mixed> $pluginJson plugin manifest
      * @param array<string, mixed> $target result of resolveInstallTarget()
+     * @param string $zipTempPath uploaded ZIP still sitting in the temp folder
      * @return string|null error message, or null on success
      */
     protected function extractAndRegister(array $pluginJson, array $target, string $zipTempPath): ?string
     {
     }
     /**
-     * Store/update the plugin row + copy the ZIP to the tmp folder (returns the plugin id).
-     *
-     * @param array<string,mixed> $pluginJson
-     */
-    protected function savePluginRecord(array $pluginJson, string $finalFolderRelative, string $zipTempPath): int
-    {
-    }
-}
-/**
- * Langkah persiapan instalasi plugin: guard, target, dan resolusi folder.
- *
- * Split out of `PluginInstallController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginInstallController` through this trait.
- */
-trait PluginInstallStepTrait
-{
-    /**
-     * @return ResponseInterface
-     */
-    /**
      * Access guard: only admins may install plugins.
      *
-     * @return \Psr\Http\Message\ResponseInterface|null denial response, or null when allowed
+     * @return ResponseInterface|null denial response, or null when allowed
      */
     protected function installGuard(): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
+     * Whether the directory is empty (no entries).
+     */
+    protected function isDirectoryEmpty(string $dir): bool
+    {
+    }
+    /**
+     * Decode + validate the plugin manifest.
+     *
+     * @return array{json: array<string, mixed>|null, error?: string} parse result
+     */
+    protected function parsePluginJson(string $content): array
+    {
+    }
+    /**
      * Read stage: ZIP upload + validated plugin.json manifest.
      *
-     * @return array{json: array<string, mixed>, temp: string}|\Psr\Http\Message\ResponseInterface install-ready data, or
+     * @return array{json: array<string, mixed>, temp: string}|ResponseInterface install-ready data, or
      *         failure response
      */
     protected function preparePluginInstall(): array|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Read plugin.json from the ZIP archive.
+     *
+     * @return array{0: string|null, 1: string} [content|null, error message]
+     */
+    protected function readPluginJsonContent(string $zipTempPath): array
+    {
+    }
+    /**
+     * Run the guard, preparation and completion steps of the plugin install flow.
+     *
+     * @return ResponseInterface rendered page, or the first guard/preparation response that stops it
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
     {
     }
     /**
@@ -9283,79 +11878,149 @@ trait PluginInstallStepTrait
      *
      * @param array<string, mixed> $pluginJson plugin manifest
      * @param bool $useCli whether the plugin is installed through the CLI
-     * @return array<string, mixed>|\Psr\Http\Message\ResponseInterface installation target
+     * @return array<string, mixed>|ResponseInterface installation target
      */
     protected function resolveInstallTarget(array $pluginJson, bool $useCli): array|\Psr\Http\Message\ResponseInterface
     {
     }
+    /**
+     * Store/update the plugin row + copy the ZIP to the tmp folder (returns the plugin id).
+     *
+     * An existing row keeps its stored config, merged under the new manifest
+     * config; a new row starts disabled (status 0).
+     *
+     * @param array<string,mixed> $pluginJson plugin manifest
+     * @param string $finalFolderRelative plugin folder relative to the plugins root
+     * @param string $zipTempPath uploaded ZIP still sitting in the temp folder
+     * @return int plugin id
+     */
+    protected function savePluginRecord(array $pluginJson, string $finalFolderRelative, string $zipTempPath): int
+    {
+    }
 }
+
 /**
- * Endpoint /administrator/plugins/install: upload & install a plugin from ZIP (JSON).
- */
-final class PluginInstallController extends \GDPlayer\View\AbstractView
-{
-    use \GDPlayer\Modules\Plugins\Controllers\PluginInstallRecordTrait;
-    use \GDPlayer\Modules\Plugins\Controllers\PluginInstallStepTrait;
-}
-/**
- * Endpoint /administrator/plugins/sync: ping (stamp isi folder), download (kirim ZIP), dan
- * notify (mulai tugas tarik di server ini). ping/download autentik dengan sync salt (server
- * remote); ping dan notify juga menerima sesi admin.
+ * Endpoint /administrator/plugins/sync: ping (folder stamp), download (send the ZIP) and
+ * notify (start a pull task on this server). ping/download authenticate with the sync salt
+ * (remote servers); ping and notify also accept an admin session.
  *
- * Arsip dinamai `<folder>-<stamp>.zip`, jadi isi yang tidak berubah tidak pernah dibangun
- * ulang dan tidak pernah ditimpa saat sedang dikirim ke server lain.
+ * Archives are named `<folder>-<stamp>.zip`, so unchanged contents are never rebuilt and
+ * never overwritten while still being sent to another server.
  */
 final class PluginSyncController extends \GDPlayer\View\AbstractView
 {
+    /** @var string[] */
+    private const ACTIONS = ['ping', 'download', 'notify'];
+    /**
+     * Dispatch ping, download or notify according to the `action` query parameter.
+     *
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\PublicEndpoint\Controllers;
 
 /**
- * Impor massal subtitle dan proses bulk.
+ * Public (unauthenticated) endpoint for video/poster/subtitle actions.
  *
- * Split out of `PublicAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PublicAjaxController` through this trait.
+ * Replacement for Ajax\PublicAjax (actions run by AbstractAjaxController, no ReflectionMethod).
  */
-trait PublicBulkActionTrait
+final class PublicAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
-    protected function saveBulkProcess(): string
+    private const MESSAGE_EMAIL_EXIST = 'The email address is already registered';
+    private const MESSAGE_USERNAME_EXIST = 'The username is already registered';
+    protected const ACTIONS = ['checkEmail', 'checkUsername', 'clearVideoCache', 'createPlayer', 'gdriveBypassLimit', 'getLoadBalancerList', 'isPublicRequestValid', 'saveBulkProcess', 'statCounter'];
+    protected const MESSAGE_CACHE_CLEAR_FAIL = \GDPlayer\Modules\AjaxCatalog::PUBLIC_CACHE_CLEAR_FAIL;
+    protected const MESSAGE_CACHE_CLEAR_SUCCESS = \GDPlayer\Modules\AjaxCatalog::PUBLIC_CACHE_CLEAR_SUCCESS;
+    protected const MESSAGE_CREATE_PLAYER_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_CREATE_PLAYER_FAIL;
+    protected const MESSAGE_FEATURE_DISABLE = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FEATURE_DISABLE;
+    protected const MESSAGE_GDRIVE_BYPASS_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_GDRIVE_BYPASS_FAIL;
+    protected const MESSAGE_GDRIVE_BYPASS_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_GDRIVE_BYPASS_SUCCESS;
+    protected const MESSAGE_STAT_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_STAT_FAIL;
+    protected const MESSAGE_STAT_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_STAT_SUCCESS;
+    protected const MESSAGE_VIDEO_SAVE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_SAVE_FAIL;
+    protected const MESSAGE_VIDEO_SAVE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_SAVE_SUCCESS;
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = false;
+    private \GDPlayer\Model\LoadBalancer $balancerModel;
+    private \GDPlayer\Core\Core $core;
+    private string $downloadSlug = 'd';
+    private string $embed2Slug = 'r';
+    private string $embedSlug = 'e';
+    private \GDPlayer\External\GoogleDriveRestAPI $gdApi;
+    private \GDPlayer\Model\GDriveAuth $gdAuth;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\External\Maxmind $maxmind;
+    private \Sqids\Sqids $sqids;
+    private \GDPlayer\Model\Stat $statModel;
+    private \GDPlayer\Model\StatUA $statUAModel;
+    private \GDPlayer\Model\SubtitleManager $subtitleManager;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\User $userModel;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
+    /**
+     * Instantiate the models, config slugs and Drive clients used by the public actions.
+     *
+     * @param ServerRequestInterface $request incoming Ajax request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
     {
     }
     /**
-     * @param int $videoId
-     * @param list<array<string,mixed>> $tracks
-     * @return int
+     * Report whether the email is already used by another account.
+     *
+     * @param string $email email to test; falls back to the posted value when empty
+     * @return string JSON response flagging the conflict
      */
-    protected function saveBulkSubtitles(int $videoId = 0, array $tracks = []): int
+    protected function checkEmail(string $email = ''): string
     {
     }
-}
-/**
- * Aksi player publik: cache, create player, bypass limit.
- *
- * Split out of `PublicAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PublicAjaxController` through this trait.
- */
-trait PublicPlayerActionTrait
-{
+    /**
+     * Report whether the username is already used by another account.
+     *
+     * @param string $username name to test; falls back to the posted value when empty
+     * @return string JSON response flagging the conflict
+     */
+    protected function checkUsername(string $username = ''): string
+    {
+    }
+    /**
+     * Clear the cached sources of the video, alternative or URL carried by the encrypted payload.
+     *
+     * @return string JSON response with a per-target clear summary
+     */
     protected function clearVideoCache(): string
     {
     }
+    /**
+     * Build the encrypted player URLs and embed code for the submitted video.
+     *
+     * @return string JSON response carrying the embed, download and request URLs
+     */
     protected function createPlayer(): string
     {
     }
+    /**
+     * Copy a Google Drive file into an authorised account to bypass its download limit.
+     *
+     * @return string JSON response carrying the new share link on success
+     */
     protected function gdriveBypassLimit(): string
     {
     }
-}
-/**
- * Pencatatan statistik kunjungan.
- *
- * Split out of `PublicAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PublicAjaxController` through this trait.
- */
-trait PublicStatTrait
-{
+    /**
+     * List the links of the enabled load balancers plus the main site.
+     *
+     * @return string JSON response holding the unique link list
+     */
+    protected function getLoadBalancerList(): string
+    {
+    }
     /**
      * Guard specific to public endpoints (used by AbstractAjaxController before the action runs).
      *
@@ -9364,30 +12029,54 @@ trait PublicStatTrait
     protected function isGatePassed(): bool
     {
     }
+    /**
+     * Decide whether the current action may run without a logged-in user.
+     *
+     * @return bool true for exempt actions, valid reCAPTCHA or a valid CORS token
+     */
+    protected function isPublicRequestValid(): bool
+    {
+    }
+    /**
+     * Save one video of a bulk import batch and report the next cursor position.
+     *
+     * @return string JSON response with the saved row, the offsets and the share links
+     */
+    protected function saveBulkProcess(): string
+    {
+    }
+    /**
+     * Insert the subtitle tracks of a freshly saved video.
+     *
+     * @param int $videoId
+     * @param list<array<mixed,mixed>> $tracks
+     * @return int number of tracks stored
+     */
+    protected function saveBulkSubtitles(int $videoId = 0, array $tracks = []): int
+    {
+    }
+    /**
+     * Record a single view for the video, honouring the daily per-visitor limit.
+     * Record one view for the video, obeying the daily per-visitor limit.
+     *
+     * @param int $videoId Video primary key
+     * @param int $currentViews Current view counter of the video
+     * @return int Inserted visit ID, or 0 when the limit was reached
+     */
     protected function saveStat(int $videoId = 0, int $currentViews = 0): int
     {
     }
+    /**
+     * Decrypt the payload, resolve the video and record one view.
+     * Resolve the video referenced by the encrypted payload and record a view.
+     *
+     * @return string JSON response
+     */
     protected function statCounter(): string
     {
     }
 }
-/**
- * Public (unauthenticated) endpoint for video/poster/subtitle actions.
- *
- * Replacement for Ajax\PublicAjax (actions run by AbstractAjaxController, no ReflectionMethod).
- */
-final class PublicAjaxController extends \GDPlayer\Modules\AbstractAjaxController
-{
-    use \GDPlayer\Modules\PublicEndpoint\Controllers\PublicBulkActionTrait;
-    use \GDPlayer\Modules\PublicEndpoint\Controllers\PublicPlayerActionTrait;
-    use \GDPlayer\Modules\PublicEndpoint\Controllers\PublicStatTrait;
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-}
+
 namespace GDPlayer\Modules\Sessions\Controllers;
 
 /**
@@ -9397,10 +12086,26 @@ namespace GDPlayer\Modules\Sessions\Controllers;
  */
 final class SessionAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_DELETE_FAIL = 'The session failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The session has been successfully deleted';
+    protected const ACTIONS = ['delete'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Session';
+    private \GDPlayer\Model\Session $sessionModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'username', 'ip', 'useragent', 'created', 'expires'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
+     * @param ServerRequestInterface $request request aktif
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Remove one stored session row and report success or failure as JSON.
+     *
+     * @return string ajax status plus message
+     */
+    protected function delete(): string
     {
     }
     /**
@@ -9412,56 +12117,9 @@ final class SessionAjaxController extends \GDPlayer\Modules\AbstractAjaxControll
     {
     }
 }
+
 namespace GDPlayer\Modules\Settings\Controllers;
 
-/**
- * Aksi pembersihan cache dari halaman pengaturan.
- *
- * Split out of `SettingAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingAjaxController` through this trait.
- */
-trait SettingCacheActionTrait
-{
-    protected function clearAllCache(): string
-    {
-    }
-    protected function clearLoadBalancer(): string
-    {
-    }
-    protected function clearSettingsCache(): string
-    {
-    }
-    protected function clearVideosCache(): string
-    {
-    }
-    protected function clearVideosFiles(): string
-    {
-    }
-    protected function hasDeletedCacheTmpDir(): bool
-    {
-    }
-    protected function resetHosts(): string
-    {
-    }
-}
-/**
- * Aksi custom VAST dan preferensi dialog.
- *
- * Split out of `SettingAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingAjaxController` through this trait.
- */
-trait SettingVastActionTrait
-{
-    protected function createCustomVast(): string
-    {
-    }
-    protected function deleteCustomVast(): string
-    {
-    }
-    protected function hideExtDialog(): string
-    {
-    }
-}
 /**
  * Admin settings endpoint (read, save, license, custom headers).
  *
@@ -9469,22 +12127,211 @@ trait SettingVastActionTrait
  */
 final class SettingAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
-    use \GDPlayer\Modules\Settings\Controllers\SettingCacheActionTrait;
-    use \GDPlayer\Modules\Settings\Controllers\SettingVastActionTrait;
+    private const MESSAGE_BLACKLIST_FAIL = 'The blacklisted videos failed to deactivate';
+    private const MESSAGE_BLACKLIST_SUCCESS = 'The blacklisted videos have been successfully deactivated';
+    private const MESSAGE_DEPENDENCY_FAIL = 'Some php functions and applications are not enabled/installed yet';
+    private const MESSAGE_DEPENDENCY_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_DEPENDENCY_SUCCESS;
+    private const MESSAGE_LICENSE_SAVE_FAIL = 'GDPlayer license failed to save';
+    private const MESSAGE_LICENSE_SAVE_SUCCESS = 'GDPlayer license has been successfully saved';
+    protected const ACTIONS = ['clearAllCache', 'clearLoadBalancer', 'clearSettingsCache', 'clearVideosCache', 'clearVideosFiles', 'createCustomVast', 'hasDeletedCacheTmpDir', 'deleteCustomVast', 'disableBlacklistedVideos', 'getDependencies', 'hideExtDialog', 'resetHosts', 'saveLicense'];
+    protected const DENIED_AS_DATATABLE = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Setting';
+    protected const MESSAGE_CACHE_CLEAR_FAIL = \GDPlayer\Modules\AjaxCatalog::SETTINGS_CACHE_CLEAR_FAIL;
+    protected const MESSAGE_CACHE_CLEAR_SUCCESS = \GDPlayer\Modules\AjaxCatalog::SETTINGS_CACHE_CLEAR_SUCCESS;
+    protected const MESSAGE_RESET_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_RESET_FAIL;
+    protected const MESSAGE_RESET_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_RESET_SUCCESS;
+    protected const MESSAGE_VAST_CREATE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VAST_CREATE_FAIL;
+    protected const MESSAGE_VAST_CREATE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VAST_CREATE_SUCCESS;
+    protected const MESSAGE_VAST_DELETE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VAST_DELETE_FAIL;
+    protected const MESSAGE_VAST_DELETE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VAST_DELETE_SUCCESS;
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = true;
+    protected const TRUNCATE_SOURCES = \GDPlayer\Modules\AjaxCatalog::TRUNCATE_SOURCES;
+    protected const TRUNCATE_TMP = \GDPlayer\Modules\AjaxCatalog::TRUNCATE_TMP;
+    private \GDPlayer\Service\Background\Background $backgroundService;
+    private \GDPlayer\Service\HeadlessChrome\HeadlessChrome $headlessChrome;
+    private \GDPlayer\Model\TmpVideoSource $tmpVideoSourceModel;
+    private string $uploadsDir = '';
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
+    protected \GDPlayer\Config\BinFile $binConfig;
+    protected \GDPlayer\Config\Config $config;
+    protected array $data;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Bind the request and the services used by the settings actions.
+     *
+     * @param ServerRequestInterface $request current HTTP request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
     {
     }
+    /**
+     * Flush every runtime cache: downloads, browsers, staging rows and cache drivers.
+     *
+     * @return string JSON response with one boolean flag per cleared area
+     */
+    protected function clearAllCache(): string
+    {
+    }
+    /**
+     * Stop downloads and drop the video sources of a single load balancer.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function clearLoadBalancer(): string
+    {
+    }
+    /**
+     * Drop the persisted settings cache and the temporary directories behind it.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function clearSettingsCache(): string
+    {
+    }
+    /**
+     * Clear the staged video sources and the filesize-tagged instance cache.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function clearVideosCache(): string
+    {
+    }
+    /**
+     * Remove the cached video, subtitle and image files left by the players.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function clearVideosFiles(): string
+    {
+    }
+    /**
+     * Render and store a custom VAST document from the request fields.
+     *
+     * The XML is written to the uploads directory and appended to the `custom_vast` setting.
+     *
+     * @return string JSON response carrying the public URL of the generated document
+     */
+    protected function createCustomVast(): string
+    {
+    }
+    /**
+     * Remove a custom VAST document from disk and from the `custom_vast` setting.
+     *
+     * @return string JSON response with the deletion status
+     */
+    protected function deleteCustomVast(): string
+    {
+    }
+    /**
+     * Flag and deactivate every video whose title starts with a blacklisted word.
+     *
+     * The word list comes from the `word_blacklisted` setting, one word per line.
+     *
+     * @return string JSON response with the update status
+     */
+    protected function disableBlacklistedVideos(): string
+    {
+    }
+    /**
+     * Report which PHP extensions, functions and binaries the application needs.
+     *
+     * @return string JSON response carrying the per-dependency result map
+     */
+    protected function getDependencies(): string
+    {
+    }
+    /**
+     * Delete the temporary, cache and upload scratch directories.
+     *
+     * @return bool true when at least one directory was removed
+     */
+    protected function hasDeletedCacheTmpDir(): bool
+    {
+    }
+    /**
+     * Remember, for thirty days, that the missing-extension dialog was dismissed.
+     *
+     * @return string JSON success response
+     */
+    protected function hideExtDialog(): string
+    {
+    }
+    /**
+     * Exempt an action from the admin guard.
+     *
+     * Always false: only the license gate is exempt, never the admin role check.
+     *
+     * @param string $action requested action name
+     * @return bool true when the action may skip the admin guard
+     */
+    protected function isAdminExempt(string $action): bool
+    {
+    }
+    /**
+     * `saveLicense` must stay callable while the license is not valid yet — otherwise a new
+     * license could never be stored (the isLicenseValid() gate rejects it), and this action is also
+     * exempt from the admin guard (legacy view behavior).
+     */
+    protected function isLicenseGateExempt(string $action): bool
+    {
+    }
+    /**
+     * Rebuild the bypassed host list from the binary config and persist it.
+     *
+     * @return string JSON response carrying the refreshed host list
+     */
+    protected function resetHosts(): string
+    {
+    }
+    /**
+     * Persist the license key and refresh the cached license status.
+     *
+     * @return string JSON response with the save status
+     */
+    protected function saveLicense(): string
+    {
+    }
 }
+
 /**
- * Aset situs: manifest PWA, favicon, dan unggahan logo.
- *
- * Split out of `SettingController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingController` through this trait.
+ * Pages settings/ads.php, settings/custom-headers.php, settings/general.php, settings/hosting.php,
+ * settings/misc.php, settings/player.php, settings/public.php, settings/reset.php, settings/shortlink.php,
+ * settings/site.php, settings/smtp.php.
  */
-trait SettingAssetTrait
+final class SettingController extends \GDPlayer\View\AbstractView
+{
+    /** Settings form template folder. */
+    protected const TEMPLATE_DIR = \GDPlayer\Modules\AjaxCatalog::SETTINGS_TEMPLATE_DIR;
+    /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
+}
+
+/**
+ * Endpoint /administrator/settings/sync (webhook load balancer) — JSON.
+ */
+final class SettingSyncController extends \GDPlayer\View\AbstractView
+{
+    /** @var string[] */
+    private const CACHE_MODES = ['php', 'apache', 'litespeed', 'nginx'];
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
+}
+
+namespace GDPlayer\Modules\Settings\Services;
+
+/**
+ * PWA manifest, favicon and logo uploads of the site settings page.
+ */
+final class AssetProcessor
 {
     /**
      * Build the PWA manifest.json contents.
@@ -9493,13 +12340,13 @@ trait SettingAssetTrait
      * @param list<array<string,string>> $icons
      * @return array<string,mixed>
      */
-    protected function buildPwaManifest(array $body, array $icons, string $size512): array
+    public static function buildPwaManifest(array $body, array $icons, string $size512): array
     {
     }
     /**
      * Create `favicon.ico` from the logo (requires the GD extension).
      */
-    protected function generateFavicon(string $logoFile, string $faviconFile): void
+    public static function generateFavicon(string $logoFile, string $faviconFile): void
     {
     }
     /**
@@ -9507,7 +12354,7 @@ trait SettingAssetTrait
      *
      * @param array<string,mixed> $uploadedFiles
      */
-    protected function handleLogoUpload(array $uploadedFiles, string $imgDir, string $logoFile): void
+    public static function handleLogoUpload(array $uploadedFiles, string $imgDir, string $logoFile): void
     {
     }
     /**
@@ -9515,155 +12362,23 @@ trait SettingAssetTrait
      *
      * @param array<string,mixed> $manifest
      */
-    protected function writeManifest(array $manifest): void
+    public static function writeManifest(array $manifest): void
     {
     }
 }
+
 /**
- * Halaman iklan, custom header, shortlink, dan reset.
- *
- * Split out of `SettingController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingController` through this trait.
+ * Turns the custom headers form rows into the stored header structure.
  */
-trait SettingContentPageTrait
+final class HeaderParser
 {
-    /**
-     * Page settings/ads.php.
-     *
-     * @return string
-     */
-    protected function adsPage(): string
-    {
-    }
-    /**
-     * Page settings/custom-headers.php.
-     *
-     * @return string
-     */
-    protected function customHeadersPage(): string
-    {
-    }
-    /**
-     * Page settings/reset.php.
-     *
-     * @return string
-     */
-    protected function resetPage(): string
-    {
-    }
-    /**
-     * Page settings/shortlink.php.
-     *
-     * @return string
-     */
-    protected function shortlinkPage(): string
-    {
-    }
-}
-/**
- * Halaman pengaturan umum, hosting, dan publik.
- *
- * Split out of `SettingController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingController` through this trait.
- */
-trait SettingGeneralPageTrait
-{
-    /**
-     * Page settings/general.php.
-     *
-     * @return string
-     */
-    protected function generalPage(): string
-    {
-    }
-    /**
-     * Page settings/hosting.php.
-     *
-     * @return string
-     */
-    protected function hostingPage(): string
-    {
-    }
-    /**
-     * Page settings/public.php.
-     *
-     * @return string
-     */
-    protected function publicPage(): string
-    {
-    }
-}
-/**
- * Halaman pengaturan misc dan SMTP.
- *
- * Split out of `SettingController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingController` through this trait.
- */
-trait SettingMiscPageTrait
-{
-    /**
-     * Page settings/misc.php.
-     *
-     * @return string
-     */
-    protected function miscPage(): string
-    {
-    }
-    /**
-     * Page settings/smtp.php.
-     *
-     * @return string
-     */
-    protected function smtpPage(): string
-    {
-    }
-}
-/**
- * Settings page helpers (SettingController) — split out so the main class stays <=20 methods
- * (rule `.agents/rules/php-code-quality.md`).
- */
-trait SettingPageTrait
-{
-    /**
-     * Frontend loader list from the templates/frontend/loader folder.
-     *
-     * @return array<string,string> loader name => label
-     */
-    private function buildLoaderList(): array
-    {
-    }
-    /**
-     * Allowed video resolutions.
-     *
-     * @return list<int|string> resolution list
-     */
-    private function buildResolutions(): array
-    {
-    }
-    /**
-     * CSS skin list from the active player's assets/skin folder.
-     *
-     * @return array<string,string> skin name => label
-     */
-    private function buildSkinList(string $currentPlayer): array
-    {
-    }
-    /**
-     * Move the uploaded logo file to the images folder.
-     *
-     * @param array<string, mixed>|null $faviconMeta upload metadata
-     * @return int true when the file was moved successfully
-     */
-    private function moveUploadedLogo(?array $faviconMeta, string $imgDir, string $logoFile): int
-    {
-    }
     /**
      * Parse the custom headers form JSON into a structured item list.
      *
      * @param array<string, mixed> $body form data
      * @return list<array{keywords:string[],headers:array<string,string>}> custom headers items
      */
-    private function parseCustomHeaders(array $body): array
+    public static function parseCustomHeaders(array $body): array
     {
     }
     /**
@@ -9671,13 +12386,38 @@ trait SettingPageTrait
      *
      * @return array<string,string> parsed headers
      */
-    private function parseHeaderLines(string $raw): array
+    public static function parseHeaderLines(string $raw): array
+    {
+    }
+}
+
+/**
+ * Options shown on the player settings page and the POST handler for that page.
+ */
+final class PlayerOptionBuilder
+{
+    /**
+     * Frontend loader list from the templates/frontend/loader folder.
+     *
+     * @return array<string,string> loader name => label
+     */
+    public static function buildLoaderList(): array
     {
     }
     /**
-     * Generate every icon size variant from the logo file.
+     * Allowed video resolutions.
+     *
+     * @return list<int|string> resolution list
      */
-    private function resizeIconSet(\GDPlayer\Service\Media\SimpleImage $imageProcessor, string $imgDir, string $logoFile): void
+    public static function buildResolutions(): array
+    {
+    }
+    /**
+     * CSS skin list from the active player's assets/skin folder.
+     *
+     * @return array<string,string> skin name => label
+     */
+    public static function buildSkinList(string $currentPlayer): array
     {
     }
     /**
@@ -9685,55 +12425,11 @@ trait SettingPageTrait
      *
      * @param array<string, mixed> $body form data
      */
-    private function savePlayerSettings(array $body, string $requestMethod, \GDPlayer\Config\Config $configModel, string $title): void
+    public static function savePlayerSettings(array $body, string $requestMethod, \GDPlayer\Config\Config $configModel, string $title): void
     {
     }
 }
-/**
- * Halaman pengaturan player dan situs.
- *
- * Split out of `SettingController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SettingController` through this trait.
- */
-trait SettingPlayerPageTrait
-{
-    /**
-     * Page settings/player.php.
-     *
-     * @return string
-     */
-    protected function playerPage(): string
-    {
-    }
-    /**
-     * Page settings/site.php.
-     *
-     * @return string
-     */
-    protected function sitePage(): string
-    {
-    }
-}
-/**
- * Pages settings/ads.php, settings/custom-headers.php, settings/general.php, settings/hosting.php,
- * settings/misc.php, settings/player.php, settings/public.php, settings/reset.php, settings/shortlink.php,
- * settings/site.php, settings/smtp.php.
- */
-final class SettingController extends \GDPlayer\View\AbstractView
-{
-    use \GDPlayer\Modules\Settings\Controllers\SettingAssetTrait;
-    use \GDPlayer\Modules\Settings\Controllers\SettingContentPageTrait;
-    use \GDPlayer\Modules\Settings\Controllers\SettingGeneralPageTrait;
-    use \GDPlayer\Modules\Settings\Controllers\SettingMiscPageTrait;
-    use \GDPlayer\Modules\Settings\Controllers\SettingPageTrait;
-    use \GDPlayer\Modules\Settings\Controllers\SettingPlayerPageTrait;
-}
-/**
- * Endpoint /administrator/settings/sync (webhook load balancer) — JSON.
- */
-final class SettingSyncController extends \GDPlayer\View\AbstractView
-{
-}
+
 namespace GDPlayer\Modules\Stream\Controllers;
 
 /**
@@ -9745,13 +12441,35 @@ namespace GDPlayer\Modules\Stream\Controllers;
  */
 final class EngineFallbackController extends \GDPlayer\View\AbstractView
 {
+    /** Engine slugs that have a fallback: endpoint name + engine number. */
+    private const ENGINE_PATTERN = '#^(stream-seg|stream-ts|stream-vid)([2-3])$#';
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Endpoint /filmstrip/{encrypted url}: filmstrip VTT for the player.
  */
 final class FilmstripController extends \GDPlayer\View\AbstractView
 {
+    /** VTT cache TTL in seconds, matching the `Cache-Control: max-age` of this response. */
+    private const CACHE_TTL = 3600;
+    /** Cache status of this response: HIT, MISS or BYPASS (unreadable URL). */
+    private string $cacheStatus = 'BYPASS';
+    /**
+     * Decrypt the URL in the request target and answer with the filmstrip VTT.
+     *
+     * @return ResponseInterface VTT response, or a redirect for URLs pointing back at this site
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Endpoint /poster?url=... (or /poster/{encrypted url}): poster image proxy + disk cache.
  *
@@ -9760,7 +12478,22 @@ final class FilmstripController extends \GDPlayer\View\AbstractView
  */
 final class PosterController extends \GDPlayer\View\AbstractView
 {
+    /** curl "write error" code that only comes from our own abort. */
+    private const CURL_WRITE_ERROR = 23;
+    /**
+     * @return bool
+     */
+    protected function isBufferingOutput(): bool
+    {
+    }
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Passthrough streaming handler: hls, mpd, stream-seg, stream-ts, stream-vid.
  *
@@ -9777,33 +12510,39 @@ final class PosterController extends \GDPlayer\View\AbstractView
  */
 final class StreamController extends \GDPlayer\View\AbstractView
 {
+    /** URL slug per action, used when redirecting to the engine. */
+    private const ENGINE_SLUGS = ['segment' => 'stream-seg', 'transportStream' => 'stream-ts', 'video' => 'stream-vid'];
+    /**
+     * @return bool
+     */
+    protected function isBufferingOutput(): bool
+    {
+    }
+    /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
 }
+
 /**
  * Endpoint /subtitle/{encrypted url}: fetch the subtitle from its source, convert to VTT, cache.
  */
 final class SubtitleController extends \GDPlayer\View\AbstractView
 {
+    /** Subtitle extensions that can be converted to VTT. */
+    private const SUBTITLE_EXTENSIONS = ['srt', 'vtt', 'ass', 'sub', 'stl', 'dfxp', 'ttml', 'sbv', 'txt'];
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Subtitles\Controllers;
 
-/**
- * Aksi subtitle: migrasi, rename, dan unggah.
- *
- * Split out of `SubtitleAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SubtitleAjaxController` through this trait.
- */
-trait SubtitleActionTrait
-{
-    protected function migrate(): string
-    {
-    }
-    protected function rename(): string
-    {
-    }
-    protected function uploadSubtitle(): string
-    {
-    }
-}
 /**
  * Subtitle library endpoint (list, upload, convert, delete).
  *
@@ -9811,11 +12550,88 @@ trait SubtitleActionTrait
  */
 final class SubtitleAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
-    use \GDPlayer\Modules\Subtitles\Controllers\SubtitleActionTrait;
+    private const MESSAGE_DELETE_FAIL = 'The subtitle file failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The subtitle file has been successfully deleted';
+    private const MESSAGE_NOT_FOUND = \GDPlayer\Modules\AjaxCatalog::MESSAGE_NOT_FOUND;
+    protected const ACTIONS = ['createSearchQuery', 'delete', 'getHosts', 'migrate', 'rename', 'uploadSubtitle'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to Subtitle';
+    protected const MESSAGE_FILE_UPLOAD_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_UPLOAD_FAIL;
+    protected const MESSAGE_FILE_UPLOAD_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_FILE_UPLOAD_SUCCESS;
+    protected const MESSAGE_MIGRATE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_MIGRATE_FAIL;
+    protected const MESSAGE_MIGRATE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_MIGRATE_SUCCESS;
+    protected const MESSAGE_NEW_LOCATION_INVALID = \GDPlayer\Modules\AjaxCatalog::MESSAGE_NEW_LOCATION_INVALID;
+    protected const MESSAGE_OLD_LOCATION_EMPTY = \GDPlayer\Modules\AjaxCatalog::MESSAGE_OLD_LOCATION_EMPTY;
+    protected const MESSAGE_RENAME_DUPLICATED = \GDPlayer\Modules\AjaxCatalog::MESSAGE_RENAME_DUPLICATED;
+    protected const MESSAGE_RENAME_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_RENAME_FAIL;
+    protected const MESSAGE_RENAME_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_RENAME_SUCCESS;
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Model\SubtitleManager $subtitleManagerModel;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\ViewSubtitleManager $viewSubtitleManagerModel;
+    protected array $data;
+    protected array $files = [];
+    protected bool $isAdmin = false;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'file_name', 'language', 'name', 'host', 'created', 'updated'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Add a prefix LIKE filter over file name, language, host and name, still scoped to the caller.
+     *
+     * @param string $search term to match; an empty value falls back to the plain owner criteria
+     * @return ViewSubtitleManager the shared view model carrying the criteria
+     */
+    protected function createSearchQuery(string $search = ''): \GDPlayer\Model\ViewSubtitleManager
+    {
+    }
+    /**
+     * Remove the subtitle row, its file on disk and any source rows pointing at it.
+     *
+     * Reports success when at least one of the three steps touched something.
+     * @return string JSON payload with the status message
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * List the distinct host values stored for subtitles; admin only.
+     *
+     * @return string JSON payload carrying the unique host list
+     */
+    protected function getHosts(): string
+    {
+    }
+    /**
+     * Rewrite every subtitle link and manager host from the old location prefix to the new one.
+     *
+     * Both locations must be non-empty URLs and the caller must be an admin.
+     * @return string JSON payload with the status message
+     */
+    protected function migrate(): string
+    {
+    }
+    /**
+     * Rename the subtitle file on disk and mirror the new name into the manager and source rows.
+     *
+     * Refuses overwrites, and reports a dedicated message when the target name already exists.
+     * @return string JSON payload with the status message
+     */
+    protected function rename(): string
+    {
+    }
+    /**
+     * Store an uploaded subtitle file, detect its real mime type and record the metadata row.
+     *
+     * The language label defaults to 'Unknown CC' when the request omits one.
+     * @return string JSON payload with the new subtitle id, language and public URL
+     */
+    protected function uploadSubtitle(): string
     {
     }
     /**
@@ -9827,6 +12643,7 @@ final class SubtitleAjaxController extends \GDPlayer\Modules\AbstractAjaxControl
     {
     }
 }
+
 namespace GDPlayer\Modules\System\Controllers;
 
 /**
@@ -9836,62 +12653,138 @@ namespace GDPlayer\Modules\System\Controllers;
  */
 final class AdminApiController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_CACHE_CLEAR_FAIL = 'The cache failed to clear or does not exist';
+    private const MESSAGE_CACHE_CLEAR_SUCCESS = 'The cache has been cleared successfully';
+    protected const ACTIONS = ['clearLoadBalancer', 'clearVideoCache', 'serverStatus'];
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Model\LoadBalancer $balancerModel;
+    private \GDPlayer\Service\System\SystemInfo $systemInfo;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\VideoSource $videoSourceModel;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Instantiate the models and the system metrics reader.
+     *
+     * @param ServerRequestInterface $request incoming Ajax request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
     {
     }
+    /**
+     * Drop the video sources and cached files of the current load balancer.
+     *
+     * @return string JSON response with the per-area delete flags
+     */
+    protected function clearLoadBalancer(): string
+    {
+    }
+    /**
+     * Drop the sources, player cache and alternative sources of one video.
+     *
+     * @return string JSON response with the per-area delete flags
+     */
+    protected function clearVideoCache(): string
+    {
+    }
+    /**
+     * Return one group of server metrics, cached for the configured timeout.
+     *
+     * @return string JSON response holding the requested metrics
+     */
+    protected function serverStatus(): string
+    {
+    }
 }
+
 /**
  * Endpoint /clear-cache (token admin): balas 'ok'/'fail'.
  */
 final class CacheController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Endpoint /cron-proxy: validate the proxy list, admin only. JSON reply.
  */
 final class CronProxyController extends \GDPlayer\View\AbstractView
 {
+    private const PROXY_DISABLED = 'The proxy is disabled.';
+    private const STATUS_OK = 'The proxies has been successfully validated and can be used.';
+    private const UNAUTHORIZED = 'You are not authorized to access this page!';
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * Page /administrator/403 (backend layout).
  */
 final class ForbiddenController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
 }
+
 /**
  * GET /health-check — metrik ringkas server (koneksi aktif, load, memori).
  */
 final class HealthController
 {
     /**
-     * @return \Psr\Http\Message\ResponseInterface JSON metrik
+     * @return ResponseInterface JSON metrik
      */
     public function index(): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
- * Eksekusi berkas/query migrasi dan pengaturan koneksi.
- *
- * Split out of `MigrationController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrationController` through this trait.
+ * Endpoint migrasi database web (via `/web-migrate` & `/web-migrate.php`):
+ * view UI + 4 aksi AJAX (prepare, execute_query, execute_files, finish).
  */
-trait MigrationExecuteTrait
+final class MigrationController extends \GDPlayer\View\AbstractView
 {
     /**
      * execute_files action: move the legacy uploads folder, regenerate nginx.conf, clear cache.
      *
-     * @param \GDPlayer\Config\Config $config site configuration
+     * @param Config $config site configuration
      * @param string $tmpQueryFile query holder file
-     * @return \Psr\Http\Message\ResponseInterface JSON response containing the log
+     * @return ResponseInterface JSON response containing the log
      */
     protected function executeFilesAction(\GDPlayer\Config\Config $config, string $tmpQueryFile): \Psr\Http\Message\ResponseInterface
     {
     }
+    /**
+     * execute_query action: run a single migration query by index.
+     *
+     * @param PDO $pdoWrite write connection
+     * @param string $tmpQueryFile query holder file
+     * @return ResponseInterface JSON response
+     */
     protected function executeQueryAction(\PDO $pdoWrite, string $tmpQueryFile): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Build a JSON response for the migration endpoint.
+     *
+     * @param array<string, mixed> $data reply payload
+     * @return ResponseInterface JSON response
+     */
+    protected function jsonResponse(array $data): \Psr\Http\Message\ResponseInterface
     {
     }
     /**
@@ -9905,79 +12798,31 @@ trait MigrationExecuteTrait
     {
     }
     /**
-     * Enable/disable MySQL bulk mode during migration.
+     * prepare action: build every migration query and store the list in the temporary file.
      *
-     * @param \PDO $pdoWrite write connection
-     * @param bool $enable true at start, false when finished
-     * @return void
-     */
-    protected function setMysqlBulkMode(\PDO $pdoWrite, bool $enable): void
-    {
-    }
-    /**
-     * execute_query action: run a single query by index.
-     *
-     * @param string $tmpQueryFile query holder file
      * @param PDO $pdoWrite write connection
+     * @param string $tmpQueryFile query holder file
      * @return ResponseInterface JSON response
-     */
-    /**
-     * Validate the file & query index before execution.
-     *
-     * @param string $tmpQueryFile query holder file
-     * @param int $index requested query index
-     * @return \Psr\Http\Message\ResponseInterface|null error response, or null when valid
-     */
-    protected function validateQueryIndex(string $tmpQueryFile, int $index): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Open the write connection with 4 attempts (100 ms delay starting from the second attempt).
-     *
-     * @return \PDO|null write connection, null when it still fails
-     */
-    protected function writeConnection(): ?\PDO
-    {
-    }
-}
-/**
- * Helper respons JSON dan persiapan aksi migrasi.
- *
- * Split out of `MigrationController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrationController` through this trait.
- */
-trait MigrationResponseTrait
-{
-    /**
-     * @param array<string, mixed> $data reply payload
-     * @return \Psr\Http\Message\ResponseInterface JSON response
-     */
-    protected function jsonResponse(array $data): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * prepare action: assemble every migration query then store it in the temporary file.
-     *
-     * @param \PDO $pdoWrite write connection
-     * @param string $tmpQueryFile query holder file
-     * @return \Psr\Http\Message\ResponseInterface JSON response
      */
     protected function prepareAction(\PDO $pdoWrite, string $tmpQueryFile): \Psr\Http\Message\ResponseInterface
     {
     }
-}
-/**
- * Halaman UI migrasi dan render respons.
- *
- * Split out of `MigrationController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `MigrationController` through this trait.
- */
-trait MigrationViewTrait
-{
     /**
-     * @return string|\Psr\Http\Message\ResponseInterface
+     * Dispatch the migration page: render the UI or run one of its actions.
+     *
+     * @return string|ResponseInterface
      */
     protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Enable/disable MySQL bulk mode during migration.
+     *
+     * @param PDO $pdoWrite write connection
+     * @param bool $enable true at start, false when finished
+     * @return void
+     */
+    protected function setMysqlBulkMode(\PDO $pdoWrite, bool $enable): void
     {
     }
     /**
@@ -9988,34 +12833,44 @@ trait MigrationViewTrait
     protected function uiPage(): string
     {
     }
+    /**
+     * Validate the holder file and the query index before execution.
+     *
+     * @param string $tmpQueryFile query holder file
+     * @param int $index requested query index
+     * @return ResponseInterface|null error response, or null when valid
+     */
+    protected function validateQueryIndex(string $tmpQueryFile, int $index): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Open the write connection with 4 attempts (100 ms delay starting from the second attempt).
+     *
+     * @return PDO|null write connection, null when it still fails
+     */
+    protected function writeConnection(): ?\PDO
+    {
+    }
 }
+
 /**
- * Endpoint migrasi database web (via `/web-migrate` & `/web-migrate.php`):
- * view UI + 4 aksi AJAX (prepare, execute_query, execute_files, finish).
- */
-final class MigrationController extends \GDPlayer\View\AbstractView
-{
-    use \GDPlayer\Modules\System\Controllers\MigrationExecuteTrait;
-    use \GDPlayer\Modules\System\Controllers\MigrationResponseTrait;
-    use \GDPlayer\Modules\System\Controllers\MigrationViewTrait;
-}
-/**
- * Aset UI endpoint migrasi: nama berkas antrean query dan HTML halaman migrasi.
+ * Assets of the migration endpoint UI: the query queue file name and the migration page HTML.
  *
- * Halaman dipecah dua berkas (rule php:S2042) dan dirangkai di sini.
+ * The page is split into two files (rule php:S2042) and reassembled here.
  */
 final class MigrationUi
 {
-    /** Halaman migrasi utuh; `{{FILENAME}}` diganti nama berkas entry point. */
+    /** Whole migration page; `{{FILENAME}}` is replaced by the entry point file name. */
     public const HTML = \GDPlayer\Modules\System\Controllers\MigrationUiHead::HTML . \GDPlayer\Modules\System\Controllers\MigrationUiBody::HTML;
     /** Holder file for the temporary query list (inside public/). */
     public const QUERY_FILE = 'migrate_queries_temp.json';
 }
+
 /**
- * Bagian <body> halaman migrasi (markup + skrip).
+ * <body> section of the migration page (markup and script).
  *
- * Dipisah dari `MigrationUi` (rule php:S2042) agar tiap berkas tetap ramping;
- * halaman utuh dirangkai kembali oleh `MigrationUi::HTML`.
+ * Split out of `MigrationUi` (rule php:S2042) so each file stays slim; the whole
+ * page is reassembled by `MigrationUi::HTML`.
  */
 final class MigrationUiBody
 {
@@ -10081,7 +12936,7 @@ final class MigrationUiBody
                 statusText.innerText = "Step 1/3: Preparing the query...";
     
                 try {
-                    // TAHAP 1: PREPARE
+                    // STEP 1: PREPARE
                     let prepRes = await fetch('?action=prepare');
                     let prepData = await prepRes.json();
     
@@ -10092,7 +12947,7 @@ final class MigrationUiBody
                     const totalQueries = prepData.total;
                     addLog(`Preparation successful. Found ${totalQueries} queries to execute.`);
     
-                    // TAHAP 2: EXECUTE QUERIES (Satu per satu)
+                    // STEP 2: EXECUTE QUERIES (one at a time)
                     for (let i = 0; i < totalQueries; i++) {
                         statusText.innerText = `Step 2/3: Execute database query (${i + 1}/${totalQueries})...`;
     
@@ -10100,7 +12955,7 @@ final class MigrationUiBody
                         let qData = await qRes.json();
     
                         if (qData.status === 'success') {
-                            // Log sukses tidak perlu selalu diprint semuanya agar browser tidak lag, cukup sesekali
+                            // Do not print every success entry, only occasionally, so the browser stays responsive
                             if (i % 10 === 0 || i === totalQueries - 1) {
                                 addLog(`[${i + 1}/${totalQueries}] Query executed successfully.`);
                             }
@@ -10114,7 +12969,7 @@ final class MigrationUiBody
                         progressBar.innerText = percentage + '%';
                     }
     
-                    // TAHAP 3: MIGRATE FILES & CACHE
+                    // STEP 3: MIGRATE FILES & CACHE
                     statusText.innerText = "Step 3/3: Migrating file folders and clearing cache...";
                     addLog("Executing uploads folder move and cache clearing...");
     
@@ -10147,11 +13002,12 @@ final class MigrationUiBody
     
     HTML;
 }
+
 /**
- * Bagian <head> halaman migrasi (meta, style).
+ * Head section of the migration page (meta, styles).
  *
- * Dipisah dari `MigrationUi` (rule php:S2042) agar tiap berkas tetap ramping;
- * halaman utuh dirangkai kembali oleh `MigrationUi::HTML`.
+ * Split out of `MigrationUi` (rule php:S2042) to keep each file lean;
+ * the whole page is reassembled by `MigrationUi::HTML`.
  */
 final class MigrationUiHead
 {
@@ -10269,29 +13125,40 @@ final class MigrationUiHead
     </head>
     HTML;
 }
+
 /**
  * GET /ping — run the background worker then return its JSON status.
  */
 final class PingController
 {
     /**
-     * @return \Psr\Http\Message\ResponseInterface JSON result of Background::run()
+     * @return ResponseInterface JSON result of Background::run()
      */
     public function index(): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 namespace GDPlayer\Modules\Themes\Controllers;
 
 /**
- * Endpoint /administrator/themes/sync: ping (stamp isi folder) & download (kirim ZIP).
+ * Endpoint /administrator/themes/sync: ping (folder contents stamp) & download (send ZIP).
  *
- * Arsip dinamai `<folder>-<stamp>.zip`, jadi isi yang tidak berubah tidak pernah dibangun
- * ulang dan tidak pernah ditimpa saat sedang dikirim ke server lain.
+ * The archive is named `<folder>-<stamp>.zip`, so unchanged contents are never rebuilt
+ * and never overwritten while being sent to another server.
  */
 final class ThemeSyncController extends \GDPlayer\View\AbstractView
 {
+    /** @var string[] */
+    private const ACTIONS = ['ping', 'download'];
+    /**
+     * @return ResponseInterface
+     */
+    protected function render(): \Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Users\Controllers;
 
 /**
@@ -10299,7 +13166,14 @@ namespace GDPlayer\Modules\Users\Controllers;
  */
 final class ProfileController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 /**
  * User management endpoint (list, create, edit, delete, password).
  *
@@ -10307,10 +13181,78 @@ final class ProfileController extends \GDPlayer\View\AbstractView
  */
 final class UserAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_DELETE_FAIL = 'The user failed to delete';
+    private const MESSAGE_DELETE_SUCCESS = 'The user has been successfully deleted';
+    private const MESSAGE_EMAIL_EMPTY = 'Email address is required';
+    private const MESSAGE_EMAIL_SEND_FAILED = 'Failed to send confirmation email';
+    private const MESSAGE_EMAIL_SENT = 'The confirmation email has been successfully sent';
+    private const MESSAGE_EMAIL_UPDATE_FAIL = 'The email address failed to update';
+    private const MESSAGE_EMAIL_UPDATE_SUCCESS = 'The email address has been successfully updated. Please re-login';
+    private const MESSAGE_EMAIL_USED = 'The email address is already in use by another user';
+    private const MESSAGE_USERNAME_EMPTY = 'Username is required';
+    private const MESSAGE_USERNAME_UPDATE_FAIL = 'The username failed to update';
+    private const MESSAGE_USERNAME_UPDATE_SUCCESS = 'The username has been successfully updated. Please re-login';
+    private const MESSAGE_USERNAME_USED = 'The username is already in use by another user';
+    private const MESSAGE_USER_ID_EMPTY = 'User ID is required';
+    private const MESSAGE_USER_NOT_EXISTS = 'User ID does not exists';
+    protected const ACTIONS = ['createSearchQuery', 'delete', 'editEmail', 'editUsername', 'sendConfirmationEmail'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Non-admin access denied to User';
+    protected const REQUIRE_ADMIN = true;
+    protected const REQUIRE_LOGIN = false;
+    private \GDPlayer\Service\Login $loginService;
+    private \GDPlayer\External\Mailer $mailer;
+    private \GDPlayer\Model\User $userModel;
+    private \GDPlayer\Model\ViewUser $viewUserModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['name', 'user', 'email', 'status', 'created', 'updated', 'role', 'videos', 'id'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Initialise the models and services used by the user actions.
+     *
+     * @param ServerRequestInterface $request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Apply the DataTables search term to the user view model.
+     *
+     * @param string $search Prefix matched against e-mail, username and name
+     * @return ViewUser Configured view model
+     */
+    protected function createSearchQuery(string $search = ''): \GDPlayer\Model\ViewUser
+    {
+    }
+    /**
+     * Delete the user referenced by the request ID.
+     *
+     * @return string JSON response
+     */
+    protected function delete(): string
+    {
+    }
+    /**
+     * Change the e-mail address of the logged-in user and force a re-login.
+     *
+     * @return string JSON response
+     */
+    protected function editEmail(): string
+    {
+    }
+    /**
+     * Change the username of the logged-in user and force a re-login.
+     *
+     * @return string JSON response
+     */
+    protected function editUsername(): string
+    {
+    }
+    /**
+     * Send a confirmation e-mail to the user referenced by the request ID.
+     *
+     * @return string JSON response
+     */
+    protected function sendConfirmationEmail(): string
     {
     }
     /**
@@ -10322,6 +13264,7 @@ final class UserAjaxController extends \GDPlayer\Modules\AbstractAjaxController
     {
     }
 }
+
 /**
  * User pages (admin only): list, new, edit, sessions.
  *
@@ -10329,7 +13272,14 @@ final class UserAjaxController extends \GDPlayer\Modules\AbstractAjaxController
  */
 final class UserController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
 }
+
 namespace GDPlayer\Modules\Videos\Controllers;
 
 /**
@@ -10339,16 +13289,55 @@ namespace GDPlayer\Modules\Videos\Controllers;
  */
 final class DmcaController extends \GDPlayer\View\AbstractView
 {
-}
-/**
- * Rename massal dan penyusunan judul hasil proses.
- *
- * Split out of `VideoAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoAjaxController` through this trait.
- */
-trait VideoBulkActionTrait
-{
     /**
+     * @return string
+     */
+    protected function render(): string
+    {
+    }
+}
+
+/**
+ * Video management endpoint (list, create, edit, delete, bulk actions).
+ *
+ * Replacement for Ajax\VideoAjax (actions run by AbstractAjaxController, no ReflectionMethod).
+ */
+class VideoAjaxController extends \GDPlayer\Modules\AbstractAjaxController
+{
+    protected const ACTIONS = ['delete', 'deleteByHostnames', 'dmcaTakedown', 'getAlternatives', 'getServer', 'removePoster', 'rename', 'renameMulti', 'updateStatus', 'deleteSubtitle', 'editSubtitle', 'getSubtitles', 'searchSubtitles'];
+    protected const HAS_LIST = true;
+    protected const LOG_DENIED_ACTION = 'Unauthorized attempt to access Video';
+    protected const MESSAGE_POSTER_REMOVE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_POSTER_REMOVE_FAIL;
+    protected const MESSAGE_POSTER_REMOVE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_POSTER_REMOVE_SUCCESS;
+    protected const MESSAGE_VIDEO_DELETE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_DELETE_FAIL;
+    protected const MESSAGE_VIDEO_DELETE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_DELETE_SUCCESS;
+    protected const MESSAGE_VIDEO_NOT_FOUND = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_NOT_FOUND;
+    protected const MESSAGE_VIDEO_RENAME_EMPTY = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_RENAME_EMPTY;
+    protected const MESSAGE_VIDEO_SAVE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_SAVE_FAIL;
+    protected const MESSAGE_VIDEO_SAVE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_SAVE_SUCCESS;
+    protected const MESSAGE_VIDEO_UPDATE_FAIL = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_UPDATE_FAIL;
+    protected const MESSAGE_VIDEO_UPDATE_SUCCESS = \GDPlayer\Modules\AjaxCatalog::MESSAGE_VIDEO_UPDATE_SUCCESS;
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\External\Maxmind $maxmind;
+    private \GDPlayer\Modules\Videos\Controllers\VideoSubtitleAjaxController $subtitleHandler;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    private \GDPlayer\Model\ViewVideo $viewVideoModel;
+    /** @var string[] $listColumns */
+    protected array $listColumns = ['id', 'title', 'host', 'slug', 'status', 'dmca', 'has_sub', 'views', 'name', 'created', 'updated', 'poster', 'host_id'];
+    /**
+     * Wire the models and the subtitle handler for this request.
+     *
+     * @param ServerRequestInterface $request current request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    /**
+     * Apply prefix, postfix and search/replace to every renamable video row.
+     *
      * @param array<array<string,mixed>> $videoRecords
      * @param string $prefix
      * @param string $postfix
@@ -10359,28 +13348,6 @@ trait VideoBulkActionTrait
     protected function applyBulkRename(array $videoRecords, string $prefix, string $postfix, string $searchPattern, string $replacementPattern): int
     {
     }
-    protected function buildProcessedTitle(string $title, string $prefix, string $postfix, string $searchPattern, string $replacementPattern): string
-    {
-    }
-    /**
-     * @param array<string,mixed> $videoRow
-     * @return bool
-     */
-    protected function isVideoRowRenamable(array $videoRow): bool
-    {
-    }
-    protected function renameMulti(): string
-    {
-    }
-}
-/**
- * Query builder datatable daftar video.
- *
- * Split out of `VideoListTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoListTrait` through this trait.
- */
-trait VideoListQueryTrait
-{
     /**
      * Build paginated list SQL (data + count) sharing the same bound params.
      *
@@ -10390,22 +13357,17 @@ trait VideoListQueryTrait
     protected function buildListQuery(array $datatableQueryParams): array
     {
     }
-}
-/**
- * Video list for the datatable endpoint: columns, query, and row formatting.
- *
- * Split out of `VideoAjaxController` so that class only holds actions
- * (rule: <=20 methods per class). This trait is only used by `VideoAjaxController`;
- * the model and the other properties still belong to the class.
- */
-trait VideoListTrait
-{
-    use \GDPlayer\Modules\Videos\Controllers\VideoListQueryTrait;
     /**
-     * @param array<array<string,mixed>> $list
-     * @return array<array<string,mixed>>
+     * Compose the new title from the prefix, the old title, the postfix and the replacement.
+     *
+     * @param string $title current title
+     * @param string $prefix text prepended to the title
+     * @param string $postfix text appended to the title
+     * @param string $searchPattern substring to replace; an empty value skips the replacement
+     * @param string $replacementPattern replacement for the search pattern
+     * @return string rebuilt title
      */
-    private function createDataList(array $list = []): array
+    protected function buildProcessedTitle(string $title, string $prefix, string $postfix, string $searchPattern, string $replacementPattern): string
     {
     }
     /**
@@ -10415,107 +13377,122 @@ trait VideoListTrait
     protected static function createSearchTitle(string $title = ''): array
     {
     }
-}
-/**
- * Hapus video, DMCA, dan perubahan status.
- *
- * Split out of `VideoAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoAjaxController` through this trait.
- */
-trait VideoModerationTrait
-{
+    /**
+     * Delete the video referenced by the `id` request field.
+     *
+     * @return string JSON AJAX response (not-found, deleted, or failed)
+     */
     protected function delete(): string
     {
     }
+    /**
+     * Delete every video belonging to the `hostnames` request list, for admins only.
+     *
+     * @return string JSON AJAX response (deleted or failed)
+     */
     protected function deleteByHostnames(): string
     {
     }
-    protected function dmcaTakedown(): string
-    {
-    }
-    protected function updateStatus(): string
-    {
-    }
-}
-/**
- * Pengambilan server stream dan penghapusan poster.
- *
- * Split out of `VideoAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoAjaxController` through this trait.
- */
-trait VideoServerActionTrait
-{
-    protected function getServer(): string
-    {
-    }
-    protected function removePoster(): string
-    {
-    }
-}
-/**
- * Aksi subtitle & alternatif pada daftar video.
- *
- * Split out of `VideoAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoAjaxController` through this trait.
- */
-trait VideoSubtitleActionTrait
-{
+    /**
+     * Delete a subtitle attached to a video.
+     *
+     * @return string JSON response produced by the subtitle handler
+     */
     protected function deleteSubtitle(): string
     {
     }
+    /**
+     * Apply the `takedown` flag to the DMCA state of the video referenced by `id`.
+     *
+     * @return string JSON AJAX response (updated or failed)
+     */
+    protected function dmcaTakedown(): string
+    {
+    }
+    /**
+     * Update the text or timing of an existing subtitle.
+     *
+     * @return string JSON response produced by the subtitle handler
+     */
     protected function editSubtitle(): string
     {
     }
+    /**
+     * List the download links of the primary source and every alternative source.
+     *
+     * @return string JSON response holding the source list, or an error when the video is missing
+     */
     protected function getAlternatives(): string
     {
     }
+    /**
+     * Resolve the streaming API endpoint and encrypted payload for one video.
+     *
+     * Accepts a numeric video id (ownership looked up in the database) or a media URL (host and id
+     * extracted by {@see Hosting}). Returns the load-balancer API URL plus the encrypted payload and HMAC
+     * parameters the player must send.
+     *
+     * @return string JSON response carrying `url`, `payload` and the HMAC fields
+     */
+    protected function getServer(): string
+    {
+    }
+    /**
+     * List the subtitles stored for a video.
+     *
+     * @return string JSON response produced by the subtitle handler
+     */
     protected function getSubtitles(): string
     {
     }
-    protected function searchSubtitles(): string
-    {
-    }
-}
-/**
- * Video management endpoint (list, create, edit, delete, bulk actions).
- *
- * Replacement for Ajax\VideoAjax (actions run by AbstractAjaxController, no ReflectionMethod).
- */
-class VideoAjaxController extends \GDPlayer\Modules\AbstractAjaxController
-{
-    use \GDPlayer\Modules\Videos\Controllers\VideoBulkActionTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoListTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoModerationTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoServerActionTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoSubtitleActionTrait;
-    protected const ACTIONS = ['delete', 'deleteByHostnames', 'dmcaTakedown', 'getAlternatives', 'getServer', 'removePoster', 'rename', 'renameMulti', 'updateStatus', 'deleteSubtitle', 'editSubtitle', 'getSubtitles', 'searchSubtitles'];
-    protected const HAS_LIST = true;
-    protected const LOG_DENIED_ACTION = 'Unauthorized attempt to access Video';
-    protected const MESSAGE_POSTER_REMOVE_FAIL = 'The poster failed to remove';
-    protected const MESSAGE_POSTER_REMOVE_SUCCESS = 'The poster has been successfully removed';
-    protected const MESSAGE_VIDEO_DELETE_FAIL = 'The video failed to delete';
-    protected const MESSAGE_VIDEO_DELETE_SUCCESS = 'The video has been successfully deleted';
-    protected const MESSAGE_VIDEO_NOT_FOUND = 'The video was not found';
-    protected const MESSAGE_VIDEO_RENAME_EMPTY = 'The video title is invalid';
-    protected const MESSAGE_VIDEO_SAVE_FAIL = 'The new video failed to save';
-    protected const MESSAGE_VIDEO_SAVE_SUCCESS = 'The new video has been saved successfully';
-    protected const MESSAGE_VIDEO_UPDATE_FAIL = 'The video failed to update';
-    protected const MESSAGE_VIDEO_UPDATE_SUCCESS = 'The video has been successfully updated';
-    protected const REQUIRE_ADMIN = false;
-    protected const REQUIRE_LOGIN = true;
-    /** @var string[] $listColumns */
-    protected array $listColumns = ['id', 'title', 'host', 'slug', 'status', 'dmca', 'has_sub', 'views', 'name', 'created', 'updated', 'poster', 'host_id'];
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Clear a video poster, deleting the local file when it is not a remote URL.
+     *
+     * @return string JSON response with the removal status
      */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    protected function removePoster(): string
     {
     }
+    /**
+     * Rename a single video from the `name` input.
+     *
+     * An empty title or an id below one is rejected before any write; the row is
+     * only touched when `id`, `title` and `updated` actually change.
+     *
+     * @return string JSON response with the outcome and message
+     */
     protected function rename(): string
     {
     }
     /**
+     * Rename the videos named by the posted id list.
+     *
+     * @return string JSON response describing the outcome
+     */
+    protected function renameMulti(): string
+    {
+    }
+    /**
+     * Search the subtitle provider for candidate subtitles.
+     *
+     * @return string JSON response produced by the subtitle handler
+     */
+    protected function searchSubtitles(): string
+    {
+    }
+    /**
+     * Set the video status from the `id` request field: disabled when it has no sources.
+     *
+     * @return string JSON AJAX response (not-found, saved, or failed)
+     */
+    protected function updateStatus(): string
+    {
+    }
+    /**
      * Return the DataTables JSON payload for the entity list.
+     *
+     * Sorting falls back to `updated desc` when the client sends no order, and
+     * only `ASC`/`DESC` survive sanitisation.
      *
      * @return string JSON response
      */
@@ -10523,143 +13500,11 @@ class VideoAjaxController extends \GDPlayer\Modules\AbstractAjaxController
     {
     }
 }
+
 /**
- * Pembuatan video baru dan halaman form-nya.
- *
- * Split out of `VideoController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoController` through this trait.
+ * Pages videos/list.php, videos/subtitles.php, videos/new.php, videos/edit.php.
  */
-trait VideoCreateTrait
-{
-    /**
-     * Store a new video from the form (POST branch of the new page).
-     *
-     * @param array<string, mixed> $body form data
-     * @param array<string, mixed>|null $userLogin logged-in user passed from newPage(), null for guests
-     * @return \Psr\Http\Message\ResponseInterface redirect response with the save result
-     */
-    protected function createVideo(array $body, string $requestUri, ?array $userLogin, \GDPlayer\Core\Hosting\Hosting $hostingService, \GDPlayer\Model\Video $videoModel, \GDPlayer\Model\VideoAlternative $videoAlternativeModel): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Page videos/new.php.
-     *
-     * @return string|\Psr\Http\Message\ResponseInterface
-     */
-    protected function newPage(): string|\Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Render form edit video dan halaman edit.
- *
- * Split out of `VideoController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoController` through this trait.
- */
-trait VideoEditFormTrait
-{
-    /**
-     * Run the video.edit.load plugin hook then print the video edit form.
-     *
-     * @param array{
-     *     video: array<string, mixed>,
-     *     embed_url: string,
-     *     download_url: string,
-     *     lb_url: string,
-     *     hash_id: int
-     * } $editVideo video data
-     * @param array{
-     *     alternatives: array<int, mixed>,
-     *     gdrive_files: array<int, mixed>,
-     *     direct_urls: array<int, mixed>
-     * } $editSources source data
-     * @return string edit form markup
-     */
-    protected function renderEditForm(array $editVideo, array $editSources, int $videoId, \GDPlayer\Config\Config $configModel): string
-    {
-    }
-    /**
-     * Branch GET halaman edit: guard kepemilikan/DMCA lalu render form.
-     *
-     * @param array<string, mixed> $queryParams query string request
-     * @return string|\Psr\Http\Message\ResponseInterface halaman, atau response 403/DMCA/404
-     */
-    protected function renderEditPage(array $queryParams, \GDPlayer\Core\Hosting\Hosting $hostingService, \GDPlayer\Model\Video $videoModel, \GDPlayer\Model\VideoAlternative $videoAlternativeModel, \GDPlayer\Model\Subtitle $subtitleModel): string|\Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Guard & entri halaman edit video.
- *
- * Split out of `VideoController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoController` through this trait.
- */
-trait VideoEditPageTrait
-{
-    /**
-     * Page videos/edit.php.
-     *
-     * @return string|\Psr\Http\Message\ResponseInterface
-     */
-    protected function editPage(): string|\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Edit page guard: 404 when the video is missing, DMCA page when a member opens a DMCA video.
-     *
-     * @param array<string, mixed> $dataVideo video row from the query
-     * @return string|\Psr\Http\Message\ResponseInterface|null response/page, or null when execution may continue
-     */
-    protected function editPageGuard(array $dataVideo): string|\Psr\Http\Message\ResponseInterface|null
-    {
-    }
-}
-/**
- * Helper kecil: badge telemetri, poster, urutan subtitle.
- *
- * Split out of `VideoController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoController` through this trait.
- */
-trait VideoHelperTrait
-{
-    /**
-     * Simpan ulang urutan subtitle lama sesuai payload `subs`.
-     *
-     * @param mixed $subs daftar id subtitle berurutan
-     * @param \GDPlayer\Model\Subtitle $subtitleModel model subtitle
-     * @param int $time timestamp update
-     */
-    protected function reorderSubtitles(mixed $subs, \GDPlayer\Model\Subtitle $subtitleModel, int $time): void
-    {
-    }
-    /**
-     * Poster hasil upload/link baru, atau poster lama bila tidak ada perubahan.
-     *
-     * @param array<string, mixed> $body form data
-     * @param string $oldPoster poster yang tersimpan
-     * @return string nama file/URL poster terpilih
-     */
-    protected function resolvePosterValue(array $body, string $oldPoster): string
-    {
-    }
-    /**
-     * Bootstrap badge class based on the stability score & success rate.
-     *
-     * @param float $score stability score 0..100
-     * @param float $rate success rate 0..100
-     * @return string badge class
-     */
-    protected function telemetryBadge(float $score, float $rate): string
-    {
-    }
-}
-/**
- * Penyusunan URL langsung, mirror GDrive, dan host telemetri.
- *
- * Split out of `VideoController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoController` through this trait.
- */
-trait VideoSourceTrait
+final class VideoController extends \GDPlayer\View\AbstractView
 {
     /**
      * Build the direct URL (mp4/hls/mpd) of the main video then of every alternative source.
@@ -10689,19 +13534,45 @@ trait VideoSourceTrait
     protected function buildTelemetryHosts(array $telemetryRaw): array
     {
     }
-}
-/**
- * Pembaruan data video dan alternatifnya.
- *
- * Split out of `VideoController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoController` through this trait.
- */
-trait VideoUpdateTrait
-{
+    /**
+     * Store a new video from the form (POST branch of the new page).
+     *
+     * The slug comes from the form or a random suffix; the poster is taken from
+     * the uploaded file first and the `poster-url` field second.
+     *
+     * @param array<string, mixed> $body form data
+     * @param string $requestUri request target used as the redirect fallback
+     * @param array<string, mixed>|null $userLogin logged-in user passed from newPage(), null for guests
+     * @return ResponseInterface redirect response with the save result
+     */
+    protected function createVideo(array $body, string $requestUri, ?array $userLogin, \GDPlayer\Core\Hosting\Hosting $hostingService, \GDPlayer\Model\Video $videoModel, \GDPlayer\Model\VideoAlternative $videoAlternativeModel): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Page videos/edit.php.
+     *
+     * @return string|ResponseInterface
+     */
+    protected function editPage(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Edit page guard: 404 when the video is missing, DMCA page when a member opens a DMCA video.
+     *
+     * @param array<string, mixed> $dataVideo video row from the query
+     * @return string|ResponseInterface|null response/page, or null when execution may continue
+     */
+    protected function editPageGuard(array $dataVideo): string|\Psr\Http\Message\ResponseInterface|null
+    {
+    }
     /**
      * Fetch the Google Drive mirrors of the main video and the alternative source list.
      *
-     * @param array<string, mixed> $dataVideo video from editVideoData()
+     * @param array<string, mixed> $dataVideo video row from {@see editVideoData()}
+     * @param int $videoId video id whose alternatives are loaded
+     * @param Hosting $hostingService host service resolving the download link of each alternative
+     * @param VideoAlternative $videoAlternativeModel alternative model
+     * @param GDriveMirror $gdriveMirrorModel mirror model
      * @return array{alternatives: array<int, mixed>, gdrive_files: array<int, mixed>}
      */
     protected function editVideoAlternatives(array $dataVideo, int $videoId, \GDPlayer\Core\Hosting\Hosting $hostingService, \GDPlayer\Model\VideoAlternative $videoAlternativeModel, \GDPlayer\Model\GDriveMirror $gdriveMirrorModel): array
@@ -10723,27 +13594,102 @@ trait VideoUpdateTrait
     {
     }
     /**
+     * Video row ownership: admin is unrestricted, other users only their own rows (prevents IDOR).
+     *
+     * @param int $videoId primary key video
+     * @return bool true when the request may touch this row
+     */
+    protected function isVideoOwner(int $videoId): bool
+    {
+    }
+    /**
+     * Render the new-video form, or delegate to createVideo() on a POST body.
+     *
+     * Guests get a 401 page instead of the form.
+     *
+     * @return string|ResponseInterface
+     */
+    protected function newPage(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * @return string|ResponseInterface
+     */
+    protected function render(): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Run the video.edit.load plugin hook then print the video edit form.
+     *
+     * @param array{
+     *     video: array<string, mixed>,
+     *     embed_url: string,
+     *     download_url: string,
+     *     lb_url: string,
+     *     hash_id: int
+     * } $editVideo video data
+     * @param array{
+     *     alternatives: array<int, mixed>,
+     *     gdrive_files: array<int, mixed>,
+     *     direct_urls: array<int, mixed>
+     * } $editSources source data
+     * @param int $videoId video being edited
+     * @param Config $configModel configuration used for the direct-link switch
+     * @return string edit form markup
+     */
+    protected function renderEditForm(array $editVideo, array $editSources, int $videoId, \GDPlayer\Config\Config $configModel): string
+    {
+    }
+    /**
+     * GET branch of the edit page: run the ownership/DMCA guard, then render the form.
+     *
+     * @param array<string, mixed> $queryParams query string request
+     * @return string|ResponseInterface page markup, or a 403/DMCA/404 response
+     */
+    protected function renderEditPage(array $queryParams, \GDPlayer\Core\Hosting\Hosting $hostingService, \GDPlayer\Model\Video $videoModel, \GDPlayer\Model\VideoAlternative $videoAlternativeModel, \GDPlayer\Model\Subtitle $subtitleModel): string|\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Rewrite the stored subtitle order to match the `subs` payload.
+     *
+     * @param mixed $subs ordered subtitle ids
+     * @param Subtitle $subtitleModel subtitle model
+     * @param int $time update timestamp
+     */
+    protected function reorderSubtitles(mixed $subs, \GDPlayer\Model\Subtitle $subtitleModel, int $time): void
+    {
+    }
+    /**
+     * Pick the new poster from the upload or the URL field, else keep the stored one.
+     *
+     * @param array<string, mixed> $body form data
+     * @param string $oldPoster currently stored poster
+     * @return string file name or URL of the chosen poster
+     */
+    protected function resolvePosterValue(array $body, string $oldPoster): string
+    {
+    }
+    /**
+     * Bootstrap badge class based on the stability score & success rate.
+     *
+     * @param float $score Stability score 0..100.
+     * @param float $rate Success rate 0..100.
+     * @return string bootstrap badge class
+     */
+    protected function telemetryBadge(float $score, float $rate): string
+    {
+    }
+    /**
      * Save video changes from the edit form (POST branch).
      *
      * @param array<string, mixed> $body form data
-     * @return \Psr\Http\Message\ResponseInterface redirect response with the save result
+     * @return ResponseInterface redirect response with the save result
      */
     protected function updateVideo(array $body, string $requestUri, \GDPlayer\Core\Hosting\Hosting $hostingService, \GDPlayer\Model\Video $videoModel, \GDPlayer\Model\VideoAlternative $videoAlternativeModel, \GDPlayer\Model\Subtitle $subtitleModel): \Psr\Http\Message\ResponseInterface
     {
     }
 }
-/**
- * Pages videos/list.php, videos/subtitles.php, videos/new.php, videos/edit.php.
- */
-final class VideoController extends \GDPlayer\View\AbstractView
-{
-    use \GDPlayer\Modules\Videos\Controllers\VideoCreateTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoEditFormTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoEditPageTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoHelperTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoSourceTrait;
-    use \GDPlayer\Modules\Videos\Controllers\VideoUpdateTrait;
-}
+
 /**
  * Video export endpoint (generate and download export files).
  *
@@ -10751,22 +13697,82 @@ final class VideoController extends \GDPlayer\View\AbstractView
  */
 final class VideoExportAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_VIDEO_EXPORT_FAIL = 'Video list failed to export';
+    private const MESSAGE_VIDEO_EXPORT_SUCCESS = 'The video list has been exported successfully';
+    protected const ACTIONS = ['exportAsCSV'];
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Instantiate the models and the hosting helper used by the CSV export.
+     *
+     * @param ServerRequestInterface $request incoming Ajax request
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
     {
     }
-}
-/**
- * Normalisasi & validasi baris CSV impor video.
- *
- * Split out of `VideoImportAjaxController` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `VideoImportAjaxController` through this trait.
- */
-trait VideoImportRowTrait
-{
     /**
+     * Export the posted video ids to a timestamped CSV file and return its URL.
+     *
+     * @return string JSON response carrying the public CSV URL
+     */
+    protected function exportAsCSV(): string
+    {
+    }
+}
+
+/**
+ * Video import endpoint (batched CSV row import and validation).
+ *
+ * Replacement for Ajax\VideoImportAjax (actions run by AbstractAjaxController, no ReflectionMethod).
+ */
+final class VideoImportAjaxController extends \GDPlayer\Modules\AbstractAjaxController
+{
+    private const MESSAGE_VIDEO_IMPORT_FAIL = 'New video list failed to import';
+    private const MESSAGE_VIDEO_IMPORT_SUCCESS = 'The new video list has been successfully imported';
+    protected const ACTIONS = ['importVideosBatch'];
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Core\Hosting\Hosting $hosting;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
+    private \GDPlayer\Model\VideoAlternative $videoAlternativeModel;
+    private \GDPlayer\Model\Video $videoModel;
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
+    {
+    }
+    // -------------------------------------------------------------------------
+    // Action handlers
+    // -------------------------------------------------------------------------
+    /**
+     * Receives a JSON batch of up to 250 pre-parsed video rows from the frontend,
+     * persists them to the database, and returns the inserted rows for the DataTable.
+     *
+     * POST body (JSON-encoded field "rows"):
+     * [
+     *   {
+     *     "title":     string,
+     *     "videos":    string[],          // [0] = main URL, [1..n] = alternatives
+     *     "subtitles": [{url, label}],    // already fetched/expanded by frontend
+     *     "poster":    string,
+     *     "slug":      string
+     *   },
+     *   ...
+     * ]
+     *
+     * @return string
+     */
+    protected function importVideosBatch(): string
+    {
+    }
+    /**
+     * Keep the usable subtitle entries of an import row, defaulting the label.
+     *
      * @param mixed $rawSubtitles
      * @return list<array{url:string,label:string}>
      */
@@ -10774,6 +13780,8 @@ trait VideoImportRowTrait
     {
     }
     /**
+     * Keep the non-empty video URLs of an import row.
+     *
      * @param mixed $rawVideos
      * @return list<string>
      */
@@ -10790,28 +13798,16 @@ trait VideoImportRowTrait
     {
     }
     /**
-     * @param array<string, mixed> $row
-     * @return array<string, mixed>
+     * Normalise an import row, or reject it when it holds no usable video URL.
+     *
+     * @param array<mixed, mixed> $row
+     * @return array<string, mixed> normalised row, or null when the row has no video
      */
     protected static function validateImportRow(array $row): ?array
     {
     }
 }
-/**
- * Video import endpoint (batched CSV row import and validation).
- *
- * Replacement for Ajax\VideoImportAjax (actions run by AbstractAjaxController, no ReflectionMethod).
- */
-final class VideoImportAjaxController extends \GDPlayer\Modules\AbstractAjaxController
-{
-    use \GDPlayer\Modules\Videos\Controllers\VideoImportRowTrait;
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
-    {
-    }
-}
+
 /**
  * Video subtitle endpoint (list, edit, upload, delete per video).
  *
@@ -10819,88 +13815,115 @@ final class VideoImportAjaxController extends \GDPlayer\Modules\AbstractAjaxCont
  */
 final class VideoSubtitleAjaxController extends \GDPlayer\Modules\AbstractAjaxController
 {
+    private const MESSAGE_SUBTITLE_DELETE_FAIL = 'The subtitle failed to remove';
+    private const MESSAGE_SUBTITLE_DELETE_SUCCESS = 'The subtitle has been successfully removed';
+    private const MESSAGE_SUBTITLE_NOT_FOUND = 'The subtitle was not found';
+    private const MESSAGE_SUBTITLE_UPDATE_FAIL = 'The subtitle file failed to update';
+    private const MESSAGE_SUBTITLE_UPDATE_SUCCESS = 'The subtitle file has been successfully updated';
+    private const MESSAGE_SUBTITLE_UPLOAD_FAIL = 'The subtitle file failed to upload';
+    private const MESSAGE_SUBTITLE_UPLOAD_SUCCESS = 'The subtitle file has been successfully uploaded';
+    protected const ACTIONS = ['deleteSubtitle', 'editSubtitle', 'getSubtitles', 'searchSubtitles'];
+    protected const REQUIRE_ADMIN = false;
+    protected const REQUIRE_LOGIN = true;
+    private \GDPlayer\Model\SubtitleManager $subtitleManagerModel;
+    private \GDPlayer\Model\Subtitle $subtitleModel;
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * Bind the subtitle models to the incoming ajax request.
+     *
+     * @param ServerRequestInterface $request
      * @return string
      */
     public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request)
     {
     }
+    /**
+     * Delete the subtitle row identified by the `id` request field.
+     *
+     * @return string JSON response describing the outcome
+     */
     public function deleteSubtitle(): string
     {
     }
+    /**
+     * Replace a subtitle link from an uploaded file or a validated URL.
+     *
+     * @return string JSON response describing the outcome
+     */
     public function editSubtitle(): string
     {
     }
+    /**
+     * List the subtitles of a video, repairing legacy encoded links on the way.
+     *
+     * @return string JSON response holding name/url pairs
+     */
     public function getSubtitles(): string
     {
     }
+    /**
+     * Search the subtitle manager table, scoped to the current user unless admin.
+     *
+     * @return string JSON response holding up to ten id/label/value suggestions
+     */
     public function searchSubtitles(): string
     {
     }
 }
+
 namespace GDPlayer\Presentation;
 
-/**
- * Alert admin: pembuatan, redirect, dan tampilan.
- *
- * Split out of `HTML` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `HTML` through this trait.
- */
-trait HtmlAlertTrait
-{
-    /**
-     * Response form (without exit) of {@see createAdminAlertRedirect()}.
-     *
-     * @param string $type alert type (success/danger/...)
-     * @param string $message alert message
-     * @param string $url target URL; empty = current request target
-     * @return \Psr\Http\Message\ResponseInterface redirect response + alert cookie
-     */
-    public static function adminAlertRedirectResponse(string $type, string $message, string $url = ''): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    public static function alertBox(string $type = '', string $message = ''): string
-    {
-    }
-    public static function createAdminAlertRedirect(string $type, string $message, string $url = ''): never
-    {
-    }
-    public static function showAdminAlert(string $type = 'info', string $message = ''): string
-    {
-    }
-}
-/**
- * Render template utama (parser placeholder & layout).
- *
- * Split out of `HTML` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `HTML` through this trait.
- */
-trait HtmlRenderTrait
-{
-    /**
-     * @param string $template
-     * @param array<string,mixed> $context
-     * @param bool $frontend
-     * @return string
-     */
-    public static function renderTemplate(string $template, array $context = [], bool $frontend = true): string
-    {
-    }
-}
 /**
  * Twig-based template renderer for the frontend and backend views.
  */
 final class HTML
 {
-    use \GDPlayer\Presentation\HtmlAlertTrait;
-    use \GDPlayer\Presentation\HtmlRenderTrait;
+    /** @var array<string,Environment> */
+    private static array $environments = [];
     /**
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
     {
     }
+    /**
+     * Response form (without exit) of {@see createAdminAlertRedirect()}.
+     *
+     * @param string $type alert type (success/danger/...)
+     * @param string $message alert message
+     * @param string $url target URL; empty = current request target
+     * @return ResponseInterface redirect response + alert cookie
+     */
+    public static function adminAlertRedirectResponse(string $type, string $message, string $url = ''): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Build a Bootstrap alert box, sanitising the message and its attributes.
+     *
+     * @param string $type alert type; unknown values fall back to `primary`
+     * @param string $message message HTML; tags outside the allow list are stripped
+     * @return string rendered alert markup
+     */
+    public static function alertBox(string $type = '', string $message = ''): string
+    {
+    }
+    /**
+     * Store the alert in short-lived cookies and redirect, ending the request.
+     *
+     * @param string $type Alert type (success/danger/...).
+     * @param string $message alert message
+     * @param string $url target URL; empty uses the current request target
+     * @return never
+     */
+    public static function createAdminAlertRedirect(string $type, string $message, string $url = ''): never
+    {
+    }
+    /**
+     * Render the embed iframe, using the configured custom code when present.
+     *
+     * @param string $embedUrl source URL of the embedded page
+     * @param string $title iframe title attribute
+     * @return string HTML markup of the iframe
+     */
     public static function createIframe(string $embedUrl = '', string $title = ''): string
     {
     }
@@ -10913,6 +13936,11 @@ final class HTML
     public static function getCookieParam(string $name): string
     {
     }
+    /**
+     * Return the PSR-7 request bound to the current runtime.
+     *
+     * @return null|ServerRequestInterface active request, null outside a request
+     */
     public static function getRequest(): ?\Psr\Http\Message\ServerRequestInterface
     {
     }
@@ -10934,7 +13962,7 @@ final class HTML
      * to load a .twig file into a variable so it can be included via a variable inside other .twig files
      *
      * @param string $template .twig file location
-     * @return null|\Twig\TemplateWrapper
+     * @return null|TemplateWrapper
      */
     public static function loadTemplate(string $template): ?\Twig\TemplateWrapper
     {
@@ -10946,10 +13974,35 @@ final class HTML
     public static function renderDefaultTemplate(array $context = []): string
     {
     }
+    /**
+     * @param string $template
+     * @param array<string,mixed> $context
+     * @param bool $frontend
+     * @return string
+     */
+    public static function renderTemplate(string $template, array $context = [], bool $frontend = true): string
+    {
+    }
+    /**
+     * Bind the PSR-7 request for the current runtime.
+     *
+     * @param null|ServerRequestInterface $request request to expose to the renderer
+     */
     public static function setRequest(?\Psr\Http\Message\ServerRequestInterface $request): void
     {
     }
+    /**
+     * Render a pending alert from the cookies and clear them.
+     *
+     * @param string $type fallback alert type when no cookie is present
+     * @param string $message fallback message when no cookie is present
+     * @return string rendered alert markup, or an empty string when there is nothing to show
+     */
+    public static function showAdminAlert(string $type = 'info', string $message = ''): string
+    {
+    }
 }
+
 /**
  * View layer helpers for rendering pages and dispatching Ajax controllers.
  */
@@ -10977,8 +14030,8 @@ class Views
     }
     /**
      * @param string[] $uri
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface|null Ajax controller response; null on failure (already logged)
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface|null Ajax controller response; null on failure (already logged)
      */
     public static function loadAjax(array $uri, \Psr\Http\Message\ServerRequestInterface $request): ?\Psr\Http\Message\ResponseInterface
     {
@@ -11016,297 +14069,50 @@ class Views
     {
     }
 }
+
 namespace GDPlayer\Routing;
 
 /**
- * Data tabel rute Ajax (modul REST dan modul publik).
+ * Ajax route table data (REST modules and public modules).
  *
- * Dipisah dari `RouteTable` (rule php:S2042): datanya besar, perilakunya nol.
+ * Split out of `RouteTable` (rule php:S2042): large data, no behaviour.
  */
 final class AjaxRouteTable
 {
-    /** Modul Ajax tanpa guard login (endpoint publik): middleware auth dilewati. */
+    /** Ajax modules with no login guard (public endpoints): the auth middleware is skipped. */
     public const AJAX_PUBLIC_MODULES = ['/administrator/ajax/public'];
     /**
-     * Grup Ajax yang sudah punya rute REST: prefix => [class, daftar action, punya list?].
+     * Ajax groups that already expose REST routes: prefix => [class, action list, has list?].
      *
-     * `list` (DataTables) tersedia lewat GET `<prefix>/list` bila kelasnya meng-override `list()`.
+     * `list` (DataTables) is served through GET `<prefix>/list` when the class overrides `list()`.
      *
      * @var array<string, array{0: class-string<AbstractAjaxController>, 1: string[], 2: bool}>
      */
-    public const AJAX_REST_MODULES = ['/administrator/ajax/admin-api' => [\GDPlayer\Modules\System\Controllers\AdminApiController::class, ['clearLoadBalancer', 'clearVideoCache', 'serverStatus'], false], '/administrator/ajax/dashboard' => [\GDPlayer\Modules\Dashboard\Controllers\DashboardAjaxController::class, ['popularASN', 'popularBrowsers', 'popularCountries', 'popularVideos', 'recentVideos', 'serversStatus', 'videosStatus', 'views'], false], '/administrator/ajax/gdrive-accounts' => [\GDPlayer\Modules\GDrive\Controllers\GDriveAccountAjaxController::class, ['delete', 'updateBypass', 'updateStatus'], true], '/administrator/ajax/gdrive-backup-files' => [\GDPlayer\Modules\GDrive\Controllers\GDriveMirrorAjaxController::class, ['delete'], true], '/administrator/ajax/gdrive-backup-queue' => [\GDPlayer\Modules\GDrive\Controllers\GDriveQueueAjaxController::class, ['copy', 'delete'], true], '/administrator/ajax/gdrive-files' => [\GDPlayer\Modules\GDrive\Controllers\GDriveFileAjaxController::class, ['createDataList', 'createNewFolder', 'delete', 'deleteMirror', 'gdriveImport', 'getSharedDrives', 'removeDuplicateFiles', 'removeDuplicateFilesByData', 'renameFileFolder', 'updateStatus'], true], '/administrator/ajax/load-balancers' => [\GDPlayer\Modules\LoadBalancers\Controllers\LoadBalancerAjaxController::class, ['delete', 'updateStatus'], true], '/administrator/ajax/profile' => [\GDPlayer\Modules\Users\Controllers\UserAjaxController::class, ['createSearchQuery', 'delete', 'editEmail', 'editUsername', 'sendConfirmationEmail'], true], '/administrator/ajax/public' => [\GDPlayer\Modules\PublicEndpoint\Controllers\PublicAjaxController::class, ['checkEmail', 'checkUsername', 'clearVideoCache', 'createPlayer', 'gdriveBypassLimit', 'getLoadBalancerList', 'publicValidation', 'saveBulkProcess', 'statCounter'], false], '/administrator/ajax/sessions' => [\GDPlayer\Modules\Sessions\Controllers\SessionAjaxController::class, ['delete'], true], '/administrator/ajax/settings' => [\GDPlayer\Modules\Settings\Controllers\SettingAjaxController::class, ['clearAllCache', 'clearLoadBalancer', 'clearSettingsCache', 'clearVideosCache', 'clearVideosFiles', 'createCustomVast', 'deleteCacheTmpDir', 'deleteCustomVast', 'disableBlacklistedVideos', 'getDependencies', 'hideExtDialog', 'resetHosts', 'saveLicense'], false], '/administrator/ajax/subtitles' => [\GDPlayer\Modules\Subtitles\Controllers\SubtitleAjaxController::class, ['createSearchQuery', 'delete', 'getHosts', 'migrate', 'rename', 'uploadSubtitle'], true], '/administrator/ajax/users' => [\GDPlayer\Modules\Users\Controllers\UserAjaxController::class, ['createSearchQuery', 'delete', 'editEmail', 'editUsername', 'sendConfirmationEmail'], true], '/administrator/ajax/videos' => [\GDPlayer\Modules\Videos\Controllers\VideoAjaxController::class, ['delete', 'deleteByHostnames', 'deleteSubtitle', 'dmcaTakedown', 'editSubtitle', 'getAlternatives', 'getServer', 'getSubtitles', 'removePoster', 'rename', 'renameMulti', 'searchSubtitles', 'updateStatus'], true], '/administrator/ajax/videos-export' => [\GDPlayer\Modules\Videos\Controllers\VideoExportAjaxController::class, ['exportAsCSV'], false], '/administrator/ajax/videos-import' => [\GDPlayer\Modules\Videos\Controllers\VideoImportAjaxController::class, ['importVideosBatch'], false]];
+    public const AJAX_REST_MODULES = ['/administrator/ajax/admin-api' => [\GDPlayer\Modules\System\Controllers\AdminApiController::class, ['clearLoadBalancer', 'clearVideoCache', 'serverStatus'], false], '/administrator/ajax/dashboard' => [\GDPlayer\Modules\Dashboard\Controllers\DashboardAjaxController::class, ['popularASN', 'popularBrowsers', 'popularCountries', 'popularVideos', 'recentVideos', 'serversStatus', 'videosStatus', 'views'], false], '/administrator/ajax/gdrive-accounts' => [\GDPlayer\Modules\GDrive\Controllers\GDriveAccountAjaxController::class, ['delete', 'updateBypass', 'updateStatus'], true], '/administrator/ajax/gdrive-backup-files' => [\GDPlayer\Modules\GDrive\Controllers\GDriveMirrorAjaxController::class, ['delete'], true], '/administrator/ajax/gdrive-backup-queue' => [\GDPlayer\Modules\GDrive\Controllers\GDriveQueueAjaxController::class, ['copy', 'delete'], true], '/administrator/ajax/gdrive-files' => [\GDPlayer\Modules\GDrive\Controllers\GDriveFileAjaxController::class, ['createDataList', 'createNewFolder', 'delete', 'deleteMirror', 'gdriveImport', 'getSharedDrives', 'removeDuplicateFiles', 'removeDuplicateFilesByData', 'renameFileFolder', 'updateStatus'], true], '/administrator/ajax/load-balancers' => [\GDPlayer\Modules\LoadBalancers\Controllers\LoadBalancerAjaxController::class, ['delete', 'updateStatus'], true], '/administrator/ajax/profile' => [\GDPlayer\Modules\Users\Controllers\UserAjaxController::class, ['createSearchQuery', 'delete', 'editEmail', 'editUsername', 'sendConfirmationEmail'], true], '/administrator/ajax/public' => [\GDPlayer\Modules\PublicEndpoint\Controllers\PublicAjaxController::class, ['checkEmail', 'checkUsername', 'clearVideoCache', 'createPlayer', 'gdriveBypassLimit', 'getLoadBalancerList', 'isPublicRequestValid', 'saveBulkProcess', 'statCounter'], false], '/administrator/ajax/sessions' => [\GDPlayer\Modules\Sessions\Controllers\SessionAjaxController::class, ['delete'], true], '/administrator/ajax/settings' => [\GDPlayer\Modules\Settings\Controllers\SettingAjaxController::class, ['clearAllCache', 'clearLoadBalancer', 'clearSettingsCache', 'clearVideosCache', 'clearVideosFiles', 'createCustomVast', 'hasDeletedCacheTmpDir', 'deleteCustomVast', 'disableBlacklistedVideos', 'getDependencies', 'hideExtDialog', 'resetHosts', 'saveLicense'], false], '/administrator/ajax/subtitles' => [\GDPlayer\Modules\Subtitles\Controllers\SubtitleAjaxController::class, ['createSearchQuery', 'delete', 'getHosts', 'migrate', 'rename', 'uploadSubtitle'], true], '/administrator/ajax/users' => [\GDPlayer\Modules\Users\Controllers\UserAjaxController::class, ['createSearchQuery', 'delete', 'editEmail', 'editUsername', 'sendConfirmationEmail'], true], '/administrator/ajax/videos' => [\GDPlayer\Modules\Videos\Controllers\VideoAjaxController::class, ['delete', 'deleteByHostnames', 'deleteSubtitle', 'dmcaTakedown', 'editSubtitle', 'getAlternatives', 'getServer', 'getSubtitles', 'removePoster', 'rename', 'renameMulti', 'searchSubtitles', 'updateStatus'], true], '/administrator/ajax/videos-export' => [\GDPlayer\Modules\Videos\Controllers\VideoExportAjaxController::class, ['exportAsCSV'], false], '/administrator/ajax/videos-import' => [\GDPlayer\Modules\Videos\Controllers\VideoImportAjaxController::class, ['importVideosBatch'], false]];
 }
-namespace GDPlayer\Routing\Middleware;
 
 /**
- * Login required; admin (role 0) for routes that need full rights.
- *
- * Replaces the `Views::adminValidation(); exit;` pattern inside views: middleware returns
- * a 401/403 response, so the request path never kills the worker.
+ * Ajax and view handlers plus route naming utilities.
  */
-final class AdminAuthMiddleware implements \Psr\Http\Server\MiddlewareInterface
-{
-    /**
-     * @param bool $requireAdmin true: role 0 only; false: login is enough
-     */
-    public function __construct(private readonly bool $requireAdmin = true)
-    {
-    }
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
-     * @param \Psr\Http\Server\RequestHandlerInterface $handler next handler
-     * @return \Psr\Http\Message\ResponseInterface 401/403 when unauthorised, otherwise the handler response
-     */
-    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Ajax route guard: JSON 401/403 replies (not an error page), matching Ajax endpoint behaviour.
- *
- * This middleware is used only by new REST routes; legacy URL aliases still go through the guard inside
- * controllers so the reply shape (200 + JSON) stays unchanged.
- */
-final class AjaxAuthMiddleware implements \Psr\Http\Server\MiddlewareInterface
-{
-    /**
-     * @param bool $requireAdmin true: role 0 only; false: login is enough
-     */
-    public function __construct(private readonly bool $requireAdmin = true)
-    {
-    }
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
-     * @param \Psr\Http\Server\RequestHandlerInterface $handler next handler
-     * @return \Psr\Http\Message\ResponseInterface 401/403 JSON when unauthorised, otherwise the handler response
-     */
-    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * CORS headers for every Ajax endpoint (one place, not per controller).
- *
- * Header values match what Helper\AjaxHelper::handle() used to send (origin from the
- * main_site configuration, or '*' when validation is disabled).
- */
-final class AjaxCorsMiddleware implements \Psr\Http\Server\MiddlewareInterface
-{
-    /**
-     * Apply CORS headers to an Ajax response (also used by legacy URL aliases).
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response base response
-     * @return \Psr\Http\Message\ResponseInterface response with CORS headers
-     */
-    public static function apply(\Psr\Http\Message\ResponseInterface $response): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
-     * @param \Psr\Http\Server\RequestHandlerInterface $handler next handler
-     * @return \Psr\Http\Message\ResponseInterface response with CORS headers
-     */
-    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-namespace GDPlayer\Routing;
-
-/**
- * Dispatch internal: AJAX backend/frontend, router-owned path, dan fallback miss.
- *
- * Split out of `RouteRegistry` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `RouteRegistry` through this trait.
- */
-trait RouteDispatchTrait
-{
-    /**
-     * Legacy Ajax URL alias (/administrator/ajax/<slug> + `action` payload) for modules that
-     * have moved: dispatched through the new controller, no ReflectionMethod.
-     *
-     * @param string[] $ajaxUri path segments starting at 'ajax'
-     * @return \Psr\Http\Message\ResponseInterface|null response when the new controller served the request
-     */
-    protected function dispatchAjaxAlias(array $ajaxUri): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Lempar request ke router bila path ini milik router.
-     *
-     * @param string $path path relatif terhadap BASE_URL
-     * @return \Psr\Http\Message\ResponseInterface|null respons router; null bila path bukan milik router
-     */
-    protected function dispatchRouterOwned(string $path): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Backend Ajax branch: reject when not logged in (except public modules), then the new controller alias,
-     * last the old view path.
-     *
-     * @param string[] $uri path segments (first segment 'administrator')
-     */
-    protected function handleBackendAjax(array $uri): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Frontend Ajax branch: new controller alias when present, otherwise the old view path.
-     *
-     * @param string[] $uri path segments starting at 'ajax'
-     */
-    protected function handleFrontendAjax(array $uri): ?\Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Response when the router finds no route (404) or the method does not match (405).
-     *
-     * The Ajax area answers JSON (Ajax reply shape), otherwise a normal error page.
-     *
-     * @param int $status HTTP status (404/405)
-     * @return \Psr\Http\Message\ResponseInterface ready-to-send response
-     */
-    protected function missResponse(int $status): \Psr\Http\Message\ResponseInterface
-    {
-    }
-}
-/**
- * Registrasi rute frontend, media, dan view.
- *
- * Split out of `RouteRegistrationTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `RouteRegistrationTrait` through this trait.
- */
-trait RouteFrontendRegistrationTrait
-{
-    public static function registerFrontendEndpointRoutes(\GDPlayer\Routing\Router $router): void
-    {
-    }
-    public static function registerFrontendPageRoutes(\GDPlayer\Routing\Router $router, \GDPlayer\Routing\Middleware\AdminAuthMiddleware $adminOnly): void
-    {
-    }
-    public static function registerMediaRoutes(\GDPlayer\Routing\Router $router): void
-    {
-    }
-    /**
-     * Backend page rows: GET+POST per row (the old view serves POST on the same path).
-     *
-     * @param list<array{0: string, 1: class-string<\GDPlayer\View\AbstractView>, 2: string, 3: \GDPlayer\Routing\Middleware\AdminAuthMiddleware}> $views
-     */
-    public static function registerViewRoutes(\GDPlayer\Routing\Router $router, array $views): void
-    {
-    }
-}
-/**
- * Thin facade over league/route.
- *
- * Goal: one short API (get/post/group/middleware/dispatch) used by RouteRegistry without
- * spreading package details across the application. The router is built once per worker (see
- * Application) so the route table is not recompiled every request.
- */
-final class Router
-{
-    /**
-     * @param \League\Route\Router|null $router league/route instance; share across workers when needed
-     */
-    public function __construct(?\League\Route\Router $router = null)
-    {
-    }
-    /**
-     * Register a route for a specific method ("all" = every method).
-     *
-     * @param string $method HTTP method or "all"
-     * @param string $path path pattern
-     * @param callable|array{class-string|object, string}|string $handler handler
-     * @param \Psr\Http\Server\MiddlewareInterface ...$middleware middleware specific to this route
-     * @return \League\Route\Route
-     */
-    public function addRoute(string $method, string $path, callable|array|string $handler, \Psr\Http\Server\MiddlewareInterface ...$middleware): \League\Route\Route
-    {
-    }
-    /**
-     * Match the path against the route table, then run its handler.
-     *
-     * The path is passed separately from the request so the BASE_URL prefix (e.g. install subfolder)
-     * is not matched; the request URI is swapped temporarily to stay consistent.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
-     * @param string $path path relative to BASE_URL, starting with "/"
-     * @return \Psr\Http\Message\ResponseInterface handler/middleware response
-     */
-    public function dispatch(\Psr\Http\Message\ServerRequestInterface $request, string $path): \Psr\Http\Message\ResponseInterface
-    {
-    }
-    /**
-     * Register a GET route.
-     *
-     * @param string $path path pattern, e.g. "/administrator/videos/{id}"
-     * @param callable|array{class-string|object, string}|string $handler callable, [object, method], or class name
-     * @param \Psr\Http\Server\MiddlewareInterface ...$middleware middleware specific to this route
-     * @return \League\Route\Route
-     */
-    public function get(string $path, callable|array|string $handler, \Psr\Http\Server\MiddlewareInterface ...$middleware): \League\Route\Route
-    {
-    }
-    /**
-     * Group routes under one prefix, e.g. group('/administrator/users', ...).
-     *
-     * @param string $prefix path prefix
-     * @param callable(\League\Route\RouteGroup): void $group route registration callback
-     * @return \League\Route\RouteGroup
-     */
-    public function group(string $prefix, callable $group): \League\Route\RouteGroup
-    {
-    }
-    /**
-     * Middleware for every route registered after this line.
-     *
-     * @param \Psr\Http\Server\MiddlewareInterface $middleware router-wide middleware
-     * @return self
-     */
-    public function middleware(\Psr\Http\Server\MiddlewareInterface $middleware): self
-    {
-    }
-    /**
-     * Register a POST route.
-     *
-     * @param string $path path pattern
-     * @param callable|array{class-string|object, string}|string $handler handler
-     * @param \Psr\Http\Server\MiddlewareInterface ...$middleware middleware specific to this route
-     * @return \League\Route\Route
-     */
-    public function post(string $path, callable|array|string $handler, \Psr\Http\Server\MiddlewareInterface ...$middleware): \League\Route\Route
-    {
-    }
-    /**
-     * @return \League\Route\Router the league/route instance inside
-     */
-    public function unwrap(): \League\Route\Router
-    {
-    }
-}
-/**
- * Handler ajax/view dan utilitas penamaan rute.
- *
- * Split out of `RouteRegistrationTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `RouteRegistrationTrait` through this trait.
- */
-trait RouteRegistrationHandlerTrait
+final class RouteHandlerFactory
 {
     /**
      * Ajax route handler: the controller is built per request, the action is guaranteed by the route list.
      *
-     * @param class-string<\GDPlayer\Modules\AbstractAjaxController> $class controller class
+     * @param class-string<AbstractAjaxController> $class controller class
      * @param string $action action name
-     * @return callable(\Psr\Http\Message\ServerRequestInterface): \Psr\Http\Message\ResponseInterface route handler
+     * @return callable(ServerRequestInterface): ResponseInterface route handler
      */
-    protected static function ajaxHandler(string $class, string $action): callable
+    public static function ajaxHandler(string $class, string $action): callable
     {
     }
     /**
      * Ajax route handler for `list` (DataTables).
      *
-     * @param class-string<\GDPlayer\Modules\AbstractAjaxController> $class controller class
-     * @return callable(\Psr\Http\Message\ServerRequestInterface): \Psr\Http\Message\ResponseInterface route handler
+     * @param class-string<AbstractAjaxController> $class controller class
+     * @return callable(ServerRequestInterface): ResponseInterface route handler
      */
-    protected static function ajaxHandlerList(string $class): callable
+    public static function ajaxHandlerList(string $class): callable
     {
     }
     /**
@@ -11315,63 +14121,80 @@ trait RouteRegistrationHandlerTrait
      * @param string $action action name
      * @return string URL segment
      */
-    protected static function kebabCase(string $action): string
+    public static function kebabCase(string $action): string
     {
     }
     /**
      * Wrap a view controller as a handler: request+response are injected through the constructor.
      *
-     * @param class-string<\GDPlayer\View\AbstractView> $class view class
+     * @param class-string<AbstractView> $class view class
      * @param string $action requested action
-     * @return callable(\Psr\Http\Message\ServerRequestInterface): \Psr\Http\Message\ResponseInterface
+     * @return callable(ServerRequestInterface): ResponseInterface
      */
-    protected static function viewHandler(string $class, string $action): callable
+    public static function viewHandler(string $class, string $action): callable
     {
     }
 }
+
 /**
- * Route table: pendaftaran seluruh rute ke `Router` (dipanggil `RouteRegistry::register()`).
+ * Route table for the administrator area, ajax REST endpoints, the plugin API and auth pages.
  *
- * Dipisah dari `RouteRegistry` supaya kelas itu hanya memegang tabel + dispatch
- * (aturan: <=20 method/kelas, <=150 baris/method). Data tabel (path, prefix, pola, `WILDCARD`,
- * tabel Ajax) ada di `RouteTable`; helper pembuat handler ada di sini karena hanya pendaftaran
- * yang memakainya — `RouteRegistry` tetap bisa memanggilnya lewat `static::` karena trait menjadi
- * bagian dari kelas itu.
- *
- * URUTAN pemanggilan method di file ini adalah bagian dari perilaku: FastRoute menolak rute
- * statis yang didaftarkan setelah rute variabel yang bisa mencocokinya. Jangan ubah urutan
- * tanpa menjalankan `php scripts/check_route_table.php --compare=tmp/baseline/route-table.json`.
- *
- * Dipakai hanya oleh `RouteRegistry`.
+ * The CALL ORDER of the methods here is part of the behaviour: FastRoute rejects static routes
+ * registered after a variable route that could match them. Do not reorder without running
+ * `php scripts/check_route_table.php --compare=tmp/baseline/route-table.json`.
  */
-trait RouteRegistrationTrait
+final class RouteRegistrarAdmin
 {
-    use \GDPlayer\Routing\RouteFrontendRegistrationTrait;
-    use \GDPlayer\Routing\RouteRegistrationHandlerTrait;
-    /** Suffix rute catch-all FastRoute: dipakai melayani sub-path (`/x/{path:.*}`). */
-    /** Modul Ajax tanpa guard login (endpoint publik): middleware auth dilewati. */
+    /**
+     * Register the administrator endpoints that share the full admin middleware: the settings and
+     * theme sync routes, the gdrive file manager and the plugin list/status/uninstall actions.
+     *
+     * @param Router $router router receiving the routes
+     * @param AdminAuthMiddleware $adminOnly admin-mode middleware
+     * @return void
+     */
     public static function registerAdminEndpointRoutes(\GDPlayer\Routing\Router $router, \GDPlayer\Routing\Middleware\AdminAuthMiddleware $adminOnly): void
     {
     }
     /**
      * Backend pages (per-row auth middleware) + plugins/install endpoints.
      *
-     * Row order sama persis dengan tabel lama. `$adminOnly` di sini hanya dipakai baris
-     * yang butuh admin penuh; `$loggedIn` untuk halaman yang cukup login.
+     * Row order matches the legacy table exactly. `$adminOnly` is only used by rows that need
+     * full admin rights; `$loggedIn` covers pages that only need a session.
      *
-     * @param \GDPlayer\Routing\Middleware\AdminAuthMiddleware $adminOnly admin-mode middleware
-     * @param \GDPlayer\Routing\Middleware\AdminAuthMiddleware $loggedIn login-mode middleware
-     * @return list<array{0: string, 1: class-string<\GDPlayer\View\AbstractView>, 2: string, 3: \GDPlayer\Routing\Middleware\AdminAuthMiddleware}>
+     * @param AdminAuthMiddleware $adminOnly admin-mode middleware
+     * @param AdminAuthMiddleware $loggedIn login-mode middleware
+     * @return list<array{0: string, 1: class-string<AbstractView>, 2: string, 3: AdminAuthMiddleware}>
      */
     public static function registerAdminPageRoutes(\GDPlayer\Routing\Router $router, \GDPlayer\Routing\Middleware\AdminAuthMiddleware $adminOnly, \GDPlayer\Routing\Middleware\AdminAuthMiddleware $loggedIn): array
     {
     }
+    /**
+     * Register the REST Ajax endpoints, one group per module.
+     *
+     * The action becomes the URL segment (kebab-cased); modules flagged public skip the auth middleware.
+     *
+     * @param Router $router router receiving the routes
+     * @return void
+     */
     public static function registerAjaxRestRoutes(\GDPlayer\Routing\Router $router): void
     {
     }
+    /**
+     * Register `/api` and its catch-all sub-path for every REST verb.
+     *
+     * @param Router $router router receiving the routes
+     * @return void
+     */
     public static function registerApiRoutes(\GDPlayer\Routing\Router $router): void
     {
     }
+    /**
+     * Register the unguarded authentication pages and the 403 page.
+     *
+     * @param Router $router router receiving the routes
+     * @return void
+     */
     public static function registerAuthRoutes(\GDPlayer\Routing\Router $router): void
     {
     }
@@ -11381,147 +14204,83 @@ trait RouteRegistrationTrait
     public static function registerHealthRoutes(\GDPlayer\Routing\Router $router): void
     {
     }
+    /**
+     * Register the JSON endpoints, with an admin middleware per row.
+     *
+     * @param Router $router router receiving the routes
+     * @param AdminAuthMiddleware $adminOnly admin-mode middleware
+     * @return void
+     */
     public static function registerJsonEndpointRoutes(\GDPlayer\Routing\Router $router, \GDPlayer\Routing\Middleware\AdminAuthMiddleware $adminOnly): void
     {
     }
 }
+
 /**
- * Kepemilikan path: apakah suatu path dilayani router baru atau jatuh ke cabang legacy.
- *
- * Dipisah dari `RouteRegistry` supaya kelas itu hanya memegang tabel + dispatch
- * (aturan: <=20 method/kelas). Daftar path/prefix/pola ada di `RouteTable`; helper slug
- * (`pageSlug()`, `slugPage()`, `frontendTarget()`) ada di sini karena hanya logika kepemilikan
- * ini yang memakainya — `RouteRegistry` tetap bisa memanggilnya lewat `self::` karena trait
- * menjadi bagian dari kelas itu.
- *
- * Dipakai hanya oleh `RouteRegistry`.
+ * Route table for the public frontend: pages, media proxies, stream handlers and backend views.
  */
-trait RouterOwnershipTrait
+final class RouteRegistrarFrontend
 {
     /**
-     * Controller class + action for one frontend page slug.
+     * Register the frontend JSON/AJAX endpoints on both the exact and wildcard path.
      *
-     * @param string $page slug without slashes (e.g. 'e', 'ads', 'sitemap.xml')
-     * @param array<string, mixed> $config site configuration
-     * @return array{0: class-string<\GDPlayer\View\AbstractView>, 1: string}|null class+action pair; null when the
-     *                                                            slug is not core-owned
+     * @param Router $router router receiving the routes
      */
-    private static function frontendTarget(string $page, array $config): ?array
+    public static function registerFrontendEndpointRoutes(\GDPlayer\Routing\Router $router): void
     {
     }
     /**
-     * Legacy flow: a frontend plugin view always wins over core (except the /api/v1 prefix).
+     * Register page routes, legacy entry points, engine fallbacks and player pages.
      *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when the plugin has a view for this path
+     * @param Router $router router receiving the routes
+     * @param AdminAuthMiddleware $adminOnly middleware applied to admin-only legacy entries
      */
-    private function hasPriorPluginFrontendView(string $path): bool
+    public static function registerFrontendPageRoutes(\GDPlayer\Routing\Router $router, \GDPlayer\Routing\Middleware\AdminAuthMiddleware $adminOnly): void
     {
     }
     /**
-     * Is this path in the administrator area (always router-owned, no frontend theme/plugin involvement).
+     * Register public media routes: info pages, poster/filmstrip/subtitle and stream handlers.
      *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when the path is under /administrator
+     * @param Router $router router receiving the routes
      */
-    private function isAdministratorPath(string $path): bool
+    public static function registerMediaRoutes(\GDPlayer\Routing\Router $router): void
     {
     }
     /**
-     * Is this path a player page slug (e/d/r or a custom slug from configuration).
+     * Backend page rows: GET+POST per row (the old view serves POST on the same path).
      *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when the slug is recognised
+     * @param list<array{0: string, 1: class-string<AbstractView>, 2: string, 3: AdminAuthMiddleware}> $views
      */
-    private function isPlayerSlug(string $path): bool
-    {
-    }
-    /**
-     * The active theme still wins over core for frontend pages (legacy behaviour).
-     *
-     * Paths in the shortcut list are always served by core, so the theme does not affect them.
-     *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when the router may handle this path
-     */
-    private function isRouterAllowedForTheme(string $path): bool
-    {
-    }
-    /**
-     * @param string $path path relative to BASE_URL
-     * @return bool true when this path is already router-owned
-     */
-    private function isRouterOwned(string $path): bool
-    {
-    }
-    /**
-     * Is this path registered as router-owned (static list, prefix, or regex pattern).
-     *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when the path is registered
-     */
-    private function isRouterPath(string $path): bool
-    {
-    }
-    /**
-     * Does the path match one of the router's regex patterns.
-     *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when it matches a registered pattern
-     */
-    private function isRouterPatternMatched(string $path): bool
-    {
-    }
-    /**
-     * Does the path start with one of the router's prefixes.
-     *
-     * @param string $path path relative to BASE_URL
-     * @return bool true when it matches a registered prefix
-     */
-    private function isRouterPrefixMatched(string $path): bool
-    {
-    }
-    /**
-     * Slug of a path: first segment, extension stripped — same as the old view's $page
-     * (e.g. /sitemap.xml -> sitemap, /poster/xxx -> poster).
-     *
-     * @param string $path path relative to BASE_URL
-     * @return string slug without slashes
-     */
-    private static function pageSlug(string $path): string
-    {
-    }
-    /**
-     * Player page view filename for one slug; '' when the slug is not a player page.
-     *
-     * Config slugs are checked first so the order matches the old view's $files map
-     * (default e/d/r, then overridden by custom slugs).
-     *
-     * @param string $page slug without slashes
-     * @param array<string, mixed> $config site configuration
-     * @return string view filename (e.g. 'embed.php') or ''
-     */
-    private static function slugPage(string $page, array $config): string
+    public static function registerViewRoutes(\GDPlayer\Routing\Router $router, array $views): void
     {
     }
 }
+
 /**
- * Tabel rute + dispatch request.
+ * Route table plus request dispatch.
  *
- * Dua lapis:
- *  1. Rute baru didaftarkan di {@see register()} (league/route): isi tabelnya ada di
- *     `RouteRegistrationTrait`, aturan path mana yang "milik router" ada di `RouterOwnershipTrait`.
- *  2. Cabang legacy dipindah apa adanya dari public/index.php (F1.10) selama view-nya belum jadi
- *     controller — dipertahankan identik supaya baseline URL tidak berubah.
+ * Two layers:
+ *  1. New routes are registered in {@see register()} (league/route): the tables live in
+ *     `RouteRegistrarAdmin` + `RouteRegistrarFrontend`, and which paths the router owns is decided
+ *     by `RouterOwnership`.
+ *  2. Legacy branches were moved verbatim from public/index.php (F1.10) while their views are not
+ *     controllers yet — kept identical so the URL baseline does not change.
  */
 final class RouteRegistry
 {
-    use \GDPlayer\Routing\RouteDispatchTrait;
-    use \GDPlayer\Routing\RouteRegistrationTrait;
-    use \GDPlayer\Routing\RouterOwnershipTrait;
+    /**
+     * Ajax modules whose legacy URL alias (/administrator/ajax/<slug> + `action` payload) is now
+     * served by a new controller, not Views::loadAjax + ReflectionMethod.
+     *
+     * @var array<string, class-string<AbstractAjaxController>>
+     */
+    protected const AJAX_ALIAS_CONTROLLERS = ['admin-api' => \GDPlayer\Modules\System\Controllers\AdminApiController::class, 'dashboard' => \GDPlayer\Modules\Dashboard\Controllers\DashboardAjaxController::class, 'gdrive-accounts' => \GDPlayer\Modules\GDrive\Controllers\GDriveAccountAjaxController::class, 'gdrive-backup-files' => \GDPlayer\Modules\GDrive\Controllers\GDriveMirrorAjaxController::class, 'gdrive-backup-queue' => \GDPlayer\Modules\GDrive\Controllers\GDriveQueueAjaxController::class, 'gdrive-files' => \GDPlayer\Modules\GDrive\Controllers\GDriveFileAjaxController::class, 'load-balancers' => \GDPlayer\Modules\LoadBalancers\Controllers\LoadBalancerAjaxController::class, 'profile' => \GDPlayer\Modules\Users\Controllers\UserAjaxController::class, 'public' => \GDPlayer\Modules\PublicEndpoint\Controllers\PublicAjaxController::class, 'sessions' => \GDPlayer\Modules\Sessions\Controllers\SessionAjaxController::class, 'settings' => \GDPlayer\Modules\Settings\Controllers\SettingAjaxController::class, 'subtitles' => \GDPlayer\Modules\Subtitles\Controllers\SubtitleAjaxController::class, 'users' => \GDPlayer\Modules\Users\Controllers\UserAjaxController::class, 'videos' => \GDPlayer\Modules\Videos\Controllers\VideoAjaxController::class, 'videos-export' => \GDPlayer\Modules\Videos\Controllers\VideoExportAjaxController::class, 'videos-import' => \GDPlayer\Modules\Videos\Controllers\VideoImportAjaxController::class];
+    /** @var array<string, mixed> */
+    private array $config;
+    private readonly \GDPlayer\Routing\RouterOwnership $ownership;
     /**
      * @param Router $router registered router
-     * @param \Psr\Http\Message\ServerRequestInterface $request request aktif
+     * @param ServerRequestInterface $request active request
      * @param array<string, mixed> $config site configuration read by Application
      */
     public function __construct(protected readonly \GDPlayer\Routing\Router $router, private readonly \Psr\Http\Message\ServerRequestInterface $request, array $config = [])
@@ -11530,56 +14289,62 @@ final class RouteRegistry
     /**
      * Run the request: try the router first, then the legacy branch.
      *
-     * @return \Psr\Http\Message\ResponseInterface|null response to send; null when output was already written
+     * @return ResponseInterface|null response to send; null when output was already written
      *                                  directly by the legacy path (view/streaming handler)
      */
     public function dispatch(): ?\Psr\Http\Message\ResponseInterface
     {
     }
     /**
-     * Daftarkan seluruh rute ke router.
+     * Register every route on the router.
      *
-     * Rute slug longgar didaftarkan paling akhir (lihat komentar di badan method).
+     * The loose-slug routes are registered last (see the comment in the method body).
      */
     public static function register(\GDPlayer\Routing\Router $router): void
     {
     }
 }
+
 /**
- * Data tabel rute: path milik router, prefix/pola, dan tabel rute Ajax.
+ * Route table data: router-owned paths, prefixes/patterns, and the Ajax route tables.
  *
- * Kenapa bukan konstanta di dalam trait: PHP 8.1 (versi minimum proyek) belum mengizinkan
- * konstanta di trait — trait hanya berisi perilaku, datanya dikumpulkan di sini supaya
- * `RouteRegistry`, `RouteRegistrationTrait`, dan `RouterOwnershipTrait` membaca sumber yang sama.
+ * Why not constants inside the registrar/ownership classes: PHP 8.1 (the project minimum) does
+ * not allow trait constants, and the data is shared, so it is collected here and
+ * `RouteRegistry`, `RouteRegistrarAdmin`/`RouteRegistrarFrontend` and `RouterOwnership` read it.
  */
 final class RouteTable
 {
-    /** Modul Ajax tanpa guard login (endpoint publik); datanya ada di {@see AjaxRouteTable}. */
+    private const AJAX_PATTERN_HEAD = '#^/administrator/ajax/(admin-api|dashboard|gdrive-accounts|';
+    private const AJAX_PATTERN_HEAD_2 = 'gdrive-backup-files|gdrive-backup-queue';
+    private const AJAX_PATTERN_MID = '|gdrive-files|load-balancers|profile|public|sessions|';
+    private const AJAX_PATTERN_MID_2 = 'settings|subtitles|users|videos';
+    private const AJAX_PATTERN_TAIL = '|videos-export|videos-import)/.+#';
+    /** Ajax modules without a login guard (public endpoints); the data lives in {@see AjaxRouteTable}. */
     public const AJAX_PUBLIC_MODULES = \GDPlayer\Routing\AjaxRouteTable::AJAX_PUBLIC_MODULES;
-    /** Tabel modul Ajax REST; datanya ada di {@see AjaxRouteTable}. */
+    /** Ajax REST module table; the data lives in {@see AjaxRouteTable}. */
     public const AJAX_REST_MODULES = \GDPlayer\Routing\AjaxRouteTable::AJAX_REST_MODULES;
-    /** Slug frontend tanpa tema — dulu view `includes/views/frontend`, kini controller core. */
+    /** Frontend slugs without a theme — once `includes/views/frontend` views, now core controllers. */
     public const FRONTEND_SHORTCUT = ['api-config', 'stream-vid', 'stream-ts', 'stream-seg', 'hls', 'mpd', 'poster', 'subtitle', 'filmstrip', 'telemetry'];
-    /** Key konfigurasi yang menimpa slug halaman player => nama file view-nya. */
+    /** Config key that overrides a player page slug => the name of its view file. */
     public const FRONTEND_SLUG_CONFIG = ['slug_embed' => 'embed.php', 'slug_download' => 'download.php', 'slug_request' => 'embed2.php'];
-    /** Nama file view halaman player untuk slug default lama (e/d/r). */
+    /** Player page view file names for the legacy default slugs (e/d/r). */
     public const FRONTEND_SLUG_FILES = ['e' => 'embed.php', 'd' => 'download.php', 'r' => 'embed2.php'];
     /**
-     * Path statis yang sudah dilayani router (controller). Sisanya jatuh ke cabang legacy
-     * sampai view-nya ikut dimigrasi.
+     * Static paths already served by the router (controllers). The rest falls back to the
+     * legacy branch until their views are migrated as well.
      *
      * @var string[]
      */
     public const ROUTER_OWNED_PATHS = ['/ping', '/health-check', '/embed.php', '/embed2.php', '/web-migrate.php', '/web-migrate', '/administrator/dashboard', '/administrator/log', '/administrator/users/list', '/administrator/users/new', '/administrator/users/edit', '/administrator/users/sessions', '/administrator/403', '/administrator/dmca', '/changelog', '/sharer', '/clear-cache', '/hls', '/mpd', '/stream-seg', '/stream-ts', '/stream-vid', '/administrator/login', '/administrator/register', '/administrator/reset-password', '/administrator/gdrive/list', '/administrator/gdrive/backup-files', '/administrator/gdrive/backup-queue', '/administrator/load-balancers/list', '/administrator/videos/list', '/administrator/videos/subtitles', '/administrator/settings/ads', '/administrator/settings/sync', '/administrator/themes/sync', '/administrator/gdrive/edit', '/administrator/gdrive/files', '/administrator/plugins/list', '/administrator/plugins/config', '/administrator/plugins/status', '/administrator/plugins/install', '/administrator/plugins/sync', '/administrator/plugins/uninstall', '/administrator/gdrive/new', '/administrator/load-balancers/edit', '/administrator/load-balancers/new', '/administrator/videos/new', '/administrator/videos/edit', '/administrator/settings/custom-headers', '/administrator/settings/general', '/administrator/settings/hosting', '/administrator/settings/misc', '/administrator/settings/player', '/administrator/settings/public', '/administrator/settings/reset', '/administrator/settings/shortlink', '/administrator/settings/smtp', '/administrator/settings/site', '/administrator/profile'];
     /**
-     * Pola regex path yang sudah dilayani router.
+     * Regex patterns of the paths already served by the router.
      *
      * @var string[]
      */
     public const ROUTER_OWNED_PATTERNS = ['#^/redirect(/|$)#', '#^/(stream-seg|stream-ts|stream-vid)[2-3](/|$)#', self::AJAX_PATTERN_HEAD . self::AJAX_PATTERN_HEAD_2 . self::AJAX_PATTERN_MID . self::AJAX_PATTERN_MID_2 . self::AJAX_PATTERN_TAIL, '#^/administrator/ajax/sessions/.+#', '#^/administrator/ajax/load-balancers/.+#'];
     /**
-     * Path router-owned beserta SEMUA sub-path-nya, karena view lama hanya melihat segmen
-     * pertama (mis. `/api/x` tetap dilayani api.php).
+     * Router-owned paths including ALL of their sub-paths, because the legacy views only
+     * inspect the first segment (e.g. `/api/x` is still served by api.php).
      *
      * @var string[]
      */
@@ -11592,485 +14357,258 @@ final class RouteTable
         '/subtitle',
         '/poster',
         '/filmstrip',
-        // Slug streaming: sub-path-nya juga milik router (view lama hanya melihat segmen pertama,
-        // dan view override plugin dulu menangani /stream-ts/<x> juga) — F7.3.
+        // Streaming slugs: their sub-paths belong to the router too (the legacy views only
+        // inspect the first segment, and plugin override views used to handle /stream-ts/<x>) — F7.3.
         '/hls',
         '/mpd',
         '/stream-seg',
         '/stream-ts',
         '/stream-vid',
     ];
-    /** Suffix rute catch-all FastRoute: dipakai melayani sub-path (`/x/{path:.*}`). */
+    /** FastRoute catch-all route suffix: used to serve sub-paths (`/x/{path:.*}`). */
     public const WILDCARD = '/{path:.*}';
 }
-namespace GDPlayer\Service\Background;
 
 /**
- * Koneksi aktif dan pembersihan browser.
+ * Thin facade over league/route.
  *
- * Split out of `Background` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Background` through this trait.
+ * Goal: one short API (get/post/group/middleware/dispatch) used by RouteRegistry without
+ * spreading package details across the application. The router is built once per worker (see
+ * Application) so the route table is not recompiled every request.
  */
-trait ConnTrait
+final class Router
 {
+    private \League\Route\Router $router;
     /**
-     * Return the number of active network connections on the host.
-     *
-     * @return int active connection count (0 when unavailable)
+     * @param LeagueRouter|null $router league/route instance; share across workers when needed
      */
-    public function getActiveConnections(): int
+    public function __construct(?\League\Route\Router $router = null)
     {
     }
     /**
-     * Count established TCP connections by parsing /proc/net/tcp{,6}.
+     * Register a route for a specific method ("all" = every method).
      *
-     * @return int active connection count
+     * @param string $method HTTP method or "all"
+     * @param string $path path pattern
+     * @param callable|array{class-string|object, string}|string $handler handler
+     * @param MiddlewareInterface ...$middleware middleware specific to this route
+     * @return Route
      */
-    public function getLinuxActiveConns(): int
+    public function addRoute(string $method, string $path, callable|array|string $handler, \Psr\Http\Server\MiddlewareInterface ...$middleware): \League\Route\Route
     {
     }
     /**
-     * @return array<string,mixed>
+     * Match the path against the route table, then run its handler.
+     *
+     * The path is passed separately from the request so the BASE_URL prefix (e.g. install subfolder)
+     * is not matched; the request URI is swapped temporarily to stay consistent.
+     *
+     * @param ServerRequestInterface $request request aktif
+     * @param string $path path relative to BASE_URL, starting with "/"
+     * @return ResponseInterface handler/middleware response
      */
-    public function killBrowsers(): array
+    public function dispatch(\Psr\Http\Message\ServerRequestInterface $request, string $path): \Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Register a GET route.
+     *
+     * @param string $path path pattern, e.g. "/administrator/videos/{id}"
+     * @param callable|array{class-string|object, string}|string $handler callable, [object, method], or class name
+     * @param MiddlewareInterface ...$middleware middleware specific to this route
+     * @return Route
+     */
+    public function get(string $path, callable|array|string $handler, \Psr\Http\Server\MiddlewareInterface ...$middleware): \League\Route\Route
+    {
+    }
+    /**
+     * Group routes under one prefix, e.g. group('/administrator/users', ...).
+     *
+     * @param string $prefix path prefix
+     * @param callable(RouteGroup): void $group route registration callback
+     * @return RouteGroup
+     */
+    public function group(string $prefix, callable $group): \League\Route\RouteGroup
+    {
+    }
+    /**
+     * Middleware for every route registered after this line.
+     *
+     * @param MiddlewareInterface $middleware router-wide middleware
+     * @return self
+     */
+    public function middleware(\Psr\Http\Server\MiddlewareInterface $middleware): self
+    {
+    }
+    /**
+     * Register a POST route.
+     *
+     * @param string $path path pattern
+     * @param callable|array{class-string|object, string}|string $handler handler
+     * @param MiddlewareInterface ...$middleware middleware specific to this route
+     * @return Route
+     */
+    public function post(string $path, callable|array|string $handler, \Psr\Http\Server\MiddlewareInterface ...$middleware): \League\Route\Route
+    {
+    }
+    /**
+     * @return LeagueRouter the league/route instance inside
+     */
+    public function unwrap(): \League\Route\Router
     {
     }
 }
-/**
- * Background process helpers: PID liveness checks and process termination.
- */
-trait CoreTrait
-{
-    private function isUnixPidRunning(int $pid, ?string $imageName): bool
-    {
-    }
-    private function isWindowsPidRunning(int $pid, ?string $imageName): bool
-    {
-    }
-    private function killUnixPid(int $pid): void
-    {
-    }
-    private function sanitizeImageName(?string $imageName): string
-    {
-    }
-    /**
-     * Cari & hentikan proses Unix berdasarkan pola cmdline.
-     *
-     * `ps -ef` tidak dipakai: pada busybox/alpine kolom kedua adalah USER, bukan PID,
-     * sehingga parsing `awk '{print $2}'` menghasilkan nama user dan tidak ada proses
-     * yang pernah dibunuh. `pgrep -a -f` tersedia baik di busybox maupun procps.
-     *
-     * @return int[] PID yang dikirim sinyal
-     */
-    protected function killUnixProcessesByPattern(string $pattern): array
-    {
-    }
-    /**
-     * Check whether a PID is running.
-     *
-     * When `$imageName` is given, the process image name is also verified so a
-     * stale PID that was recycled by an unrelated process (PID reuse) is NOT
-     * reported as running.
-     *
-     * @param null|int $pid
-     * @param null|string $imageName
-     * @return bool
-     */
-    public function isRunning(?int $pid, ?string $imageName = null): bool
-    {
-    }
-    /**
-     * Hentikan proses berdasarkan PID (Windows: taskkill, Unix: killUnixPid).
-     *
-     * @param int         $pid       process id
-     * @param null|string $imageName nama image/proses untuk verifikasi PID (opsional)
-     */
-    public function stopPid(int $pid, ?string $imageName = null): void
-    {
-    }
-}
-/**
- * Manajemen proses plugin aktif/nonaktif.
- *
- * Split out of `Background` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Background` through this trait.
- */
-trait PluginTrait
-{
-    /**
-     * Start background scripts for active plugins that are not manually stopped.
-     *
-     * @param \GDPlayer\Model\Plugins $pluginModel
-     */
-    protected function startActivePluginsBackground(\GDPlayer\Model\Plugins $pluginModel): void
-    {
-    }
-    /**
-     * Stop background scripts for disabled plugins.
-     *
-     * @param \GDPlayer\Model\Plugins $pluginModel
-     */
-    protected function stopDisabledPluginsBackground(\GDPlayer\Model\Plugins $pluginModel): void
-    {
-    }
-    /**
-     * Manage background daemon processes for all plugins.
-     */
-    public function managePluginsBackground(): void
-    {
-    }
-}
-/**
- * Penghentian proses berbasis path (Unix & Windows).
- *
- * Split out of `Background` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Background` through this trait.
- */
-trait ProcessStopTrait
-{
-    /**
-     * @param string $workingPath
-     * @return int[]
-     */
-    protected function stopUnixProcessByPath(string $workingPath): array
-    {
-    }
-    /**
-     * @param string $workingPath
-     * @return int[]
-     */
-    protected function stopWindowsProcessByPath(string $workingPath): array
-    {
-    }
-}
-/**
- * Spawn proses latar dan penghentian proses.
- *
- * Split out of `Background` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Background` through this trait.
- */
-trait ProcessTrait
-{
-    protected function spawnProcess(string $scriptPath, string $pidFile, ?string $logFile): int
-    {
-    }
-    /**
-     * Stop a background process identified by its script name.
-     *
-     * @param string $scriptName script base name
-     * @return false|string result message, or false on failure
-     */
-    public function stopProcessByName(string $scriptName): false|string
-    {
-    }
-    /**
-     * @param string $workingPath
-     * @return int[]
-     */
-    public function stopProcessByPath(string $workingPath): array
-    {
-    }
-}
-/**
- * Eksekusi tugas latar dan stop unduhan.
- *
- * Split out of `Background` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Background` through this trait.
- */
-trait RunTrait
-{
-    /**
-     * @return array<string,mixed>
-     */
-    public function run(): array
-    {
-    }
-    /**
-     * Spawn a PHP script as a detached background process.
-     *
-     * @param string      $scriptPath script to run
-     * @param null|string $logFile    optional log file to capture output
-     * @return false|int process id, or false on failure
-     */
-    public function runInBackground(string $scriptPath = '', ?string $logFile = null): false|int
-    {
-    }
-    /**
-     * @return array<string,mixed>
-     */
-    public function stopDownload(): array
-    {
-    }
-}
-/**
- * Background task runner and system-activity monitor.
- *
- * Spawns and supervises worker scripts, reports resource usage and manages
- * the download queue, honoring the cache/download settings.
- */
-class Background
-{
-    use \GDPlayer\Service\Background\ConnTrait;
-    use \GDPlayer\Service\Background\CoreTrait;
-    use \GDPlayer\Service\Background\PluginTrait;
-    use \GDPlayer\Service\Background\ProcessStopTrait;
-    use \GDPlayer\Service\Background\ProcessTrait;
-    use \GDPlayer\Service\Background\RunTrait;
-    /**
-     * Load the download settings and ensure the required directories exist.
-     */
-    public function __construct()
-    {
-    }
-    protected function pidFileIsRunning(?string $pidFile): ?int
-    {
-    }
-    protected function runDownloadInBackground(): false|int
-    {
-    }
-    /**
-     * Resolve the pending background video data for a lock key.
-     *
-     * Only runs on the load balancer (or a single-server install); on any other
-     * condition the lock key is cleared from the cache.
-     *
-     * @param string $lockKey background download lock key
-     * @return array<string, mixed>|false video data with host/host_id, or false
-     */
-    public function getDataVideoByLockKey(?string $lockKey): false|array
-    {
-    }
-    /**
-     * Return the free disk space (in bytes) for the cache directory.
-     *
-     * @return float free space in bytes
-     */
-    public function getFreeSpace(): float
-    {
-    }
-}
-namespace GDPlayer\Service\Cache;
 
 /**
- * Satu entri cache: nilai, TTL, dan daftar tag.
+ * Path ownership: whether a path is served by the router or falls back to the legacy branch.
  *
- * Dipakai pemanggil sebagai builder (`set()->expiresAfter()->addTag()`) lalu
- * disimpan lewat `InstanceCache::save()`. Objek ini tidak menyimpan koneksi.
+ * The path/prefix/pattern lists live in `RouteTable`; the slug helpers (`pageSlug()`, `slugPage()`,
+ * `frontendTarget()`) live here because only the ownership logic and the loose-slug handler use them.
  */
-final class CacheItem
+final class RouterOwnership
 {
-    public function __construct(private readonly string $key, int $defaultTtl)
-    {
-    }
-    public function addTag(string $tag): self
+    /**
+     * @param array<string, mixed> $config site configuration
+     */
+    public function __construct(private readonly array $config)
     {
     }
     /**
-     * @param string[] $tags
+     * Controller class + action for one frontend page slug.
+     *
+     * @param string $page slug without slashes (e.g. 'e', 'ads', 'sitemap.xml')
+     * @param array<string, mixed> $config site configuration
+     * @return array{0: class-string<AbstractView>, 1: string}|null class+action pair; null when the
+     *                                                            slug is not core-owned
      */
-    public function addTags(array $tags): self
-    {
-    }
-    public function expiresAfter(int|\DateInterval|null $ttl): self
-    {
-    }
-    public function expiresAt(\DateTimeInterface $expiry): self
-    {
-    }
-    public function get(): mixed
-    {
-    }
-    public function getKey(): string
+    public static function frontendTarget(string $page, array $config): ?array
     {
     }
     /**
-     * @return string[]
+     * Is this path served by the router instead of the legacy branch.
+     *
+     * @param string $path path relative to BASE_URL
+     * @return bool true when this path is already router-owned
      */
-    public function getTags(): array
-    {
-    }
-    public function getTtl(): int
-    {
-    }
-    public function isHit(): bool
+    public function isOwned(string $path): bool
     {
     }
     /**
-     * Tandai entri sebagai hasil baca dari storage (dipakai store).
+     * Slug of a path: first segment, extension stripped — same as the old view's $page
+     * (e.g. /sitemap.xml -> sitemap, /poster/xxx -> poster).
+     *
+     * @param string $path path relative to BASE_URL
+     * @return string slug without slashes
      */
-    public function markHit(mixed $value): self
+    public static function pageSlug(string $path): string
     {
     }
-    public function set(mixed $value): self
+    /**
+     * Player page view filename for one slug; '' when the slug is not a player page.
+     *
+     * Config slugs are checked first so the order matches the old view's $files map
+     * (default e/d/r, then overridden by custom slugs).
+     *
+     * @param string $page slug without slashes
+     * @param array<string, mixed> $config site configuration
+     * @return string view filename (e.g. 'embed.php') or ''
+     */
+    public static function slugPage(string $page, array $config): string
     {
     }
 }
+
+namespace GDPlayer\Routing\Middleware;
+
 /**
- * Lock `RedisCache` berbasis SET NX PX.
+ * Login required; admin (role 0) for routes that need full rights.
  *
- * Dipisah dari `RedisCache` karena aturan php:S2042 (maks 200 baris per kelas).
+ * Replaces the `Views::adminValidation(); exit;` pattern inside views: middleware returns
+ * a 401/403 response, so the request path never kills the worker.
  */
-trait RedisCacheLockTrait
+final class AdminAuthMiddleware implements \Psr\Http\Server\MiddlewareInterface
 {
     /**
-     * Klaim lock SET NX PX.
+     * Sync routes that authenticate themselves via the `secure` parameter (= SECURE_SALT),
+     * because the caller is this same instance via cron/CLI without an admin cookie
+     * (`ThemeManager`/`PluginManager::getSyncDownloadUrl()`). The salt is re-verified in the controller;
+     * without this exception, cron always gets a 401 and theme/plugin sync fails.
      *
-     * false = lock dipegang proses lain, null = cache mati.
+     * @var string[]
      */
-    public function lock(string $key, int $ttl): string|false|null
+    private const SALT_AUTH_PATHS = ['/administrator/themes/sync', '/administrator/settings/sync', '/administrator/plugins/sync'];
+    /**
+     * Bind the access level the protected routes require.
+     *
+     * @param bool $requireAdmin true: role 0 only; false: login is enough
+     */
+    public function __construct(private readonly bool $requireAdmin = true)
     {
     }
-    public function unlock(string $key, string $token): bool
+    /**
+     * Reject unauthenticated requests, then hand the request to the next handler.
+     *
+     * @param ServerRequestInterface $request active request
+     * @param RequestHandlerInterface $handler next handler
+     * @return ResponseInterface 401/403 when unauthorised, otherwise the handler response
+     */
+    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
- * Format payload `RedisCache`: diserahkan penuh ke phpredis bila build-nya
- * mendukung igbinary (serializer) dan zstd (kompresi), selain itu kembali ke
- * `serialize()` manual dengan whitelist class.
+ * Ajax route guard: JSON 401/403 replies (not an error page), matching Ajax endpoint behaviour.
  *
- * Dipisah dari `RedisCache` karena aturan php:S2042 (maks 200 baris per kelas).
+ * This middleware is used only by new REST routes; legacy URL aliases still go through the guard inside
+ * controllers so the reply shape (200 + JSON) stays unchanged.
  */
-trait RedisCacheSerializerTrait
+final class AjaxAuthMiddleware implements \Psr\Http\Server\MiddlewareInterface
 {
+    private const MESSAGE_UNAUTHORIZE = 'You are not authorized to access this feature';
     /**
-     * Pasang serializer/kompresi terbaik yang tersedia.
-     *
-     * Konstanta `Redis::SERIALIZER_IGBINARY` dan `Redis::COMPRESSION_ZSTD` hanya
-     * ada kalau phpredis dikompilasi dengan dukungan tersebut, jadi cek
-     * `defined()` + `extension_loaded()` sudah cukup — build tanpa dukungan
-     * (umum di Windows) otomatis jatuh ke jalur manual.
+     * @param bool $requireAdmin true: role 0 only; false: login is enough
      */
-    private function applySerializerOptions(\Redis $redis): void
-    {
-    }
-    private function decode(string $raw): mixed
+    public function __construct(private readonly bool $requireAdmin = true)
     {
     }
     /**
-     * Kebalikan `encodeValue()`. Nilai dari klien berserializer sudah berupa
-     * data asli; payload string lama dibaca lewat `decode()`.
+     * @param ServerRequestInterface $request request aktif
+     * @param RequestHandlerInterface $handler next handler
+     * @return ResponseInterface 401/403 JSON when unauthorised, otherwise the handler response
      */
-    private function decodeValue(mixed $raw): mixed
-    {
-    }
-    /**
-     * Nilai siap simpan: mentah (phpredis yang meng-encode) atau serialize
-     * manual bila klien tidak punya serializer aktif.
-     */
-    private function encodeValue(mixed $value): mixed
-    {
-    }
-    /**
-     * Klien aktif sudah (un)serialize sendiri? Handle eksternal bisa saja
-     * dimiliki komponen lain tanpa serializer, jadi tanya kliennya langsung:
-     * `getOption` dijawab phpredis dari memori, tanpa round-trip.
-     */
-    private function usesNativeSerializer(): bool
+    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
- * Operasi tag `RedisCache`: kunci versi tag dan pembuangan entri bertag.
+ * CORS headers for every Ajax endpoint (one place, not per controller).
  *
- * Dipisah dari `RedisCache` karena aturan php:S2042 (maks 200 baris per kelas).
+ * Header values match what Helper\AjaxHelper::handle() used to send (origin from the
+ * main_site configuration, or '*' when validation is disabled).
  */
-trait RedisCacheTagTrait
+final class AjaxCorsMiddleware implements \Psr\Http\Server\MiddlewareInterface
 {
-    /** TTL versi tag: 30 hari. Dipakai `bumpTag()` dan `tagVersion()`. */
-    private int $tagTtl = 2592000;
-    private function tagKey(string $tag): string
-    {
-    }
-    private function tagSetKey(string $tag): string
-    {
-    }
     /**
-     * Naikkan versi tag secara atomik (INCR). Nilai disimpan sebagai integer mentah.
-     */
-    public function bumpTag(string $tag): int
-    {
-    }
-    /**
-     * Hapus fisik semua entri yang terdaftar pada satu tag.
+     * Apply CORS headers to an Ajax response (also used by legacy URL aliases).
      *
-     * SMEMBERS + DEL dijalankan dalam satu skrip Lua: kalau dipisah, anggota yang
-     * mendarat di antara kedua perintah tidak pernah masuk daftar dan lolos.
+     * @param ResponseInterface $response base response
+     * @return ResponseInterface response with CORS headers
      */
-    public function deleteTag(string $tag): bool
+    public static function apply(\Psr\Http\Message\ResponseInterface $response): \Psr\Http\Message\ResponseInterface
     {
     }
     /**
-     * Invalidasi tag atomik: versi naik dan entri lama dibuang dalam satu skrip.
-     *
-     * `bumpTag()` lalu `deleteTag()` punya dua titik waktu: key yang ditulis di
-     * antaranya bisa ikut terbuang (data baru hilang) atau lolos sama sekali
-     * (entri basi bertahan). Satu skrip = satu titik waktu: tulisan sebelum
-     * invalidasi dibuang, tulisan sesudahnya selamat.
-     *
-     * @return int versi baru, 0 bila cache mati atau versi gagal dibaca
+     * @param ServerRequestInterface $request request aktif
+     * @param RequestHandlerInterface $handler next handler
+     * @return ResponseInterface response with CORS headers
      */
-    public function invalidateTag(string $tag): int
-    {
-    }
-    /**
-     * Versi tag saat ini; key yang belum ada diinisialisasi ke 1.
-     */
-    public function tagVersion(string $tag): int
+    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
     {
     }
 }
-/**
- * Cache store Redis biasa (phpredis).
- *
- * Handle Redis bisa di-inject runtime (RoadRunner: satu handle per worker,
- * Swoole: handle hasil borrow pool) sehingga cache tidak membuka koneksi baru.
- * Tanpa injeksi, store membuka satu koneksi persisten sendiri (mode FPM).
- *
- * Prefix ditulis manual ke setiap key — `Redis::OPT_PREFIX` milik klien tidak
- * diubah, karena klien yang di-inject dipakai bersama komponen lain.
- *
- * Operasi tag ada di `RedisCacheTagTrait`, operasi lock di `RedisCacheLockTrait`
- * (aturan php:S2042: maks 200 baris per kelas).
- */
-final class RedisCache
-{
-    use \GDPlayer\Service\Cache\RedisCacheLockTrait;
-    use \GDPlayer\Service\Cache\RedisCacheSerializerTrait;
-    use \GDPlayer\Service\Cache\RedisCacheTagTrait;
-    public function __construct(private readonly string $prefix, ?\Redis $redis = null, private readonly bool $external = false, private readonly int $defaultTtl = 3600)
-    {
-    }
-    /**
-     * Hapus seluruh key dalam prefix instance ini saja (bukan FLUSHDB).
-     */
-    public function clear(): bool
-    {
-    }
-    public function delete(string $key): bool
-    {
-    }
-    /**
-     * Baca satu entri. Miss/rusak/mati = item tanpa hit, tanpa exception.
-     */
-    public function get(string $key): \GDPlayer\Service\Cache\CacheItem
-    {
-    }
-    public function getPrefix(): string
-    {
-    }
-    /**
-     * Simpan satu entri.
-     *
-     * Saat entri bertag, nilai dan keanggotaan tagset dikirim dalam satu
-     * MULTI/EXEC. Kalau dipisah, invalidasi yang mendarat di antara SET dan SADD
-     * tidak melihat key baru: entri itu tidak pernah masuk daftar buang sehingga
-     * nilai basi bertahan sampai TTL habis.
-     */
-    public function save(\GDPlayer\Service\Cache\CacheItem $item): bool
-    {
-    }
-}
+
 namespace GDPlayer\Service;
 
 /**
@@ -12087,6 +14625,10 @@ namespace GDPlayer\Service;
  */
 final class EngineGate
 {
+    /** Server configuration files rendered by the application (Apache/LiteSpeed + nginx). */
+    private const CONFIG_FILES = ['public/.htaccess', 'resources/nginx/site.d/nginx.conf'];
+    /** Recognized engine suffixes: Swoole and RoadRunner. */
+    private const SUFFIXES = ['2', '3'];
     /**
      * Engine suffix usable by this install: the first active engine plugin whose
      * reverse proxy configuration is installed; '' when none.
@@ -12145,28 +14687,1166 @@ final class EngineGate
     {
     }
 }
+
+/**
+ * Shared read layer over `tb_orders_users`, the bridge between `tb_users` and `tb_orders`.
+ *
+ * The table is owned and created by the billing plugin, never by a core migration. It is
+ * absent on installations that do not use billing, so every read is guarded and a missing
+ * table simply means "no entitlement".
+ *
+ * Ownership is namespaced: one plugin may own several products, so a gate checks either a
+ * single `product_code` or every active row of an `owner` (for example `api`, `xvs`).
+ */
+final class Entitlement
+{
+    /** Line status that grants access while `period_end` is in the future. */
+    private const ACTIVE = 'active';
+    private static ?bool $available = null;
+    /**
+     * Latest active `period_end` for one product, or 0 when there is none.
+     */
+    public static function activeUntil(int $uid, string $productCode): int
+    {
+    }
+    /**
+     * Whether the user holds any active entitlement owned by a plugin or theme.
+     */
+    public static function hasActiveOwner(int $uid, string $owner): bool
+    {
+    }
+    /**
+     * Whether the user holds an active entitlement for one product.
+     */
+    public static function hasActiveProduct(int $uid, string $productCode): bool
+    {
+    }
+    /**
+     * Drop the memoised readiness flag (used after schema changes and by tests).
+     */
+    public static function reset(): void
+    {
+    }
+}
+
+/**
+ * Authentication service for login, registration tokens and session handling.
+ */
+final class Login
+{
+    private ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    private \GDPlayer\Core\Security\Security $security;
+    private \GDPlayer\Model\Session $session;
+    private string $userIP = '';
+    /**
+     * Bind the security, session and geolocation services.
+     *
+     * @param ServerRequestInterface|null $request PSR-7 request, or null to fall back to globals
+     */
+    public function __construct(?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+    /**
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * @return array<string,string|int|float|null>|null
+     */
+    public static function getCurrentUser(string $customToken = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): ?array
+    {
+    }
+    /**
+     * Return the id of the logged-in user, falling back to the configured public video user.
+     *
+     * @return int
+     */
+    public static function getPublicUserId(?\Psr\Http\Message\ServerRequestInterface $request = null): int
+    {
+    }
+    /**
+     * The token cookie must stay readable by JavaScript: `main-v4.0.3.js` reads it with js-cookie
+     * and forwards it as `Authorization: Bearer` plus a `token` body field on every Ajax call,
+     * including calls to other load-balancer hosts where the cookie is not sent at all.
+     * Marking it HttpOnly makes `Cookies.get("adv_token")` return undefined, so those requests
+     * would carry "Bearer undefined" and lose authentication.
+     *
+     * @param array<string,mixed> $dataUser
+     * @param string $expiredAt
+     * @return bool
+     */
+    public function hasSavedLoginData(array $dataUser, string $expiredAt): bool
+    {
+    }
+    /**
+     * Accept a token only when it resolves to an active user with the admin role.
+     *
+     * @param string $token token to validate; empty falls back to the request cookie
+     * @param ?ServerRequestInterface $request request used for cookie and header lookup
+     * @return bool
+     */
+    public static function isAdminTokenValid(string $token = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    {
+    }
+    /**
+     * Tell whether the current session belongs to an administrator.
+     *
+     * @return bool
+     */
+    public static function isCurrentUserAdmin(?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    {
+    }
+    /**
+     * Validate a login/registration token from the query string.
+     *
+     * @param string $redirectUrl URL to redirect to on failure
+     * @return bool true when the token is valid
+     */
+    public function isRegisterTokenValid(string $redirectUrl): bool
+    {
+    }
+    /**
+     * Revoke the session and clear the HttpOnly auth cookie.
+     *
+     * @return int
+     */
+    public function logout(): int
+    {
+    }
+    /**
+     * Validate a password and its confirmation against the security policy.
+     *
+     * @param string $password        password to validate
+     * @param string $retype_password confirmation value
+     * @return string alert HTML with the validation result
+     */
+    public function passwordValidation(string $password = '', string $retype_password = ''): string
+    {
+    }
+    /**
+     * Record a failed login attempt.
+     *
+     * @param string $username attempted username
+     * @return string|false insert result, or false on failure
+     */
+    public function saveLoginFailed(string $username = ''): string|false
+    {
+    }
+    /**
+     * @param string $token
+     * @return null|array<string,string|int|float|null>
+     */
+    public function tokenValidation(string $token): ?array
+    {
+    }
+}
+
+/**
+ * Minifier for inline JavaScript, CSS and JSON.
+ */
+final class Minify
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * @param string $input
+     * @return string
+     */
+    public static function js(string $input = ''): string
+    {
+    }
+    /**
+     * Minify a JSON string.
+     *
+     * @param string $input JSON text
+     * @return string minified JSON, or the input when empty/invalid
+     */
+    public static function json(string $input = ''): string
+    {
+    }
+}
+
+/**
+ * Full-page HTML cache, read before dispatch and filled after it.
+ *
+ * The key is an HMAC over the visitor identity (login token, its expiry, user agent,
+ * language, dark-mode cookie) and the request (host, path, normalised query string).
+ * A page rendered for one visitor therefore never reaches another visitor, and the
+ * entry lifetime never outlives the login session that produced it.
+ */
+final class PageCache
+{
+    /** Query parameters that only exist to bust caches. */
+    private const IGNORED_QUERY = ['_', 't', 'nocache', 'clearCache'];
+    /** Key namespace inside the instance prefix. */
+    private const KEY_PREFIX = 'html_';
+    /** Key layout marker: bump to retire every entry written by an older layout. */
+    private const LAYOUT = 'v3';
+    /** Request methods that never change state, so they may read the cache. */
+    private const SAFE_METHODS = ['GET', 'HEAD'];
+    /** Field separator for the HMAC input, so fields cannot be shifted into each other. */
+    private const SEPARATOR = "\x1f";
+    /** Tag whose version is bumped after every write request, so edited pages are not served. */
+    private const TAG = 'page';
+    /**
+     * Default page lifetime in seconds.
+     *
+     * ponytail: 300 s keeps a manual reload inside the window; a page edited outside this
+     * app stays stale that long. Lower it back if external writers ever touch the tables.
+     */
+    public const TTL = 300;
+    /**
+     * Retire every cached page. Called after a write request, so an edited page is never served.
+     *
+     * @return int 1 when the version was bumped, 0 when storage failed
+     */
+    public static function invalidate(): int
+    {
+    }
+    /**
+     * Tell whether a finished request must retire the cached pages.
+     *
+     * @param ServerRequestInterface $request finished request
+     * @return bool true when the cache must be wiped
+     */
+    public static function isInvalidationRequired(\Psr\Http\Message\ServerRequestInterface $request): bool
+    {
+    }
+    /**
+     * Build the storage key for one page of one visitor.
+     *
+     * @param ServerRequestInterface $request active request
+     * @param string $token login token, empty for a guest
+     * @param int $expiresAt login session expiry, 0 for a guest
+     * @return string key without the instance prefix
+     */
+    public static function key(\Psr\Http\Message\ServerRequestInterface $request, string $token, int $expiresAt): string
+    {
+    }
+    /**
+     * Return the cached page of this request, or null when it has to be rendered.
+     *
+     * @param ServerRequestInterface $request active request
+     * @return string|null cached HTML, null on a miss or when the request may not use the cache
+     */
+    public static function lookup(\Psr\Http\Message\ServerRequestInterface $request): ?string
+    {
+    }
+    /**
+     * Store the finished page of this request, when it is a full HTML page.
+     *
+     * @param ServerRequestInterface $request active request
+     * @param ResponseInterface $response finished response
+     * @return int 1 when the entry was stored, 0 otherwise
+     */
+    public static function store(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response): int
+    {
+    }
+}
+
+/**
+ * Login token codec plus the revocation list.
+ *
+ * Token shape: `v2.<base64url(expires:random)>.<base64url(hmac)>`. The expiry travels
+ * inside the token so a cache entry (and its TTL) can be scoped to the session without
+ * reading `tb_sessions`; only the HMAC is trusted, the payload is never taken on its own.
+ */
+final class SessionToken
+{
+    /** Longest configured session (`+7 days`): ceiling for a revocation marker. */
+    private const MAX_REVOKE_TTL = 604800;
+    /** Revocation marker prefix, followed by the token fingerprint. */
+    private const REVOKED_PREFIX = 'revoked_';
+    /** Bytes of the HMAC kept inside the token (128 bit). */
+    private const SIGNATURE_BYTES = 16;
+    /** Token format marker; bump when the payload layout or the signature changes. */
+    public const VERSION = 'v2';
+    /**
+     * Read the session expiry from a token.
+     *
+     * @param string $token raw token
+     * @param int|null $now clock override, defaults to the current time
+     * @return int|null unix expiry timestamp, or null when the token is malformed, forged or expired
+     */
+    public static function expiresAt(string $token, ?int $now = null): ?int
+    {
+    }
+    /**
+     * Fingerprint a value with the installation secret (HMAC-SHA256, 128 bit).
+     *
+     * Used for the revocation key and for the page cache key: the raw token never
+     * becomes a storage key, so a Redis dump never exposes a usable credential.
+     *
+     * @param string $value value to fingerprint
+     * @return string hex digest, empty when the installation secret is missing
+     */
+    public static function fingerprint(string $value): string
+    {
+    }
+    /**
+     * Read the token sent by the client: the Bearer header wins over the `adv_token` cookie.
+     *
+     * @param ServerRequestInterface|null $request request to read, current one when null
+     * @return string raw token, empty when the client sent none
+     */
+    public static function fromRequest(?\Psr\Http\Message\ServerRequestInterface $request = null): string
+    {
+    }
+    /**
+     * Tell whether the installation secret needed to sign and fingerprint tokens exists.
+     *
+     * @return bool false when `SECURE_SALT` is missing, which disables the fast paths
+     */
+    public static function isConfigured(): bool
+    {
+    }
+    /**
+     * Tell whether a token was revoked after it left the login page.
+     *
+     * @param string $token raw token
+     * @return bool true when the revocation marker exists
+     */
+    public static function isRevoked(string $token): bool
+    {
+    }
+    /**
+     * Build a signed token for the given session expiry.
+     *
+     * @param int $expiresAt unix timestamp the session ends
+     * @return string token stored in `tb_sessions.token` and in the `adv_token` cookie
+     */
+    public static function issue(int $expiresAt): string
+    {
+    }
+    /**
+     * Mark a token as revoked so the page cache stops honouring it immediately.
+     *
+     * @param string $token raw token
+     * @param int $expiresAt session expiry, used to bound the marker; 0 falls back to the ceiling
+     * @return int 1 when the marker was stored, 0 otherwise
+     */
+    public static function revoke(string $token, int $expiresAt = 0): int
+    {
+    }
+}
+
+/**
+ * Upload handler for posters and subtitle files (PSR-7 aware).
+ */
+final class Upload
+{
+    /**
+     * Expose the application info block instead of the upload state.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Determine whether an uploaded file is an accepted subtitle file.
+     *
+     * @param string $file temporary file path
+     * @param string $ext  file extension
+     * @param int    $size file size in bytes
+     * @return bool true when the file is a readable, non-PHP subtitle within the size limit
+     */
+    public static function isSubtitleFile(string $file = '', string $ext = '', int $size = 0): bool
+    {
+    }
+    /**
+     * Normalize PSR-7 UploadedFileInterface input into standard file meta array.
+     *
+     * @param mixed $file
+     * @param string|null $error receives a human-readable reason when the upload is rejected
+     * @return array{
+     * name:string,
+     * type:string,
+     * tmp_name:string,
+     * error:int,
+     * size:int,
+     * psr7:UploadedFileInterface
+     * }|null
+     */
+    public static function normalizeFile(mixed $file, ?string &$error = null): ?array
+    {
+    }
+    /**
+     * Explain why a PHP upload failed, quoting the effective server limits.
+     *
+     * @param int $code one of the UPLOAD_ERR_* constants
+     * @return string human-readable reason, safe to show to the user
+     */
+    public static function uploadErrorMessage(int $code): string
+    {
+    }
+    /**
+     * Validate and store an uploaded poster image.
+     *
+     * The extension must be jpg, jpeg, gif, png or webp, the content must really be an image and
+     * the size must stay under 5 MB. Rejected uploads are unlinked.
+     *
+     * @param mixed $file PSR-7 uploaded file, or an array wrapping one
+     * @return string|false stored path, or false when the upload was rejected
+     */
+    public static function uploadPoster(mixed $file = null): string|false
+    {
+    }
+    /**
+     * Validate and store an uploaded subtitle file.
+     *
+     * The extension must be one of the accepted subtitle formats, the file must not be PHP and the
+     * size must stay under 2 MB. Rejected uploads are unlinked.
+     *
+     * @param mixed $file PSR-7 uploaded file, or an array wrapping one
+     * @return string|false stored path, or false when the upload was rejected
+     */
+    public static function uploadSubtitleFile(mixed $file = null): string|false
+    {
+    }
+}
+
+namespace GDPlayer\Service\Background;
+
+/**
+ * Background task runner and system-activity monitor.
+ *
+ * Spawns and supervises worker scripts, reports resource usage and manages
+ * the download queue, honoring the cache/download settings.
+ */
+class Background
+{
+    private bool $allowDownload = false;
+    private \GDPlayer\Config\Config $config;
+    private string $downloadFile = \GDPlayer\Config\App::RESOURCES_PATH . 'bin/bg_download.php';
+    private string $lockKey = 'background_download-progress';
+    /** @var ConnMonitor connection counter and browser cleanup */
+    protected \GDPlayer\Service\Background\ConnMonitor $connections;
+    /** @var PluginWorker plugin daemon lifecycle */
+    protected \GDPlayer\Service\Background\PluginWorker $plugins;
+    /** @var ProcessControl process spawning and termination */
+    protected \GDPlayer\Service\Background\ProcessControl $processes;
+    /**
+     * Load the download settings and ensure the required directories exist.
+     */
+    public function __construct()
+    {
+    }
+    /**
+     * Pick the most viewed video source of today and hand it to the download worker.
+     *
+     * Uses aria2c when the binary exists, otherwise the built-in downloader.
+     *
+     * @return false|int process id of the spawned worker, or false when nothing to download
+     */
+    protected function runDownloadInBackground(): false|int
+    {
+    }
+    /**
+     * Return the number of active network connections on the host.
+     *
+     * @return int active connection count (0 when unavailable)
+     */
+    public function getActiveConnections(): int
+    {
+    }
+    /**
+     * Resolve the pending background video data for a lock key.
+     *
+     * Only runs on the load balancer (or a single-server install); on any other
+     * condition the lock key is cleared from the cache.
+     *
+     * @param string $lockKey background download lock key
+     * @return array<mixed>|false video data with host/host_id, or false
+     */
+    public function getDataVideoByLockKey(?string $lockKey): false|array
+    {
+    }
+    /**
+     * Return the free disk space (in bytes) for the cache directory.
+     *
+     * @return float free space in bytes
+     */
+    public function getFreeSpace(): float
+    {
+    }
+    /**
+     * Terminate every leftover browser process started by the background jobs.
+     *
+     * @return array<string,mixed>
+     */
+    public function killBrowsers(): array
+    {
+    }
+    /**
+     * Start the background workers (general, Drive, stats, download) for this tick.
+     *
+     * @return array<string,mixed> spawn result per worker; empty when the schema is stale
+     */
+    public function run(): array
+    {
+    }
+    /**
+     * Spawn a PHP script as a detached background process.
+     *
+     * @param string      $scriptPath script to run
+     * @param null|string $logFile    optional log file to capture output
+     * @return false|int process id, 1 while the child is still booting, or false on failure
+     */
+    public function runInBackground(string $scriptPath = '', ?string $logFile = null): false|int
+    {
+    }
+    /**
+     * Kill the downloader processes and drop their progress cache entries.
+     *
+     * @return array<string,mixed> stop and delete result per process and cache key
+     */
+    public function stopDownload(): array
+    {
+    }
+    /**
+     * Stop a background process identified by its script name.
+     *
+     * @param string $scriptName script base name
+     * @return false|string result message, or false on failure
+     */
+    public function stopProcessByName(string $scriptName): false|string
+    {
+    }
+}
+
+/**
+ * Counts established network connections and terminates leftover browser processes.
+ */
+class ConnMonitor
+{
+    /**
+     * @param Config $config site configuration holding the last connection count
+     * @param ProcessControl $processes process lookup used to stop browsers
+     */
+    public function __construct(private readonly \GDPlayer\Config\Config $config, private readonly \GDPlayer\Service\Background\ProcessControl $processes)
+    {
+    }
+    /**
+     * Return the number of active network connections on the host.
+     *
+     * @return int active connection count (0 when unavailable)
+     */
+    public function getActiveConnections(): int
+    {
+    }
+    /**
+     * Count established TCP connections by parsing /proc/net/tcp{,6}.
+     *
+     * @return int active connection count
+     */
+    public function getLinuxActiveConns(): int
+    {
+    }
+    /**
+     * Terminate every leftover browser process started by the background jobs.
+     *
+     * @return array<string,mixed>
+     */
+    public function killBrowsers(): array
+    {
+    }
+}
+
+/**
+ * Manajemen proses plugin aktif/nonaktif.
+ */
+class PluginWorker
+{
+    /**
+     * @param ProcessControl $processes worker spawning and termination
+     */
+    public function __construct(private readonly \GDPlayer\Service\Background\ProcessControl $processes)
+    {
+    }
+    /**
+     * Manage background daemon processes for all plugins.
+     */
+    public function managePluginsBackground(): void
+    {
+    }
+}
+
+/**
+ * Spawns and stops background processes and reports whether a PID is alive.
+ */
+class ProcessControl
+{
+    /**
+     * Seconds a spawn marker stays valid while the child is still booting (PowerShell boot ~0.4 s).
+     *
+     * Must stay well above a slow boot: the pid file is only written after the wrapper exits, so a
+     * marker that expires too early lets the next tick spawn a second worker.
+     */
+    private int $spawnTtl = 30;
+    /**
+     * Find and terminate Unix processes whose cmdline matches a pattern.
+     *
+     * `ps -ef` is not used: on busybox/alpine the second column is USER, not PID, so
+     * parsing `awk '{print $2}'` yields a user name and no process ever gets killed.
+     * `pgrep -a -f` is available on both busybox and procps.
+     *
+     * @return int[] PIDs that were signalled
+     */
+    protected function killUnixProcessesByPattern(string $pattern): array
+    {
+    }
+    /**
+     * Read a pid file and report its process only while that process is still alive.
+     *
+     * @param string|null $pidFile absolute path of the pid file; null when unknown
+     * @return int|null live process id, or null when the file or process is gone
+     */
+    protected function pidFileIsRunning(?string $pidFile): ?int
+    {
+    }
+    /**
+     * Start a PHP script detached from the current request and record its PID.
+     *
+     * Uses PowerShell `Start-Process` on Windows and `nohup` elsewhere.
+     *
+     * @param string $scriptPath script to run
+     * @param string $pidFile file receiving the child PID
+     * @param string|null $logFile destination for the child output, null discards it
+     * @return int 1 when the child was spawned, 0 when spawning failed
+     */
+    protected function spawnProcess(string $scriptPath, string $pidFile, ?string $logFile): int
+    {
+    }
+    /**
+     * Start the worker, or reuse the one that is already running (or still booting).
+     *
+     * @param string      $scriptPath script to run
+     * @param string      $pidFile    file receiving the child PID
+     * @param string      $startFile  marker of a spawn that is still booting
+     * @param null|string $logFile    optional log file to capture output
+     * @return false|int process id, 1 while the child is booting, or false on failure
+     */
+    protected function startWorker(string $scriptPath, string $pidFile, string $startFile, ?string $logFile): false|int
+    {
+    }
+    /**
+     * Stop processes whose working directory matches the given path on Unix.
+     *
+     * @param string $workingPath working directory of the processes to stop
+     * @return int[] PIDs that were signalled
+     */
+    protected function stopUnixProcessByPath(string $workingPath): array
+    {
+    }
+    /**
+     * Stop Windows processes whose command line mentions the given path.
+     *
+     * Each match gets a graceful `taskkill` first and a forced tree kill after
+     * a short pause; the current process is always excluded.
+     *
+     * @param string $workingPath path fragment to match in the command line
+     * @return int[] PIDs that were killed
+     */
+    protected function stopWindowsProcessByPath(string $workingPath): array
+    {
+    }
+    /**
+     * Check whether a PID is running.
+     *
+     * When `$imageName` is given, the process image name is also verified so a
+     * stale PID that was recycled by an unrelated process (PID reuse) is NOT
+     * reported as running.
+     *
+     * @param null|int $pid
+     * @param null|string $imageName
+     * @return bool
+     */
+    public function isRunning(?int $pid, ?string $imageName = null): bool
+    {
+    }
+    /**
+     * Spawn a PHP script as a detached background process.
+     *
+     * The spawn is fire-and-forget: `<pid>.starting` marks a child that is still booting, so the
+     * next tick does not start a second worker while its PID file has not been written yet.
+     *
+     * @param string      $scriptPath script to run
+     * @param null|string $logFile    optional log file to capture output
+     * @return false|int process id, 1 while the child is still booting, or false on failure
+     */
+    public function runInBackground(string $scriptPath = '', ?string $logFile = null): false|int
+    {
+    }
+    /**
+     * Terminate a process by PID (Windows: taskkill, Unix: killUnixPid).
+     *
+     * @param int         $pid       process id
+     * @param null|string $imageName image/process name used to verify the PID (optional)
+     */
+    public function stopPid(int $pid, ?string $imageName = null): void
+    {
+    }
+    /**
+     * Stop a background process identified by its script name.
+     *
+     * @param string $scriptName script base name
+     * @return false|string result message, or false on failure
+     */
+    public function stopProcessByName(string $scriptName): false|string
+    {
+    }
+    /**
+     * Stop every process started from a working directory.
+     *
+     * @param string $workingPath
+     * @return int[]
+     */
+    public function stopProcessByPath(string $workingPath): array
+    {
+    }
+}
+
+namespace GDPlayer\Service\Cache;
+
+/**
+ * A single cache entry: value, TTL, and tag list.
+ *
+ * Callers use it as a builder (`set()->expiresAfter()->addTag()`) and then hand
+ * it to `InstanceCache::save()`. The object holds no connection.
+ */
+final class CacheItem
+{
+    private bool $hit = false;
+    /** @var string[] */
+    private array $tags = [];
+    private int $ttl;
+    private mixed $value = null;
+    /**
+     * Bind the entry to a key and seed its lifetime with the store default.
+     *
+     * @param string $key key the entry will be written under
+     * @param int $defaultTtl fallback lifetime in seconds
+     */
+    public function __construct(private readonly string $key, int $defaultTtl)
+    {
+    }
+    /**
+     * Attach a single tag, skipping empty strings and duplicates.
+     *
+     * @param string $tag tag used for grouped invalidation
+     * @return $this
+     */
+    public function addTag(string $tag): self
+    {
+    }
+    /**
+     * @param string[] $tags
+     */
+    public function addTags(array $tags): self
+    {
+    }
+    /**
+     * Set the lifetime from a second count or a DateInterval.
+     *
+     * A null argument and any other type leave the current TTL untouched.
+     *
+     * @param int|DateInterval|null $ttl Lifetime in seconds or a relative interval
+     * @return $this
+     */
+    public function expiresAfter(int|\DateInterval|null $ttl): self
+    {
+    }
+    /**
+     * Convert an absolute expiry moment into a remaining-seconds lifetime.
+     *
+     * @param DateTimeInterface $expiry moment the entry should expire
+     * @return $this
+     */
+    public function expiresAt(\DateTimeInterface $expiry): self
+    {
+    }
+    /**
+     * Return the payload, which stays null until it is set or filled by a hit.
+     *
+     * @return mixed
+     */
+    public function get(): mixed
+    {
+    }
+    /**
+     * Return the key this entry is bound to.
+     *
+     * @return string
+     */
+    public function getKey(): string
+    {
+    }
+    /**
+     * @return string[]
+     */
+    public function getTags(): array
+    {
+    }
+    /**
+     * Return the current lifetime in seconds.
+     *
+     * @return int
+     */
+    public function getTtl(): int
+    {
+    }
+    /**
+     * Report whether the entry came from a successful storage read.
+     *
+     * @return bool
+     */
+    public function isHit(): bool
+    {
+    }
+    /**
+     * Mark the entry as the result of a storage read (used by the store).
+     */
+    public function markHit(mixed $value): self
+    {
+    }
+    /**
+     * Replace the payload, leaving the hit flag and TTL alone.
+     *
+     * @param mixed $value value to store
+     * @return $this
+     */
+    public function set(mixed $value): self
+    {
+    }
+}
+
+/**
+ * Plain Redis cache store (phpredis).
+ *
+ * The Redis handle may be injected at runtime (RoadRunner: one handle per worker,
+ * Swoole: a handle borrowed from the pool) so the cache opens no new connection.
+ * Without injection the store opens its own persistent connection (FPM mode).
+ *
+ * The prefix is written into every key by hand — the client's `Redis::OPT_PREFIX`
+ * is left alone, because an injected client is shared with other components.
+ *
+ * Connection handling lives in `RedisCacheConnection`, tag operations in
+ * `RedisCacheTagStore` and lock operations in `RedisCacheLock`.
+ */
+final class RedisCache
+{
+    private readonly \GDPlayer\Service\Cache\RedisCacheConnection $connection;
+    private readonly \GDPlayer\Service\Cache\RedisCacheLock $locks;
+    private readonly \GDPlayer\Service\Cache\RedisCacheTagStore $tags;
+    /**
+     * Bind the key prefix and open (or adopt) the Redis connection.
+     *
+     * @param string $prefix prefix written into every key of this instance
+     * @param null|Redis $redis existing handle to reuse, or null to connect
+     * @param bool $external true when the handle is owned by the caller
+     * @param int $defaultTtl fallback entry lifetime in seconds
+     */
+    public function __construct(private readonly string $prefix, ?\Redis $redis = null, bool $external = false, private readonly int $defaultTtl = 3600)
+    {
+    }
+    /**
+     * Raise a tag version; see `RedisCacheTagStore::bumpTag()`.
+     */
+    public function bumpTag(string $tag): int
+    {
+    }
+    /**
+     * Delete every key under this instance's prefix only (not FLUSHDB).
+     *
+     * SCAN walks the keyspace in pages so a large prefix does not block Redis;
+     * an unreachable cache reports false.
+     */
+    public function clear(): bool
+    {
+    }
+    /**
+     * Delete every entry under one tag; see `RedisCacheTagStore::deleteTag()`.
+     */
+    public function deleteTag(string $tag): bool
+    {
+    }
+    /**
+     * Read one entry. A miss, a corrupt payload, or a dead cache yields an
+     * item without a hit, never an exception.
+     */
+    public function get(string $key): \GDPlayer\Service\Cache\CacheItem
+    {
+    }
+    /**
+     * Return the prefix written into every key of this instance.
+     */
+    public function getPrefix(): string
+    {
+    }
+    /**
+     * Remove a single entry.
+     *
+     * @param string $key key without the instance prefix
+     * @return bool false when the cache is unreachable or the delete failed
+     */
+    public function hasDeletedKey(string $key): bool
+    {
+    }
+    /**
+     * Release a lock; see `RedisCacheLock::hasReleasedLock()`.
+     *
+     * @param string $key lock key without the instance prefix
+     * @param string $token token returned by `lock()`
+     * @return bool true when the release reached Redis
+     */
+    public function hasReleasedLock(string $key, string $token): bool
+    {
+    }
+    /**
+     * Invalidate a tag; see `RedisCacheTagStore::invalidateTag()`.
+     */
+    public function invalidateTag(string $tag): int
+    {
+    }
+    /**
+     * Claim a lock; see `RedisCacheLock::lock()`.
+     *
+     * @param string $key lock key without the instance prefix
+     * @param int $ttl lock lifetime in seconds
+     * @return string|false|null
+     */
+    public function lock(string $key, int $ttl): string|false|null
+    {
+    }
+    /**
+     * Store one entry.
+     *
+     * When the entry is tagged, the value and the tag-set membership go out in a
+     * single MULTI/EXEC. Split apart, an invalidation landing between SET and SADD
+     * would miss the new key: the entry never reaches the drop list, so the stale
+     * value survives until its TTL expires.
+     */
+    public function save(\GDPlayer\Service\Cache\CacheItem $item): bool
+    {
+    }
+    /**
+     * Current tag version; see `RedisCacheTagStore::tagVersion()`.
+     */
+    public function tagVersion(string $tag): int
+    {
+    }
+}
+
+/**
+ * Redis handle ownership, lazy reconnect and failure reporting.
+ */
+final class RedisCacheConnection
+{
+    private readonly bool $external;
+    private float $lastAttempt = 0.0;
+    private ?\Redis $redis;
+    /**
+     * @param null|Redis $redis injected handle, or null to connect lazily
+     * @param bool $external true when the handle belongs to the caller
+     */
+    public function __construct(?\Redis $redis = null, bool $external = false)
+    {
+    }
+    /**
+     * Active client, reconnecting lazily after a failed attempt.
+     *
+     * An external handle is never replaced: when its owner reports it dead the
+     * cache stays dead rather than opening a second connection.
+     */
+    public function client(): ?\Redis
+    {
+    }
+    /**
+     * Log a failed cache operation and drop a self-owned connection.
+     *
+     * The next request retries its own connection; an external handle is left
+     * for its owner to repair.
+     *
+     * @param Throwable $e failure to report
+     * @param string $action operation name used in the log line
+     */
+    public function report(\Throwable $e, string $action): void
+    {
+    }
+}
+
+/**
+ * Lock acquisition and token-guarded release.
+ */
+final class RedisCacheLock
+{
+    public function __construct(private readonly \GDPlayer\Service\Cache\RedisCacheConnection $connection, private readonly string $prefix)
+    {
+    }
+    /**
+     * Release a lock only when the token still belongs to the caller.
+     *
+     * The compare-and-delete runs as a Lua script so a stale holder cannot
+     * delete another process's lock.
+     *
+     * @param string $key lock key without the instance prefix
+     * @param string $token token returned by `lock()`
+     * @return bool true when the release reached Redis
+     */
+    public function hasReleasedLock(string $key, string $token): bool
+    {
+    }
+    /**
+     * Claim a lock with SET NX PX.
+     *
+     * The returned token proves ownership and must be passed back to
+     * `hasReleasedLock()`. A false result means another process holds the lock;
+     * null means the cache is unreachable.
+     *
+     * @param string $key lock key without the instance prefix
+     * @param int $ttl lock lifetime in seconds
+     * @return string|false|null
+     */
+    public function lock(string $key, int $ttl): string|false|null
+    {
+    }
+}
+
+/**
+ * Tag operations: tag version keys and tagged entry eviction.
+ */
+final class RedisCacheTagStore
+{
+    /** Tag version TTL: 30 days. Used by `bumpTag()` and `tagVersion()`. */
+    private const TAG_TTL = 2592000;
+    public function __construct(private readonly \GDPlayer\Service\Cache\RedisCacheConnection $connection, private readonly string $prefix)
+    {
+    }
+    /**
+     * Raise a tag version atomically with INCR. The value is stored as a raw integer.
+     */
+    public function bumpTag(string $tag): int
+    {
+    }
+    /**
+     * Physically delete every entry registered under one tag.
+     *
+     * SMEMBERS + DEL run in a single Lua script: if split, a member landing between
+     * the two commands never enters the list and slips through.
+     */
+    public function deleteTag(string $tag): bool
+    {
+    }
+    /**
+     * Invalidate a tag atomically: bump the version and drop old entries in one script.
+     *
+     * `bumpTag()` then `deleteTag()` has two points in time: a key written between them
+     * can be dropped (new data lost) or escape entirely (stale entry survives). One
+     * script is one point in time: writes before it are dropped, writes after survive.
+     *
+     * @return int new version, 0 when the cache is down or the version cannot be read
+     */
+    public function invalidateTag(string $tag): int
+    {
+    }
+    /**
+     * Build the Redis set key tracking the cache keys registered to a tag.
+     *
+     * Public because `RedisCache::save()` registers the entry itself inside its
+     * own MULTI/EXEC transaction.
+     *
+     * @param string $tag tag name
+     * @return string prefixed tag-set key
+     */
+    public function tagSetKey(string $tag): string
+    {
+    }
+    /**
+     * Current tag version; a missing key is initialised to 1.
+     */
+    public function tagVersion(string $tag): int
+    {
+    }
+}
+
+/**
+ * `RedisCache` payload format: fully delegated to phpredis when its build supports
+ * igbinary (serializer) and zstd (compression), otherwise it falls back to a manual
+ * `serialize()` with a class whitelist.
+ */
+final class RedisSerializer
+{
+    /**
+     * Install the best serializer/compression available.
+     *
+     * The `Redis::SERIALIZER_IGBINARY` and `Redis::COMPRESSION_ZSTD` constants only
+     * exist when phpredis is compiled with that support, so a `defined()` +
+     * `extension_loaded()` check is enough — a build without it (common on Windows)
+     * falls back to the manual path automatically.
+     */
+    public static function applyOptions(\Redis $redis): void
+    {
+    }
+    /**
+     * Inverse of `encodeValue()`. Values from a serializing client are already
+     * plain data; legacy string payloads are read through `decode()`.
+     */
+    public static function decodeValue(mixed $raw, ?\Redis $redis): mixed
+    {
+    }
+    /**
+     * Value ready to store: raw (phpredis does the encoding) or a manual serialize
+     * when the client has no active serializer.
+     */
+    public static function encodeValue(mixed $value, ?\Redis $redis): mixed
+    {
+    }
+}
+
 namespace GDPlayer\Service\HeadlessChrome;
 
 /**
- * Pembuatan browser dan URL browser persisten.
- *
- * Split out of `HeadlessChrome` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `HeadlessChrome` through this trait.
+ * Browser and persistent browser URL creation.
  */
-trait BrowserTrait
+final class ChromeBrowserFactory
 {
+    /**
+     * @param null|string $instance Chromium executable path
+     * @param int $debuggingPort remote debugging port
+     * @param int $timeout DevTools sync timeout in milliseconds
+     * @param bool $production whether only errors are logged
+     * @param string $proxy proxy URL
+     * @param string $proxyBypassList comma-separated bypass list
+     * @param string $userAgent user agent override
+     */
+    public function __construct(private ?string $instance, private int $debuggingPort, private int $timeout, private bool $production, private string $proxy, private string $proxyBypassList, private string $userAgent)
+    {
+    }
     /**
      * Spawns a configured Headless Chromium browser instance.
      *
      * @param array<string,string> $headers
      * @param string $logName
      * @param bool $keepAlive
-     * @return \HeadlessChromium\Browser
+     * @return Browser
      */
-    protected function createBrowser(array $headers, string $logName, bool $keepAlive = false): \HeadlessChromium\Browser
+    public function createBrowser(array $headers, string $logName, bool $keepAlive = false): \HeadlessChromium\Browser
     {
     }
-    protected function createLogStream(string $logName): \Monolog\Logger
+    /**
+     * Open a Monolog stream handler under the headless Chrome log directory.
+     *
+     * @param string $logName log file base name, without extension
+     * @return Logger
+     */
+    public function createLogStream(string $logName): \Monolog\Logger
     {
     }
     /**
@@ -12174,19 +15854,171 @@ trait BrowserTrait
      *
      * @return string|null
      */
-    protected function getPersistentBrowserUrl(): ?string
+    public function getPersistentBrowserUrl(): ?string
     {
     }
 }
+
 /**
- * Deteksi dan pembersihan proses Chrome/Chromium.
- *
- * Split out of `CoreTrait` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `CoreTrait` through this trait.
+ * Fetch interception, page initialisation and network listeners.
  */
-trait ProcessTrait
+final class ChromeNetworkCapture
 {
-    protected function getChromiumWindows(): ?string
+    /**
+     * Captures media and AJAX requests seen by the page.
+     *
+     * @param array<string,mixed> $data
+     * @param array<string,mixed> $result
+     * @param array<string,int> $capturedRequests
+     */
+    public static function handleRequestWillBeSent(array $data, array &$result, array &$capturedRequests): void
+    {
+    }
+    /**
+     * Initialise page settings and enable the CDP domains the listeners rely on.
+     *
+     * Downloads are denied: the scraper only needs the network traffic.
+     *
+     * @param Page $page page to initialise
+     * @return void
+     */
+    public static function initializePage(\HeadlessChromium\Page $page): void
+    {
+    }
+    /**
+     * Resolves whether the intercepted redirect request should be allowed.
+     *
+     * @param string $requestUrl
+     * @param string $initialUrl
+     * @return bool
+     */
+    public static function isRedirectAllowed(string $requestUrl, string $initialUrl): bool
+    {
+    }
+    /**
+     * Enables Fetch domain and registers redirection interception event listeners.
+     *
+     * @param Page $page
+     * @param string $url
+     * @param bool $redirected
+     * @return void
+     */
+    public static function setupFetchInterception(\HeadlessChromium\Page $page, string $url, bool &$redirected): void
+    {
+    }
+    /**
+     * Registers network event listeners to capture specific AJAX requests and their load state.
+     *
+     * @param Page $page
+     * @param array<string,mixed> $result
+     * @param array<string,int> $capturedRequests
+     * @param array<string,bool> $loadedRequests
+     * @return void
+     */
+    public static function setupNetworkListeners(\HeadlessChromium\Page $page, array &$result, array &$capturedRequests, array &$loadedRequests): void
+    {
+    }
+}
+
+/**
+ * Page navigation, in-page script execution and DevTools protocol wait helpers.
+ */
+final class ChromePageNavigator
+{
+    public function __construct(private int $timeout = 30000)
+    {
+    }
+    /**
+     * Helper to run optional custom page scripts and evaluation code.
+     *
+     * @param Page $page
+     * @param string $jsContent
+     * @param string $evaluation
+     * @param array<string,mixed> $result
+     * @return void
+     */
+    public function executePageScripts(\HeadlessChromium\Page $page, string $jsContent, string $evaluation, array &$result): void
+    {
+    }
+    /**
+     * Dump the page markup through DiDom, falling back to a direct HTML fetch when that throws.
+     *
+     * @param Page $page loaded page to serialise
+     * @return string page markup, or the raw HTML when the DOM dump fails
+     */
+    public function extractPageHtml(\HeadlessChromium\Page $page): string
+    {
+    }
+    /**
+     * Generates the multi-line JS stealth script.
+     *
+     * @param bool $isDoodstream
+     * @return string
+     */
+    public static function getStealthScript(bool $isDoodstream): string
+    {
+    }
+    /**
+     * Executes Doodstream-specific navigation and non-blocking wait loop.
+     *
+     * @param Page $page
+     * @param string $url
+     * @param bool $redirected
+     * @param string $jsContent
+     * @param string $evaluation
+     * @param array<string,mixed> $result
+     * @return void
+     */
+    public function navigateDoodstream(\HeadlessChromium\Page $page, string $url, bool &$redirected, string $jsContent, string $evaluation, array &$result): void
+    {
+    }
+    /**
+     * Executes standard page navigation for all other hosts.
+     *
+     * @param Page $page
+     * @param string $url
+     * @param string $jsContent
+     * @param string $evaluation
+     * @param array<string,mixed> $result
+     * @return void
+     */
+    public function navigateStandard(\HeadlessChromium\Page $page, string $url, string $jsContent, string $evaluation, array &$result): void
+    {
+    }
+    /**
+     * Prepares custom request headers.
+     *
+     * @param string $userLanguage Accept-Language value
+     * @param string $cookies Cookie header value
+     * @param string $referer Referer header value
+     * @return array<string,string>
+     */
+    public static function prepareHeaders(string $userLanguage, string $cookies, string $referer): array
+    {
+    }
+    /**
+     * Drain received messages until a redirect arrives, the page settles or the timeout expires.
+     *
+     * Received data is read through reflection because the driver exposes no public accessor.
+     * @param Page $page page to poll
+     * @param bool &$redirected Set by the response handler once a redirect response is seen
+     */
+    public function waitForDoodstreamLoad(\HeadlessChromium\Page $page, bool &$redirected): void
+    {
+    }
+}
+
+/**
+ * Chrome/Chromium process detection and cleanup.
+ *
+ * Methods stay protected so tests can steer the process list, and the class is
+ * not final for that same reason.
+ */
+class ChromeProcessManager
+{
+    /** Port the keepAlive browser instance listens on. */
+    public int $debuggingPort;
+    public function __construct(int $debuggingPort = 9222)
     {
     }
     /**
@@ -12218,6 +16050,11 @@ trait ProcessTrait
     protected function getHeadlessChromeProcessesWindows(): array
     {
     }
+    /**
+     * Read the Chrome or Edge executable path from the Windows App Paths registry.
+     *
+     * @return string|null executable path, or null when neither browser is registered
+     */
     protected static function getWindowsInstance(): ?string
     {
     }
@@ -12245,220 +16082,15 @@ trait ProcessTrait
     public function closeOrphanChrome(): int
     {
     }
-}
-/**
- * Headless Chrome process management and DevTools protocol helpers.
- */
-trait CoreTrait
-{
-    use \GDPlayer\Service\HeadlessChrome\ProcessTrait;
-    private string $cookies = '';
-    private string $referer = '';
-    private int $timeout = 30000;
-    private string $userLanguage = \GDPlayer\Config\App::ACCEPT_LANGUAGE;
-    private function extractPageHtml(\HeadlessChromium\Page $page): string
-    {
-    }
     /**
-     * @param \HeadlessChromium\Communication\Connection $connection
-     * @param \ReflectionProperty $propReceived
-     */
-    private function flushReceivedMessages($connection, \ReflectionProperty $propReceived): void
-    {
-    }
-    private function isPageLoadWaitComplete(\HeadlessChromium\Page $page, ?float &$loadTime, float $waitAfterLoadSeconds): bool
-    {
-    }
-    /**
-     * Prepares custom request headers.
+     * Resolve the Chromium binary shipped in the user profile on Windows.
      *
-     * @return array<string,string>
+     * @return string|null path to the executable, or the generic Windows instance as fallback
      */
-    private function prepareHeaders(): array
-    {
-    }
-    private function waitForDoodstreamLoad(\HeadlessChromium\Page $page, bool &$redirected): void
+    public static function getChromiumWindows(): ?string
     {
     }
 }
-/**
- * Navigasi halaman dan eksekusi skrip halaman.
- *
- * Split out of `HeadlessChrome` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `HeadlessChrome` through this trait.
- */
-trait NavigateTrait
-{
-    /**
-     * Helper to run optional custom page scripts and evaluation code.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @param string $jsContent
-     * @param string $evaluation
-     * @param array<string,mixed> $result
-     * @return void
-     */
-    protected function executePageScripts(\HeadlessChromium\Page $page, string $jsContent, string $evaluation, array &$result): void
-    {
-    }
-    /**
-     * Executes Doodstream-specific navigation and non-blocking wait loop.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @param string $url
-     * @param bool $redirected
-     * @param string $jsContent
-     * @param string $evaluation
-     * @param array<string,mixed> $result
-     * @return void
-     */
-    protected function navigateDoodstream(\HeadlessChromium\Page $page, string $url, bool &$redirected, string $jsContent, string $evaluation, array &$result): void
-    {
-    }
-    /**
-     * Executes standard page navigation for all other hosts.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @param string $url
-     * @param string $jsContent
-     * @param string $evaluation
-     * @param array<string,mixed> $result
-     * @return void
-     */
-    protected function navigateStandard(\HeadlessChromium\Page $page, string $url, string $jsContent, string $evaluation, array &$result): void
-    {
-    }
-}
-/**
- * Intersepsi fetch dan listener jaringan.
- *
- * Split out of `HeadlessChrome` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `HeadlessChrome` through this trait.
- */
-trait NetworkTrait
-{
-    /**
-     * Enables Fetch domain and registers redirection interception event listeners.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @param string $url
-     * @param bool $redirected
-     * @return void
-     */
-    protected function setupFetchInterception(\HeadlessChromium\Page $page, string $url, bool &$redirected): void
-    {
-    }
-    /**
-     * Registers network event listeners to capture specific AJAX requests and their load state.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @param array<string,mixed> $result
-     * @param array<string,int> $capturedRequests
-     * @param array<string,bool> $loadedRequests
-     * @return void
-     */
-    protected function setupNetworkListeners(\HeadlessChromium\Page $page, array &$result, array &$capturedRequests, array &$loadedRequests): void
-    {
-    }
-}
-/**
- * Eksekusi skrip pada browser persisten.
- *
- * Split out of `HeadlessChrome` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `HeadlessChrome` through this trait.
- */
-trait PersistentTrait
-{
-    /**
-     * Initializes basic page settings and enables required CDP domains.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @return void
-     */
-    private static function initializePage(\HeadlessChromium\Page $page): void
-    {
-    }
-    /**
-     * Sync retrieves the response body of loaded captured requests.
-     *
-     * @param \HeadlessChromium\Page $page
-     * @param array<string,int> $capturedRequests
-     * @param array<string,bool> $loadedRequests
-     * @param array<string,mixed> $result
-     * @return void
-     */
-    protected function fetchAjaxResponseBodies(\HeadlessChromium\Page $page, array $capturedRequests, array $loadedRequests, array &$result): void
-    {
-    }
-    /**
-     * Generates the multi-line JS stealth script.
-     *
-     * @param bool $isDoodstream
-     * @return string
-     */
-    protected static function getStealthScript(bool $isDoodstream): string
-    {
-    }
-    /**
-     * Executes headless Chrome against a URL using a persistent running Chrome instance.
-     * Auto-spawns the browser on a specific port if it is dead or unavailable.
-     * Creates a new isolated tab for each request to support concurrency.
-     *
-     * @param string $url
-     * @param string $logName
-     * @param string $jsContent
-     * @param string $evaluation
-     * @return array<string,mixed>
-     */
-    public function execPersistent(string $url = '', string $logName = '', string $jsContent = '', string $evaluation = ''): array
-    {
-    }
-}
-namespace GDPlayer\Service\System;
-
-/**
- * TCP port availability checker.
- */
-trait PortChecker
-{
-    /**
-     * @param string $file
-     * @return array{ip: string|false, port: int|float}[]
-     */
-    private function extractFile(string $file): array
-    {
-    }
-    /**
-     * @return array{ip: string|false, port: int|float}[]
-     */
-    protected function getListeningPortsLinux(): array
-    {
-    }
-    /**
-     * @return array{ip: string|false, port: int|float}[]
-     */
-    protected function getListeningPortsWindows(): array
-    {
-    }
-    /**
-     * @return array{ip: string|false, port: int|float}[]
-     */
-    protected function getListeningPortsWithCommand(): array
-    {
-    }
-    /**
-     * Check whether a TCP port accepts connections.
-     *
-     * @param int    $port    port number
-     * @param string $host    host to probe
-     * @param int    $timeout connection timeout in seconds
-     * @return bool true when the port is open
-     */
-    public function isPortOpen(int $port, string $host = '127.0.0.1', int $timeout = 2): bool
-    {
-    }
-}
-namespace GDPlayer\Service\HeadlessChrome;
 
 /**
  * Headless Chrome service for JavaScript-heavy hosts.
@@ -12466,14 +16098,20 @@ namespace GDPlayer\Service\HeadlessChrome;
  * Manages a persistent Chromium instance over the DevTools protocol and
  * exposes a fluent configuration API for proxy, cookies and timeouts.
  */
-final class HeadlessChrome
+class HeadlessChrome
 {
-    use \GDPlayer\Service\HeadlessChrome\BrowserTrait;
-    use \GDPlayer\Service\HeadlessChrome\CoreTrait;
-    use \GDPlayer\Service\HeadlessChrome\NavigateTrait;
-    use \GDPlayer\Service\HeadlessChrome\NetworkTrait;
-    use \GDPlayer\Service\HeadlessChrome\PersistentTrait;
     use \GDPlayer\Service\System\PortChecker;
+    private const DEFAULT_PORT = 9222;
+    private const PORT_KEY = 'chrome-port';
+    protected string $cookies = '';
+    protected int $debuggingPort = self::DEFAULT_PORT;
+    protected bool $production = false;
+    protected string $proxy = '';
+    protected string $proxyBypassList = '';
+    protected string $referer = '';
+    protected int $timeout = 30000;
+    protected string $userAgent = '';
+    protected string $userLanguage = \GDPlayer\Config\App::ACCEPT_LANGUAGE;
     /**
      * Resolve the persistent debugging port and prepare the service configuration.
      *
@@ -12488,6 +16126,71 @@ final class HeadlessChrome
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
+    {
+    }
+    /**
+     * Spawns a configured Headless Chromium browser instance.
+     *
+     * @param array<string,string> $headers
+     * @param string $logName
+     * @param bool $keepAlive
+     * @return Browser
+     */
+    protected function createBrowser(array $headers, string $logName, bool $keepAlive = false): \HeadlessChromium\Browser
+    {
+    }
+    /**
+     * Open a Monolog stream handler under the headless Chrome log directory.
+     *
+     * @param string $logName log file base name, without extension
+     * @return Logger
+     */
+    protected function createLogStream(string $logName): \Monolog\Logger
+    {
+    }
+    /**
+     * Retrieve the response bodies of the captured requests that finished loading.
+     *
+     * Synchronous on purpose: CDP response bodies are only retrievable while the tab lives.
+     *
+     * @param Page $page active page
+     * @param array<string,int> $capturedRequests request id => row index
+     * @param array<string,bool> $loadedRequests request ids known to be complete
+     * @param array<string,mixed> $result result accumulator, updated by reference
+     * @return void
+     */
+    protected function fetchAjaxResponseBodies(\HeadlessChromium\Page $page, array $capturedRequests, array $loadedRequests, array &$result): void
+    {
+    }
+    /**
+     * Queries the local running Chrome debugging port to fetch the WebSocket debugger URL.
+     *
+     * @return string|null
+     */
+    protected function getPersistentBrowserUrl(): ?string
+    {
+    }
+    /**
+     * Terminate headless Chrome instances that no longer serve the active port.
+     *
+     * @return int number of terminated processes
+     */
+    public function closeOrphanChrome(): int
+    {
+    }
+    /**
+     * Execute headless Chrome against a URL on the persistent browser instance.
+     *
+     * Auto-spawns a keep-alive browser on `$debuggingPort` when the running one is dead or missing,
+     * and gives every call its own tab so concurrent requests do not share page state.
+     *
+     * @param string $url page to load
+     * @param string $logName scenario name; contains `doodstream` to switch to the interception path
+     * @param string $jsContent pre-script evaluated after navigation
+     * @param string $evaluation expression evaluated once the page settled
+     * @return array<string,mixed>
+     */
+    public function execPersistent(string $url = '', string $logName = '', string $jsContent = '', string $evaluation = ''): array
     {
     }
     /**
@@ -12554,6 +16257,7 @@ final class HeadlessChrome
     {
     }
 }
+
 /**
  * Exception thrown for headless Chrome failures.
  */
@@ -12566,156 +16270,150 @@ final class HeadlessChromeException extends \Exception
     {
     }
 }
+
 namespace GDPlayer\Service\InstanceCache;
 
 /**
- * Pemegang store cache bersama.
+ * Application cache facade on top of plain Redis (`RedisCache`).
  *
- * Runtime long-running meng-inject handle Redis miliknya sendiri
- * (`useRedis()`), jadi cache tidak pernah membuka koneksi kedua. Tanpa
- * injeksi, `RedisCache` membuka satu koneksi persisten (mode FPM).
+ * Static so the 293 existing callers stay unchanged. A long-running runtime only
+ * injects its Redis handle once at boot through `useRedis()`.
  */
-trait CoreTrait
+final class InstanceCache
 {
-    /** Dipakai di luar coroutine (SAPI / RoadRunner / CLI). */
-    private static ?\GDPlayer\Service\InstanceCache\InstanceCacheState $state = null;
     /**
-     * Prefix instance + `_v2_`: key phpfastcache lama tidak pernah terbaca
-     * sebagai payload baru, dan mati sendiri oleh TTL.
+     * Drop every cache entry and forget the in-request tag version memo.
+     *
+     * @return int 1 when the store reported success, 0 otherwise
      */
-    private static function cachePrefix(): string
+    public static function clear(): int
     {
     }
     /**
-     * State milik coroutine berjalan; di Swoole tiap request punya instance sendiri
-     * sehingga `resetRedis()` milik satu request tidak memutus store request lain.
-     */
-    private static function state(): \GDPlayer\Service\InstanceCache\InstanceCacheState
-    {
-    }
-    private static function store(): \GDPlayer\Service\Cache\RedisCache
-    {
-    }
-    /**
-     * Kembali ke mode kelola-sendiri (FPM / CLI).
-     */
-    public static function resetRedis(): void
-    {
-    }
-    /**
-     * Inject handle Redis milik runtime. Handle yang sama dipakai terus —
-     * reconnect adalah tanggung jawab pemiliknya (pool / worker manager).
-     */
-    public static function useRedis(?\Redis $redis): void
-    {
-    }
-}
-/**
- * Versi tag dan invalidasi cache berbasis tag.
- *
- * Versi tag disimpan sebagai integer mentah (`INCR` atomik) supaya invalidasi
- * dari worker mana pun langsung terlihat. Split dari `InstanceCache` karena
- * aturan php:S2042 (maks 150 baris per kelas).
- */
-trait TagTrait
-{
-    private static function cleanTag(string $tag): string
-    {
-    }
-    /**
-     * Kunci komposit ber-versi tag (tanpa titik dua).
+     * Tag-versioned composite key (without colons).
      * Format: {baseKey}_v{tag1Version}_{tag2Version}
      *
      * @param string|string[] $tags
+     * @return string key that changes whenever any of the given tags is invalidated
      */
     public static function createVersionedKey(string $baseKey, string|array $tags): string
     {
     }
     /**
-     * Invalidasi tag: versi dinaikkan dan entri bertag dibuang fisik.
+     * Remove one entry by key.
      *
-     * Keduanya satu skrip di server (`RedisCache::invalidateTag()`), jadi tidak
-     * ada jendela antara naik-versi dan buang-entri tempat key baru bisa lolos.
+     * @param string $key cache key; empty string is a no-op
+     * @return int 1 when the entry was deleted, 0 otherwise
+     */
+    public static function deleteItem(string $key = ''): int
+    {
+    }
+    /**
+     * Invalidate a tag: bump its version and physically drop the tagged entries.
+     *
+     * Both happen in one server-side script (`RedisCache::invalidateTag()`), so there is
+     * no window between bumping the version and dropping the entries where a new key
+     * could slip through.
+     *
+     * @param string $tagName tag to invalidate
+     * @return int 1 on success, 0 when the tag is empty or storage failed
      */
     public static function deleteItemsByTag(string $tagName = ''): int
     {
     }
     /**
+     * Invalidate several tags, succeeding only when every one of them was applied.
+     *
      * @param string[] $tagNames
+     * @return int 1 when all tags were invalidated, 0 otherwise
      */
     public static function deleteItemsByTags(array $tagNames = []): int
     {
     }
     /**
-     * Versi tag saat ini dari storage (dimemo per request).
-     */
-    public static function getTagVersion(string $tag): int
-    {
-    }
-    /**
-     * Naikkan versi tag secara atomik.
-     */
-    public static function invalidateTag(string $tag): int
-    {
-    }
-    /**
-     * @param string[] $tags
-     */
-    public static function invalidateTags(array $tags): int
-    {
-    }
-    /**
-     * Kosongkan memo versi tag. Wajib dipanggil di akhir tiap request pada
-     * proses long-running (RoadRunner/Swoole): versi dibaca ulang dari storage
-     * sehingga invalidasi worker lain langsung terlihat.
-     */
-    public static function resetTagVersions(): void
-    {
-    }
-}
-/**
- * Facade cache aplikasi di atas Redis biasa (`RedisCache`).
- *
- * Static supaya 293 pemanggil lama tidak berubah. Runtime long-running cukup
- * meng-inject handle Redis-nya sekali saat boot lewat `useRedis()`.
- */
-final class InstanceCache
-{
-    use \GDPlayer\Service\InstanceCache\CoreTrait;
-    use \GDPlayer\Service\InstanceCache\TagTrait;
-    public static function clear(): int
-    {
-    }
-    public static function deleteItem(string $key = ''): int
-    {
-    }
-    /**
-     * Ambil entri; selalu mengembalikan objek (miss = `isHit()` false) supaya
-     * pola `$item->set(...)` lalu `save()` tetap jalan.
+     * Get the entry; always returns an object (miss = `isHit()` false) so the
+     * `$item->set(...)` then `save()` pattern keeps working.
      */
     public static function getItem(string $key): ?\GDPlayer\Service\Cache\CacheItem
     {
     }
     /**
-     * Cache stampede protection: satu pemegang lock, sisanya menunggu hasil.
+     * Cache stampede protection: one lock holder, the rest wait for the result.
      *
-     * @param int|\DateInterval|\DateTimeInterface|null $ttl
+     * @param int|DateInterval|DateTimeInterface|null $ttl
      * @param string|string[]|null $tags
      */
-    public static function getOrSetWithLock(string $key, $ttl, callable $callback, $tags = null, int $lockTimeout = 15): mixed
+    public static function getOrSetWithLock(string $key, null|int|\DateInterval|\DateTimeInterface $ttl, callable $callback, null|string|array $tags = null, int $lockTimeout = 15): mixed
     {
     }
+    /**
+     * Current tag version from storage, memoised for the request.
+     *
+     * @param string $tag tag name
+     * @return int version number, defaulting to 1 when storage is unavailable
+     */
+    public static function getTagVersion(string $tag): int
+    {
+    }
+    /**
+     * Bump a tag version atomically and store the new value in the request memo.
+     *
+     * @param string $tag tag name
+     * @return int 1 on success, 0 when storage failed
+     */
+    public static function invalidateTag(string $tag): int
+    {
+    }
+    /**
+     * Bump several tag versions, succeeding only when every one of them was applied.
+     *
+     * @param string[] $tags
+     * @return int 1 when all tags were invalidated, 0 otherwise
+     */
+    public static function invalidateTags(array $tags): int
+    {
+    }
+    /**
+     * Return to self-managed mode (FPM / CLI), dropping the injected handle and the store.
+     */
+    public static function resetRedis(): void
+    {
+    }
+    /**
+     * Clear the memoised tag versions. Must run at the end of every request in a
+     * long-running process (RoadRunner/Swoole): versions are then re-read from storage
+     * so invalidation performed by another worker becomes visible.
+     */
+    public static function resetTagVersions(): void
+    {
+    }
+    /**
+     * Persist an item that was filled through `setItem()`/`getItem()`.
+     *
+     * @param CacheItem|null $cacheItem item to store; null is a no-op
+     * @return int 1 when the store reported success, 0 otherwise
+     */
     public static function save(?\GDPlayer\Service\Cache\CacheItem $cacheItem): int
     {
     }
     /**
-     * @param int|\DateInterval|\DateTimeInterface|null $ttl
+     * @param int|DateInterval|DateTimeInterface|null $ttl
      * @param string|string[]|null $tags
      */
-    public static function setItem(string $key, mixed $value, $ttl = null, $tags = null): int
+    public static function setItem(string $key, mixed $value, null|int|\DateInterval|\DateTimeInterface $ttl = null, null|string|array $tags = null): int
+    {
+    }
+    /**
+     * Inject the runtime's own Redis handle.
+     *
+     * The same handle is reused for the whole process; reconnecting is the owner's
+     * responsibility (pool / worker manager).
+     */
+    public static function useRedis(?\Redis $redis): void
     {
     }
 }
+
 /**
  * Exception thrown for cache backend failures.
  */
@@ -12728,116 +16426,55 @@ final class InstanceCacheException extends \Exception
     {
     }
 }
+
 /**
- * Pemegang store cache untuk satu eksekusi (satu request).
+ * Cache store holder for one execution (one request).
  *
- * Di Swoole beberapa request hidup sebagai coroutine dalam satu proses, jadi state ini
- * disimpan di context coroutine (lihat {@see CoreTrait::state()}); di SAPI/RoadRunner
- * hanya ada satu instance statis. Field-nya publik supaya trait tidak perlu getter/setter.
+ * Under Swoole several requests run as coroutines inside one process, so this state
+ * lives in the coroutine context (see {@see InstanceCacheStore::state()}); on SAPI/RoadRunner
+ * there is only one static instance. The fields are public so traits need no getter/setter.
  */
 final class InstanceCacheState
 {
     public ?\Redis $redis = null;
-    /** true = handle milik runtime; cache tidak boleh connect sendiri. */
+    /** true = handle owned by the runtime; the cache must not open its own connection. */
     public bool $redisInjected = false;
     public ?\GDPlayer\Service\Cache\RedisCache $store = null;
     /**
-     * Memo versi tag, hanya berlaku satu request.
+     * Memoised tag versions, valid for one request only.
      *
      * @var array<string, int>
      */
     public array $tagVersions = [];
 }
-namespace GDPlayer\Service;
 
 /**
- * Authentication service for login, registration tokens and session handling.
+ * Shared cache store holder.
+ *
+ * Long-running runtimes inject their own Redis handle (`InstanceCache::useRedis()`), so the
+ * cache never opens a second connection.
  */
-final class Login
+final class InstanceCacheStore
 {
+    /** Used outside a coroutine (SAPI / RoadRunner / CLI). */
+    private static ?\GDPlayer\Service\InstanceCache\InstanceCacheState $state = null;
     /**
-     * Bind the security, session and geolocation services.
+     * State of the running coroutine; under Swoole each request owns its instance, so
+     * one request's `resetRedis()` never disconnects another request's store.
+     */
+    public static function state(): \GDPlayer\Service\InstanceCache\InstanceCacheState
+    {
+    }
+    /**
+     * Return the process or coroutine cache store, creating it on first use.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request PSR-7 request, or null to fall back to globals
+     * @return RedisCache cache facade bound to this runtime's Redis handle
      */
-    public function __construct(?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    /**
-     * @return array<string, mixed>|null
-     */
-    public static function getCurrentUser(string $customToken = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): ?array
-    {
-    }
-    public static function getPublicUserId(?\Psr\Http\Message\ServerRequestInterface $request = null): int
-    {
-    }
-    /**
-     * must be httponly: false because it is used for http and ajax
-     *
-     * @param array<string,mixed> $dataUser
-     * @param string $expiredAt
-     * @return bool
-     */
-    public function hasSavedLoginData(array $dataUser, string $expiredAt): bool
-    {
-    }
-    public static function isCurrentUserAdmin(?\Psr\Http\Message\ServerRequestInterface $request = null): bool
-    {
-    }
-    /**
-     * Validate a login/registration token from the query string.
-     *
-     * @param string $redirectUrl URL to redirect to on failure
-     * @return bool true when the token is valid
-     */
-    public function isRegisterTokenValid(string $redirectUrl): bool
-    {
-    }
-    /**
-     * must be httponly: false because it is used for http and ajax
-     *
-     * @return int
-     */
-    public function logout(): int
-    {
-    }
-    /**
-     * Validate a password and its confirmation against the security policy.
-     *
-     * @param string $password        password to validate
-     * @param string $retype_password confirmation value
-     * @return string alert HTML with the validation result
-     */
-    public function passwordValidation(string $password = '', string $retype_password = ''): string
-    {
-    }
-    /**
-     * Record a failed login attempt.
-     *
-     * @param string $username attempted username
-     * @return string|false insert result, or false on failure
-     */
-    public function saveLoginFailed(string $username = ''): string|false
-    {
-    }
-    /**
-     * @param string $token
-     * @return null|array<string,mixed>
-     */
-    public function tokenValidation(string $token): ?array
-    {
-    }
-    public static function isAdminTokenValid(string $token = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): bool
+    public static function store(): \GDPlayer\Service\Cache\RedisCache
     {
     }
 }
+
 namespace GDPlayer\Service\Media;
 
 /**
@@ -12845,6 +16482,12 @@ namespace GDPlayer\Service\Media;
  */
 class PhpIco
 {
+    /**
+     * Images in the BMP format.
+     *
+     * @var list<array{width:int,height:int,colorPaletteColors:int,bitsPerPixel:int,size:int|float,data:string}> $images
+     */
+    private array $images = [];
     /**
      * Constructor - Create a new ICO generator.
      * If the constructor is not passed a file, a file will need to be supplied using the {@link PhpIco::addImage}
@@ -12869,11 +16512,20 @@ class PhpIco
     {
     }
 }
+
 /**
  * Minimal GD-based image loader/resizer used for logos and favicons.
  */
 final class SimpleImage
 {
+    /** @var GdImage|false $image */
+    private \GdImage|false $image = false;
+    /** @var array{0:int<0,max>,1:int<0,max>,2:int,3:string,mime:string,channels?:int,bits?:int}|false $imageInfo */
+    private array|false $imageInfo = false;
+    /** @var int $imageType */
+    private int $imageType = \IMAGETYPE_JPEG;
+    /** @var string $outputFile */
+    private string $outputFile;
     /**
      * @return array<string, mixed>
      */
@@ -12925,12 +16577,18 @@ final class SimpleImage
     {
     }
 }
+
 /**
  * Converts subtitle formats (SRT/VTT/ASS/...) to WebVTT.
  */
 final class SubtitleConverter
 {
+    private string $content = '';
+    /** @var string[] $sourceTypes */
+    private array $sourceTypes = ['youtube'];
     /**
+     * Expose the application info instead of the internal state in var_dump output.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
@@ -12964,153 +16622,9 @@ final class SubtitleConverter
     {
     }
 }
-namespace GDPlayer\Service;
 
-/**
- * Minifier for inline JavaScript, CSS and JSON.
- */
-final class Minify
-{
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    /**
-     * @param string $input
-     * @return string
-     */
-    public static function js(string $input = ''): string
-    {
-    }
-    /**
-     * Minify a JSON string.
-     *
-     * @param string $input JSON text
-     * @return string minified JSON, or the input when empty/invalid
-     */
-    public static function json(string $input = ''): string
-    {
-    }
-}
-namespace GDPlayer\Service\Sync;
-
-/**
- * Bagian protokol sinkronisasi yang identik untuk tema dan plugin.
- *
- * Blok ini dulu disalin utuh di `Service\Theme\DownloadTrait` dan `Service\Plugin\DownloadTrait`
- * (duplikasi high pada new code). Perilaku tiap method tidak berubah; `$kind` hanya untuk log.
- */
-trait DownloadSyncTrait
-{
-    /**
-     * Unduh satu arsip di bawah file lock (lock sengaja permanen: menghapusnya saat masih
-     * dipegang memungkinkan dua proses menulis arsip yang sama).
-     *
-     * @param string               $link     URL arsip
-     * @param string               $zipPath  tujuan
-     * @param string               $lockBase path dasar file lock/log
-     * @param string               $kind     plugin|theme
-     * @param array<string, mixed> $context  konteks log
-     * @return string|false
-     */
-    protected static function fetchArchive(string $link, string $zipPath, string $lockBase, string $kind, array $context): string|false
-    {
-    }
-    /**
-     * Minta stamp isi folder tema/plugin dari server sumber.
-     *
-     * @param string               $url     URL aksi `ping`
-     * @param string               $kind    plugin|theme (untuk pesan log)
-     * @param array<string, mixed> $context konteks log
-     * @return string|false stamp, atau false saat gagal / tidak valid
-     */
-    protected static function fetchStampFromSource(string $url, string $kind, array $context): string|false
-    {
-    }
-    /**
-     * @param string $stamp nilai stamp dari server sumber
-     */
-    protected static function isValidStamp(string $stamp): bool
-    {
-    }
-    /**
-     * @param string $tmpDir direktori tmp
-     * @param string $name   nama folder tema/plugin
-     */
-    protected static function readStamp(string $tmpDir, string $name): string
-    {
-    }
-    /**
-     * Alamat `main_site` yang dipakai untuk menarik arsip, atau '' bila server ini sendiri.
-     */
-    protected static function resolveMainSite(): string
-    {
-    }
-    /**
-     * @param string $tmpDir direktori tmp
-     * @param string $name   nama folder tema/plugin
-     */
-    protected static function stampFile(string $tmpDir, string $name): string
-    {
-    }
-}
 namespace GDPlayer\Service\Plugin;
 
-/**
- * Unduh dan simpan berkas plugin.
- *
- * Split out of `PluginManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginManager` through this trait.
- *
- * Protokol sinkronisasi: `ping` membalas stamp isi folder (sha1), bukan 'ok'.
- * Node membandingkannya dengan stamp terakhir yang sukses diekstrak; stamp sama =
- * tidak ada unduhan sama sekali. Nama arsip memuat stamp, jadi isi yang tidak
- * berubah tidak pernah dibangun ulang di server sumber. Bagian yang sama dengan
- * tema ada di `DownloadSyncTrait`.
- */
-trait DownloadTrait
-{
-    use \GDPlayer\Service\Sync\DownloadSyncTrait;
-    /**
-     * @param int    $pluginId plugin id
-     * @param string $action   ping|download
-     * @return string URL, atau '' bila server ini adalah sumbernya sendiri
-     */
-    protected static function getSyncDownloadUrl(int $pluginId, string $action = 'ping'): string
-    {
-    }
-    /**
-     * Unduh arsip plugin bila stamp berbeda dari yang terakhir dipasang.
-     *
-     * @param int    $pluginId plugin id
-     * @param string $folder   folder plugin
-     * @param string $stamp    stamp isi folder di server sumber
-     * @return string|false path arsip, false bila sudah mutakhir atau gagal
-     */
-    public static function downloadPluginFile(int $pluginId, string $folder, string $stamp = ''): string|false
-    {
-    }
-    /**
-     * Catat stamp yang sudah berhasil dipasang (dipakai untuk melewati siklus berikutnya).
-     *
-     * @param string $folder folder plugin
-     * @param string $stamp  stamp isi folder di server sumber
-     */
-    public static function markSynced(string $folder, string $stamp): void
-    {
-    }
-    /**
-     * Minta stamp isi folder plugin di server sumber.
-     *
-     * @param int $pluginId plugin id
-     * @return string|false stamp, '' bila tidak ada yang perlu disinkronkan, false saat gagal
-     */
-    public static function syncPluginFile(int $pluginId): string|false
-    {
-    }
-}
 /**
  * Bridge from plugin API routes (plugins/api) to the core router.
  *
@@ -13121,11 +16635,14 @@ trait DownloadTrait
  */
 final class PluginApiBridge
 {
+    private const CORS_ALLOW_HEADERS = 'Authorization, Content-Type';
+    private const CORS_METHODS = 'GET, POST, PUT, PATCH, DELETE, OPTIONS';
+    private const FOLDER = 'plugins/api/';
     /**
      * Handle /api/v1/* requests through the plugin router.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request active request
-     * @return \Psr\Http\Message\ResponseInterface plugin JSON response
+     * @param ServerRequestInterface $request active request
+     * @return ResponseInterface plugin JSON response
      */
     public static function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
     {
@@ -13139,12 +16656,15 @@ final class PluginApiBridge
     {
     }
 }
+
 /**
  * Dispatches registered plugin hooks and filters across the application.
  */
 final class PluginHookManager
 {
     /**
+     * Expose application info when the object is dumped.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
@@ -13188,63 +16708,7 @@ final class PluginHookManager
     {
     }
 }
-/**
- * Shared plugin/theme archive extraction and version-check helpers.
- */
-trait ThemeManagerTrait
-{
-    /**
-     * @param string $link
-     * @param string $zipPath
-     * @param string $logFile
-     * @param string $targetType
-     * @param array<string, mixed> $context
-     * @return string|false
-     */
-    private static function performDownload(string $link, string $zipPath, string $logFile, string $targetType = 'plugin', array $context = []): string|false
-    {
-    }
-}
-/**
- * Ekstraksi arsip plugin dan penentuan berkas yang dipertahankan.
- *
- * Split out of `PluginManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginManager` through this trait.
- */
-trait ZipTrait
-{
-    /**
-     * @param \ZipArchive $zip
-     * @return array<string|int,mixed>
-     */
-    protected static function getFilesToKeep(\ZipArchive $zip): array
-    {
-    }
-    /**
-     * @param \ZipArchive $zip
-     * @param int $index
-     * @param string $destinationPath
-     * @param array<string|int,mixed> $keepFiles
-     * @param bool $isUpgrade
-     */
-    protected static function processZipItem(\ZipArchive $zip, int $index, string $destinationPath, array $keepFiles, bool $isUpgrade): void
-    {
-    }
-    protected static function isPluginUpgradeNeeded(\ZipArchive $zip, string $destinationPath): bool
-    {
-    }
-    /**
-     * Extract a plugin archive into the plugins directory.
-     *
-     * @param string $zipPath         path to the archive
-     * @param string $destinationPath destination directory
-     * @param bool   $isUpgrade       whether this is an upgrade (version-guarded)
-     * @return int true when extraction succeeded
-     */
-    public static function extractPluginZip(string $zipPath, string $destinationPath, bool $isUpgrade = false): int
-    {
-    }
-}
+
 /**
  * Plugin lifecycle manager (install, upgrade, dispatch, sync).
  *
@@ -13253,9 +16717,6 @@ trait ZipTrait
  */
 final class PluginManager
 {
-    use \GDPlayer\Service\Plugin\DownloadTrait;
-    use \GDPlayer\Service\Plugin\ThemeManagerTrait;
-    use \GDPlayer\Service\Plugin\ZipTrait;
     /**
      * @return array<string, mixed>
      */
@@ -13263,10 +16724,60 @@ final class PluginManager
     {
     }
     /**
+     * Read the `keep_files` list declared by the plugin manifest inside the archive.
+     *
+     * @param ZipArchive $zip open archive
+     * @return array<string|int,mixed> normalized relative paths, empty when undeclared
+     */
+    protected static function getFilesToKeep(\ZipArchive $zip): array
+    {
+    }
+    /**
+     * @param int    $pluginId plugin id
+     * @param string $action   ping|download
+     * @return string URL, or '' when this server is the source itself
+     */
+    protected static function getSyncDownloadUrl(int $pluginId, string $action = 'ping'): string
+    {
+    }
+    /**
+     * Decide whether the archive may overwrite the installed copy.
+     *
+     * @param ZipArchive $zip open archive
+     * @param string $destinationPath installed plugin directory
+     * @return bool true on a fresh install or when the archive version is newer
+     */
+    protected static function isPluginUpgradeNeeded(\ZipArchive $zip, string $destinationPath): bool
+    {
+    }
+    /**
+     * Extract one archive entry, skipping folders and the files an upgrade must preserve.
+     *
+     * @param ZipArchive $zip open archive
+     * @param int $index entry index to extract
+     * @param string $destinationPath directory the entry is written to
+     * @param array<string|int,mixed> $keepFiles relative paths preserved on upgrade
+     * @param bool $isUpgrade whether the archive is an upgrade
+     */
+    protected static function processZipItem(\ZipArchive $zip, int $index, string $destinationPath, array $keepFiles, bool $isUpgrade): void
+    {
+    }
+    /**
      * @param list<array<string, mixed>> $activePlugins
-     * @return list<array<string, mixed>>
+     * @return list<array{folder: string, manifest: array<int|string, mixed>, priority: int}>
      */
     public static function checkCandidates(array $activePlugins): array
+    {
+    }
+    /**
+     * Download the plugin archive when its stamp differs from the last installed one.
+     *
+     * @param int    $pluginId plugin id
+     * @param string $folder   plugin folder
+     * @param string $stamp    folder content stamp on the source server
+     * @return string|false archive path, false when already current or on failure
+     */
+    public static function downloadPluginFile(int $pluginId, string $folder, string $stamp = ''): string|false
     {
     }
     /**
@@ -13275,6 +16786,17 @@ final class PluginManager
      * @return string[] [preferred engine, fallback engine]; empty array when no engine plugin is active
      */
     public static function engineFallbackOrder(): array
+    {
+    }
+    /**
+     * Extract a plugin archive into the plugins directory.
+     *
+     * @param string $zipPath         path to the archive
+     * @param string $destinationPath destination directory
+     * @param bool   $isUpgrade       whether this is an upgrade (version-guarded)
+     * @return int 1 when extraction succeeded, 0 otherwise
+     */
+    public static function extractPluginZip(string $zipPath, string $destinationPath, bool $isUpgrade = false): int
     {
     }
     /**
@@ -13293,6 +16815,15 @@ final class PluginManager
      * @return bool
      */
     public static function isPluginValid(array $pluginJson): bool
+    {
+    }
+    /**
+     * Record the installed stamp so later cycles skip the download.
+     *
+     * @param string $folder plugin folder
+     * @param string $stamp  folder content stamp on the source server
+     */
+    public static function markSynced(string $folder, string $stamp): void
     {
     }
     /**
@@ -13319,13 +16850,24 @@ final class PluginManager
     public static function redirectEngineAlive(string $separator, string $engineFirst, string $engineLast = '', ?\Psr\Http\Message\ServerRequestInterface $request = null): void
     {
     }
+    /**
+     * Ask the source server for the content stamp of the plugin folder.
+     *
+     * @param int $pluginId plugin id
+     * @return string|false stamp, '' when nothing needs syncing, false when the call fails
+     */
+    public static function syncPluginFile(int $pluginId): string|false
+    {
+    }
 }
+
 /**
  * Exception thrown for plugin manager failures.
  */
 final class PluginManagerException extends \RuntimeException
 {
 }
+
 /**
  * Resolves plugin-owned admin pages and uninstall hooks from `plugin.json`.
  *
@@ -13335,101 +16877,35 @@ final class PluginManagerException extends \RuntimeException
  */
 final class PluginPageRegistry
 {
+    /** @var array<string, array<string, mixed>> decoded manifests per folder */
+    private static array $manifests = [];
     /**
-     * Buang manifest plugin yang sudah dibaca agar perubahan manifest ikut terbaca.
+     * Drop the manifests already read so later edits to `plugin.json` are picked up.
      */
     public static function reset(): void
     {
     }
     /**
+     * Uninstall hook declared by the plugin, when it implements the hook interface.
+     *
      * @param string $folder plugin folder with trailing slash
-     * @return class-string<\GDPlayer\Extension\UninstallHookInterface>|null
+     * @return class-string<UninstallHookInterface>|null
      */
     public static function uninstallHook(string $folder): ?string
     {
     }
     /**
+     * Backend page declared by the plugin, when it implements the view interface.
+     *
      * @param string $folder plugin folder with trailing slash (e.g. `swoole/`)
      * @param string $page page slug from `?page=` (already sanitised by the caller)
-     * @return class-string<\GDPlayer\View\ViewInterface>|null
+     * @return class-string<ViewInterface>|null
      */
     public static function viewClass(string $folder, string $page): ?string
     {
     }
 }
-/**
- * Route-map compilers (manifest + registry table) and route-path validation.
- *
- * Split out of `PluginRouteRegistry` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginRouteRegistry` through this trait.
- */
-trait RouteCompileTrait
-{
-    /**
-     * Keep the first declaration of an area/match/page triple.
-     *
-     * `routes` is read before the legacy `overrides` map, so a page declared in both
-     * resolves to the `routes` entry. The index holds one row per triple, so a duplicate
-     * would violate the unique key and abort the whole sync.
-     *
-     * @param list<array{page: string, view: string, match: string, priority: int, status: int}> $declared
-     * @param array<string, true> $seen area/match/page triples already declared
-     * @param string $area frontend or backend
-     * @param array{page: string, view: string, match: string, priority: int, status: int} $route
-     */
-    private static function addDeclaredRoute(array &$declared, array &$seen, string $area, array $route): void
-    {
-    }
-    /**
-     * Compile the route map for one area straight from the active plugin manifests.
-     *
-     * @param string $area frontend or backend
-     * @return array<string, array<string, ?string>>
-     */
-    private static function compileFromManifests(string $area): array
-    {
-    }
-    /**
-     * Compile the route map for one area from the registry table.
-     *
-     * @param string $area frontend or backend
-     * @return array<string, array<string, ?string>>|null null when the table is unavailable
-     */
-    private static function compileFromTable(string $area): ?array
-    {
-    }
-    /**
-     * @param string $fileReal
-     * @param string $pluginReal
-     * @param string $folder
-     * @param string $viewPath
-     * @return string|null
-     */
-    private static function ensureInsidePluginFolder(string $fileReal, string $pluginReal, string $folder, string $viewPath): ?string
-    {
-    }
-    private static function isValidPage(string $page): bool
-    {
-    }
-    private static function isValidViewPath(string $viewPath): bool
-    {
-    }
-    /**
-     * Resolve a manifest-relative view path to its absolute path, rejecting anything
-     * that escapes the plugin folder (symlink or traversal).
-     */
-    /**
-     * Resolve a manifest-relative view path to its absolute path, rejecting anything
-     * that escapes the plugin folder (symlink or traversal).
-     *
-     * @param string $folder
-     * @param string $viewPath
-     * @return string|null
-     */
-    private static function resolvePluginFile(string $folder, string $viewPath): ?string
-    {
-    }
-}
+
 /**
  * Resolves a request path to a plugin-owned view file through the `tb_plugin_routes` table.
  *
@@ -13439,8 +16915,17 @@ trait RouteCompileTrait
  */
 final class PluginRouteRegistry
 {
-    use \GDPlayer\Service\Plugin\RouteCompileTrait;
+    /** Longest allowed cache age for the compiled route map, in seconds. */
+    private const CACHE_TTL = 300;
     /**
+     * Compiled route map per area, memoised for this request.
+     *
+     * @var array<string, array<string, array<string, ?string>>>
+     */
+    private static array $memo = [];
+    /**
+     * Expose the cached application info when the object is dumped.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
@@ -13466,6 +16951,12 @@ final class PluginRouteRegistry
     public static function isValidRoute(string $page, string $viewPath, string $matchType): bool
     {
     }
+    /**
+     * Normalise a route path by trimming slashes and the .php suffix.
+     *
+     * @param string $path Raw path from the manifest
+     * @return string Normalised path
+     */
     public static function normalizePath(string $path): string
     {
     }
@@ -13485,107 +16976,11 @@ final class PluginRouteRegistry
      * @param string $requestPath request path relative to BASE_URL, without a .php suffix
      * @return string|null absolute view path, or null when no plugin claims the path
      */
-    /**
-     * Resolve a request path to the plugin view that owns it.
-     *
-     * Exact matches win over the longest matching prefix.
-     *
-     * @param string $area        frontend or backend
-     * @param string $requestPath request path relative to BASE_URL, without a .php suffix
-     * @return string|null absolute view path, or null when no plugin claims the path
-     */
     public static function resolve(string $area, string $requestPath): ?string
     {
     }
 }
-/**
- * File-lock helpers for the plugin route index rebuild.
- *
- * Split out of `PluginRouteSync` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginRouteSync` through this trait.
- */
-trait RouteSyncLockTrait
-{
-    /**
-     * @return resource|null
-     */
-    private static function acquireLock()
-    {
-    }
-    /**
-     * @return mixed
-     */
-    private static function acquireOrBreakLock(): mixed
-    {
-    }
-    /**
-     * Break a lock left behind by a crashed process.
-     *
-     * @return bool true when the stale lock was removed
-     */
-    private static function hasBrokenStaleLock(): bool
-    {
-    }
-    /**
-     * Baca stamp berkas lock tanpa memunculkan warning saat berkas sedang dipegang proses lain
-     * (Windows: read of 8192 bytes failed with errno=13). Gagal baca = tidak ada stamp.
-     */
-    private static function readLockStamp(string $lockFile): string|false
-    {
-    }
-    /**
-     * @param resource|null $lockHandle released by reference so the caller's variable is unset too
-     */
-    private static function releaseLock(&$lockHandle): void
-    {
-    }
-    /**
-     * Sync lock retention, in seconds, before a stale lock is broken.
-     *
-     * @return int retention in seconds
-     */
-    protected static function lockTtl(): int
-    {
-    }
-}
-/**
- * Transactional writer for the `tb_plugin_routes` index rows.
- *
- * Split out of `PluginRouteSync` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `PluginRouteSync` through this trait.
- */
-trait RouteSyncWriteTrait
-{
-    /**
-     * Replace the indexed routes of a plugin inside one transaction.
-     *
-     * DELETE and INSERT share the transaction, so a failed insert rolls back to the previous route
-     * set instead of leaving the plugin unroutable until the next sync.
-     *
-     * @param \PDO $pdoWrite
-     * @param int $pluginId
-     * @param array<string, mixed> $manifest
-     * @param int $pluginPriority
-     * @return int true when the new route set was committed
-     */
-    private static function applyRouteChanges(\PDO $pdoWrite, int $pluginId, array $manifest, int $pluginPriority): int
-    {
-    }
-    /**
-     * Insert the manifest routes of a plugin. Runs inside the caller transaction.
-     *
-     * An invalid manifest entry is logged and skipped; it must not abort the whole sync.
-     *
-     * @param \PDO $pdoWrite
-     * @param int $pluginId
-     * @param array<string, mixed> $manifest decoded plugin.json
-     * @param int $pluginPriority manifest priority, kept so resolution needs no disk read
-     * @return void
-     */
-    private static function insertRoutes(\PDO $pdoWrite, int $pluginId, array $manifest, int $pluginPriority): void
-    {
-    }
-}
+
 /**
  * Rebuilds the `tb_plugin_routes` index for one plugin from its `plugin.json` manifest.
  *
@@ -13595,12 +16990,18 @@ trait RouteSyncWriteTrait
  */
 final class PluginRouteSync
 {
-    use \GDPlayer\Service\Plugin\RouteSyncLockTrait;
-    use \GDPlayer\Service\Plugin\RouteSyncWriteTrait;
     /**
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
+    {
+    }
+    /**
+     * Sync lock retention, in seconds, before a stale lock is broken.
+     *
+     * @return int retention in seconds
+     */
+    protected static function lockTtl(): int
     {
     }
     /**
@@ -13622,6 +17023,7 @@ final class PluginRouteSync
     {
     }
 }
+
 /**
  * Mapping of plugin-owned paths to view classes (read from `plugin.json`, not from a table/file path).
  *
@@ -13630,79 +17032,105 @@ final class PluginRouteSync
  */
 final class PluginViewRegistry
 {
+    /** @var array<string, array<string, array<string, class-string<ViewInterface>>>> */
+    private static array $memo = [];
+    /**
+     * Report whether a plugin view claims the given request path.
+     *
+     * @param string $area frontend or backend
+     * @param string $requestPath path relative to BASE_URL (without .php)
+     * @return bool
+     */
     public static function has(string $area, string $requestPath): bool
     {
     }
     /**
-     * Buang peta view plugin agar worker panjang melihat plugin yang baru dipasang/dicopot.
+     * Drop the memoised map so long-running workers see plugins installed or removed.
      */
     public static function reset(): void
     {
     }
     /**
+     * Resolve a request path to a plugin view class.
+     *
+     * Exact routes win; otherwise the longest matching prefix is tried, walking
+     * one segment up per iteration.
+     *
      * @param string $area frontend or backend
      * @param string $requestPath path relative to BASE_URL (without .php)
-     * @return class-string<\GDPlayer\View\ViewInterface>|null
+     * @return class-string<ViewInterface>|null
      */
     public static function resolve(string $area, string $requestPath): ?string
     {
     }
 }
+
 namespace GDPlayer\Service\ServerConfig;
 
 /**
- * Render template dan penulisan berkas htaccess/nginx.
- *
- * Split out of `ServerConfigManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ServerConfigManager` through this trait.
+ * Penyusunan dan pembandingan urutan konfigurasi.
  */
-trait FileTrait
+final class ConfigSorter
 {
     /**
-     * @param string $settingKey
-     * @param array<string, mixed> $serverConfig
-     * @param string $twigFile
-     * @return string
+     * Report whether a submitted value should be treated as absent.
      */
-    protected function renderTemplate(string $settingKey, array $serverConfig, string $twigFile): string
+    public static function isEmpty(mixed $value): bool
     {
     }
     /**
-     * @param array<string, mixed> $priorities
+     * Apply incoming sub-values onto the stored ones, dropping blank keys.
+     *
+     * @param array<mixed, mixed> $existing
+     * @param array<mixed, mixed> $incoming
+     * @return array<mixed, mixed>
      */
-    public static function updateHtaccessFile(string $key = '', string $value = '', array $priorities = []): int|false
+    public static function merge(array $existing, array $incoming): array
     {
     }
     /**
-     * @param array<string, mixed> $priorities
+     * Build the settings key that stores the signature of a config entry.
      */
-    public static function updateNginxFile(string $key = '', string $value = '', array $priorities = []): int|false
+    public static function signatureKey(string $settingKey): string
+    {
+    }
+    /**
+     * Sort config groups, and each group's sub-entries, by configured priority.
+     *
+     * @param array<string, mixed> $config
+     * @param array<string, int>   $priorities
+     * @return array<string, mixed>
+     */
+    public static function sort(array $config, array $priorities): array
     {
     }
 }
+
 /**
- * Lock regenerasi dan penjagaan berkas konfigurasi nginx.
- *
- * Split out of `ServerConfigManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ServerConfigManager` through this trait.
+ * Manages the generation of server configuration files (nginx, .htaccess, etc.)
+ * from Twig templates based on the settings stored in Config.
  */
-trait LockTrait
+final class ServerConfigManager
 {
     /**
-     * @param string $configFile
-     * @return resource|null
+     * Default key order priorities: specific themes/routes first, then plugins/proxies, then fallbacks.
+     *
+     * @var array<string, int>
      */
-    protected function acquireLock(string $configFile)
+    private const DEFAULT_PRIORITIES = ['dlhd_config' => 10, 'dlhd_proxy' => 10, 'swoole_config.dlhd' => 10, 'swoole_proxy.dlhd' => 10, 'litespeed_config' => 20, 'swoole_config' => 50, 'swoole_config.core' => 50, 'swoole_proxy' => 50, 'swoole_proxy.core' => 50, 'roadrunner_nginx_conf' => 60, 'roadrunner_nginx_conf.core' => 60, 'roadrunner_proxy' => 60, 'roadrunner_proxy.core' => 60];
+    private \GDPlayer\Config\Config $config;
+    /**
+     * Bind the settings store, creating a default one when none is injected.
+     *
+     * @param null|Config $config optional config instance (a new one is created when omitted)
+     */
+    public function __construct(?\GDPlayer\Config\Config $config = null)
     {
     }
     /**
-     * @param resource|null $lockHandle released by reference so the caller's variable is unset too
-     */
-    protected function releaseLock(&$lockHandle): void
-    {
-    }
-    /**
-     * @param array<string, mixed> $config
+     * Make sure the shared nginx.conf rendered from the current settings is up to date.
+     *
+     * @param array<string, mixed> $config settings the signature is derived from
      */
     public static function ensureNginxConfigFile(array $config = []): bool
     {
@@ -13720,64 +17148,6 @@ trait LockTrait
      * @return bool
      */
     public function isConfigEnsured(string $settingKey, array $signatureSource, string $twigFile, string $configFile, array $priorities = []): bool
-    {
-    }
-}
-/**
- * Penyusunan dan pembandingan urutan konfigurasi.
- *
- * Split out of `ServerConfigManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ServerConfigManager` through this trait.
- */
-trait SortTrait
-{
-    /**
-     * @param string $dottedA
-     * @param string $dottedB
-     * @param array<string, int> $priorities
-     * @param null|string $fallbackA
-     * @param null|string $fallbackB
-     * @return int
-     */
-    protected function comparePriority(string $dottedA, string $dottedB, array $priorities, ?string $fallbackA = null, ?string $fallbackB = null): int
-    {
-    }
-    protected function isEmptyValue(mixed $value): bool
-    {
-    }
-    /**
-     * @param array<string, mixed> $existing
-     * @param array<string, mixed> $incoming
-     * @return array<string, mixed>
-     */
-    protected function mergeSubValues(array $existing, array $incoming): array
-    {
-    }
-    protected function signatureKey(string $settingKey): string
-    {
-    }
-    /**
-     * @param array<string, mixed> $config
-     * @param array<string, int>   $priorities
-     * @return array<string, mixed>
-     */
-    protected function sortConfig(array $config, array $priorities): array
-    {
-    }
-}
-/**
- * Manages the generation of server configuration files (nginx, .htaccess, etc.)
- * from Twig templates based on the settings stored in Config.
- */
-final class ServerConfigManager
-{
-    use \GDPlayer\Service\ServerConfig\FileTrait;
-    use \GDPlayer\Service\ServerConfig\LockTrait;
-    use \GDPlayer\Service\ServerConfig\SortTrait;
-    /**
-     * @param null|\GDPlayer\Config\Config $config optional config instance (a new one is created when omitted)
-     */
-    public function __construct(?\GDPlayer\Config\Config $config = null)
     {
     }
     /**
@@ -13811,10 +17181,113 @@ final class ServerConfigManager
     public function update(string $settingKey, array $settingValue, string $twigFile, string $configFile, array $priorities = []): int|false
     {
     }
+    /**
+     * Regenerate the web-server config that matches the active cache mode.
+     *
+     * LiteSpeed writes the .htaccess rule pointing at `cache-files/`, nginx
+     * rewrites its site config, and anything else falls back to the plain
+     * LiteSpeed config.
+     *
+     * @param string $cacheMode configured cache mode
+     */
     public static function updateByCacheMode(string $cacheMode): void
     {
     }
+    /**
+     * Merge one key into the .htaccess settings and rewrite the file.
+     *
+     * @param string $key setting key to merge, or an empty string to rewrite as-is
+     * @param string $value value for that key
+     * @param array<string, int> $priorities key order overrides
+     * @return int|false bytes written, or false on failure
+     */
+    public static function updateHtaccessFile(string $key = '', string $value = '', array $priorities = []): int|false
+    {
+    }
+    /**
+     * Merge one key into the nginx settings and rewrite the config file.
+     *
+     * @param string $key setting key to merge, or an empty string to rewrite as-is
+     * @param string $value value for that key
+     * @param array<string, int> $priorities key order overrides
+     * @return int|false bytes written, or false on failure
+     */
+    public static function updateNginxFile(string $key = '', string $value = '', array $priorities = []): int|false
+    {
+    }
 }
+
+namespace GDPlayer\Service\Sync;
+
+/**
+ * The part of the sync protocol that is identical for themes and plugins.
+ */
+final class SyncDownloader
+{
+    /**
+     * Download one archive under a file lock (the lock is permanent on purpose: removing it
+     * while it is still held would let two processes write the same archive).
+     *
+     * @param string               $link     archive URL
+     * @param string               $zipPath  destination
+     * @param string               $lockBase base path of the lock/log file
+     * @param string               $kind     plugin|theme
+     * @param array<string, mixed> $context  log context
+     * @return string|false
+     */
+    public static function fetchArchive(string $link, string $zipPath, string $lockBase, string $kind, array $context): string|false
+    {
+    }
+    /**
+     * Ask the source server for the theme/plugin folder contents stamp.
+     *
+     * @param string               $url     `ping` action URL
+     * @param string               $kind    plugin|theme (for log messages)
+     * @param array<string, mixed> $context log context
+     * @return string|false stamp, or false when it fails / is not valid
+     */
+    public static function fetchStampFromSource(string $url, string $kind, array $context): string|false
+    {
+    }
+    /**
+     * @param string $stamp stamp value from the source server
+     */
+    public static function isValidStamp(string $stamp): bool
+    {
+    }
+    /**
+     * @param string $link
+     * @param string $zipPath
+     * @param string $logFile
+     * @param string $targetType
+     * @param array<string, mixed> $context
+     * @return string|false
+     */
+    public static function performDownload(string $link, string $zipPath, string $logFile, string $targetType = 'plugin', array $context = []): string|false
+    {
+    }
+    /**
+     * @param string $tmpDir tmp directory
+     * @param string $name   theme/plugin folder name
+     */
+    public static function readStamp(string $tmpDir, string $name): string
+    {
+    }
+    /**
+     * The `main_site` address used to pull the archive, or '' when this server is the source.
+     */
+    public static function resolveMainSite(): string
+    {
+    }
+    /**
+     * @param string $tmpDir tmp directory
+     * @param string $name   theme/plugin folder name
+     */
+    public static function stampFile(string $tmpDir, string $name): string
+    {
+    }
+}
+
 namespace GDPlayer\Service\System;
 
 /**
@@ -13823,9 +17296,13 @@ namespace GDPlayer\Service\System;
 final class CloudflareProxy
 {
     /**
-     * @param \GDPlayer\Config\Config|array<string, mixed>|null $config
+     * @var Config|array<string, mixed>|null
      */
-    public function __construct($config = null)
+    private $config;
+    /**
+     * @param Config|array<string, mixed>|null $config
+     */
+    public function __construct(null|array|\GDPlayer\Config\Config $config = null)
     {
     }
     /**
@@ -13842,8 +17319,8 @@ final class CloudflareProxy
      * the single-request path uses `proxyFor()` + `Http\Fetcher::withProxy()`.
      *
      * @param string $vHost
-     * @param \CurlHandle& $ch
-     * @return \CurlHandle
+     * @param CurlHandle& $ch
+     * @return CurlHandle
      */
     public function applyProxyIfEligible(\CurlHandle &$ch, string $vHost = ''): \CurlHandle
     {
@@ -13891,26 +17368,12 @@ final class CloudflareProxy
     {
     }
 }
+
 /**
  * Detects whether the process is running inside a container.
  */
 trait ContainerChecker
 {
-    private function hasContainerCgroup(): bool
-    {
-    }
-    private function hasContainerSched(): bool
-    {
-    }
-    private function isDarwinContainer(): bool
-    {
-    }
-    private function isLinuxContainer(): bool
-    {
-    }
-    private function isWindowsContainer(): bool
-    {
-    }
     /**
      * Determine whether the current process runs inside a container.
      *
@@ -13920,56 +17383,67 @@ trait ContainerChecker
     {
     }
 }
+
 /**
- * Pembacaan CPU, RAM, dan OS lintas Linux/Windows.
- *
- * Split out of `SystemInfo` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `SystemInfo` through this trait.
+ * TCP port availability checker.
  */
-trait CpuTrait
+trait PortChecker
 {
-    protected function calculateProcStatCpu(string $stats1, string $stats2): float
-    {
-    }
-    protected function getCpuCores(): int
-    {
-    }
-    protected function getCpuUsage(): float
+    /**
+     * @return array{ip: string|false, port: int|float}[]
+     */
+    protected function getListeningPortsLinux(): array
     {
     }
     /**
-     * @return array{total: int, available: int}
+     * @return array{ip: string|false, port: int|float}[]
      */
-    protected function getLinuxRam(): array
-    {
-    }
-    protected function getOperatingSystem(): string
-    {
-    }
-    protected function getProcStatUsage(): float
-    {
-    }
-    protected function getWindowsCpuCores(): int
-    {
-    }
-    protected function getWindowsCpuUsage(): float
+    protected function getListeningPortsWindows(): array
     {
     }
     /**
-     * @return array{total: int, available: int}
+     * @return array{ip: string|false, port: int|float}[]
      */
-    protected function getWindowsRam(): array
+    protected function getListeningPortsWithCommand(): array
+    {
+    }
+    /**
+     * Check whether a TCP port accepts connections.
+     *
+     * @param int    $port    port number
+     * @param string $host    host to probe
+     * @param int    $timeout connection timeout in seconds
+     * @return bool true when the port is open
+     */
+    public function isPortOpen(int $port, string $host = '127.0.0.1', int $timeout = 2): bool
+    {
+    }
+    /**
+     * Probe a TCP port with a non-blocking connect, without PHP warnings.
+     *
+     * A blocking `socket_connect()` emits E_WARNING when the port is closed, whereas a non-blocking
+     * connect returns false plus EINPROGRESS. The pattern here: connect non-blocking, wait with
+     * `socket_select()`, then inspect SO_ERROR.
+     *
+     * @param string $host hostname or IPv4 address
+     * @param int $port port number
+     * @param int $timeout seconds to wait for the handshake
+     * @return bool true when the port is open
+     */
+    public function isTcpOpen(string $host, int $port, int $timeout = 1): bool
     {
     }
 }
+
 /**
  * Host system information provider (OS, RAM, disk, services, containers).
  */
 final class SystemInfo
 {
     use \GDPlayer\Service\System\ContainerChecker;
-    use \GDPlayer\Service\System\CpuTrait;
     use \GDPlayer\Service\System\PortChecker;
+    private bool $isWindows;
+    private string $ps = '';
     /**
      * Detect the platform and prepare the PowerShell bridge on Windows.
      */
@@ -13977,30 +17451,122 @@ final class SystemInfo
     {
     }
     /**
+     * Expose the application info instead of the internal platform state.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
     {
     }
     /**
+     * Convert two `/proc/stat` snapshots into a busy-CPU percentage.
+     *
+     * @param string $stats1 earlier snapshot of the aggregate `cpu` line
+     * @param string $stats2 later snapshot taken after a short delay
+     * @return float Busy percentage rounded to two decimals, or 0.0 when no time elapsed.
+     */
+    protected function calculateProcStatCpu(string $stats1, string $stats2): float
+    {
+    }
+    /**
+     * Count logical CPU cores from the Windows environment or `/proc/cpuinfo`.
+     *
+     * @return int logical core count, at least 1
+     */
+    protected function getCpuCores(): int
+    {
+    }
+    /**
+     * Report current CPU usage, preferring load average and falling back to `/proc/stat`.
+     *
+     * @return float busy CPU percentage
+     */
+    protected function getCpuUsage(): float
+    {
+    }
+    /**
+     * Read total and currently available RAM from `/proc/meminfo`.
+     *
+     * @return array{total: int, available: int}
+     */
+    protected function getLinuxRam(): array
+    {
+    }
+    /**
+     * Resolve a human-readable OS name from `/etc/os-release` or `php_uname()`.
+     *
+     * @return string detected operating system name
+     */
+    protected function getOperatingSystem(): string
+    {
+    }
+    /**
+     * Sample `/proc/stat` 100 ms apart and derive CPU usage from the delta.
+     *
+     * @return float Busy CPU percentage, or 0.0 when the file is unreadable.
+     */
+    protected function getProcStatUsage(): float
+    {
+    }
+    /**
+     * Read the 1-minute load average and scale it to a percentage-like value.
+     *
+     * @return float|null scaled load, or null when the extension is missing or the load is zero
+     */
+    protected function getSystemLoadAverage(): ?float
+    {
+    }
+    /**
+     * Count logical processors via `NUMBER_OF_PROCESSORS` or a PowerShell CIM query.
+     *
+     * @return int logical core count, or 0 when it cannot be determined
+     */
+    protected function getWindowsCpuCores(): int
+    {
+    }
+    /**
+     * Query the current CPU load percentage through PowerShell.
+     *
+     * @return float Busy CPU percentage, or 0.0 when PowerShell is unavailable.
+     */
+    protected function getWindowsCpuUsage(): float
+    {
+    }
+    /**
+     * Read total and free physical memory through a PowerShell CIM query.
+     *
+     * @return array{total: int, available: int}
+     */
+    protected function getWindowsRam(): array
+    {
+    }
+    /**
+     * Read the disk usage of the installation volume.
+     *
      * @return array{total: float|int, used: float|int, free: float|int, percent: float|int}
      */
     public function getDiskUsage(): array
     {
     }
     /**
+     * Collect the CPU load, core count, OS name and uptime.
+     *
      * @return array{cpu: float, cpu_cores: int, os: string, uptime: float}
      */
     public function getOSInfo(): array
     {
     }
     /**
+     * Read the RAM usage of the host.
+     *
      * @return array{total: int, used: int, free: int, percent: float|int}
      */
     public function getRamUsage(): array
     {
     }
     /**
+     * Report the status of the web server, Redis and PHP services.
+     *
      * @return array{
      * nginx: array{status: bool, name: string},
      * apache: array{status: bool, name: string},
@@ -14013,20 +17579,44 @@ final class SystemInfo
     {
     }
 }
+
 namespace GDPlayer\Service\Theme;
 
 /**
- * Utilitas arsip tema: entry zip, nama tema, dan symlink publik.
+ * Theme discovery, activation and synchronization service.
  *
- * Split out of `ThemeManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ThemeManager` through this trait.
+ * Resolves the active theme, lists installed themes and syncs theme
+ * archives from the remote repository.
  */
-trait ArchiveTrait
+final class ThemeManager
 {
+    private static ?string $activeTheme = null;
     /**
-     * Ekstrak satu entri arsip bila lolos validasi nama (anti zip-slip).
+     * Expose application info when the object is dumped.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Extract one archive entry once its name passes validation (anti zip-slip).
+     *
+     * @param ZipArchive $zip             archive being read
+     * @param int        $index           entry index inside the archive
+     * @param string     $destinationPath directory the entry is extracted under
      */
     protected static function extractEntry(\ZipArchive $zip, int $index, string $destinationPath): void
+    {
+    }
+    /**
+     * Build the URL of the source server's theme sync endpoint.
+     *
+     * @param string $themeFolder theme folder
+     * @param string $action      ping|download
+     * @return string URL, or '' when this server is the source itself
+     */
+    protected static function getSyncDownloadUrl(string $themeFolder, string $action = 'ping'): string
     {
     }
     /**
@@ -14036,6 +17626,16 @@ trait ArchiveTrait
      * @return bool true when the entry is safe to extract into destinationPath
      */
     protected static function isSafeArchiveEntry(string $fileName): bool
+    {
+    }
+    /**
+     * Tell whether the archive carries a higher version than the installed theme.
+     *
+     * @param ZipArchive $zip             archive being installed
+     * @param string     $destinationPath theme directory currently on disk
+     * @return bool true when the archive is newer, or when no version is installed yet
+     */
+    protected static function isThemeUpgradeNeeded(\ZipArchive $zip, string $destinationPath): bool
     {
     }
     /**
@@ -14057,40 +17657,21 @@ trait ArchiveTrait
     protected static function resolveThemeName(string $themePath, string $folderName): string
     {
     }
+    /**
+     * Link the active theme's public assets into `public/themes/`.
+     *
+     * Backend and frontend are linked separately because each ships its own
+     * `public` directory.
+     */
     public static function createPublicSymlinks(): void
     {
     }
-}
-/**
- * Unduh dan ekstrak berkas tema dari server sinkronisasi.
- *
- * Split out of `ThemeManager` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `ThemeManager` through this trait.
- *
- * Protokol sinkronisasi: `ping` membalas stamp isi folder (sha1), bukan 'ok'.
- * Node membandingkannya dengan stamp terakhir yang sukses diekstrak; stamp sama =
- * tidak ada unduhan sama sekali. Bagian yang sama dengan plugin ada di `DownloadSyncTrait`.
- */
-trait DownloadTrait
-{
-    use \GDPlayer\Service\Sync\DownloadSyncTrait;
     /**
-     * @param string $themeFolder folder tema
-     * @param string $action      ping|download
-     * @return string URL, atau '' bila server ini adalah sumbernya sendiri
-     */
-    protected static function getSyncDownloadUrl(string $themeFolder, string $action = 'ping'): string
-    {
-    }
-    protected static function isThemeUpgradeNeeded(\ZipArchive $zip, string $destinationPath): bool
-    {
-    }
-    /**
-     * Unduh arsip tema bila stamp berbeda dari yang terakhir dipasang.
+     * Download the theme archive when its stamp differs from the last installed one.
      *
-     * @param string $themeFolder folder tema
-     * @param string $stamp       stamp isi folder di server sumber
-     * @return string|false path arsip, false bila sudah mutakhir atau gagal
+     * @param string $themeFolder theme folder
+     * @param string $stamp       content stamp of the folder on the source server
+     * @return string|false archive path, false when already current or when it failed
      */
     public static function downloadThemeFile(string $themeFolder, string $stamp = ''): string|false
     {
@@ -14104,42 +17685,6 @@ trait DownloadTrait
      * @return int true when extraction succeeded
      */
     public static function extractThemeZip(string $zipPath, string $destinationPath, bool $isUpgrade = false): int
-    {
-    }
-    /**
-     * Catat stamp yang sudah berhasil dipasang (dipakai untuk melewati siklus berikutnya).
-     *
-     * @param string $themeFolder folder tema
-     * @param string $stamp       stamp isi folder di server sumber
-     */
-    public static function markSynced(string $themeFolder, string $stamp): void
-    {
-    }
-    /**
-     * Minta stamp isi folder tema di server sumber.
-     *
-     * @param string $themeFolder folder tema
-     * @return string|false stamp, '' bila tidak ada yang perlu disinkronkan, false saat gagal
-     */
-    public static function syncThemeFile(string $themeFolder): string|false
-    {
-    }
-}
-/**
- * Theme discovery, activation and synchronization service.
- *
- * Resolves the active theme, lists installed themes and syncs theme
- * archives from the remote repository.
- */
-final class ThemeManager
-{
-    use \GDPlayer\Service\Theme\ArchiveTrait;
-    use \GDPlayer\Service\Theme\DownloadTrait;
-    use \GDPlayer\Service\Plugin\ThemeManagerTrait;
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
     {
     }
     /**
@@ -14167,100 +17712,463 @@ final class ThemeManager
     {
     }
     /**
+     * Record the stamp that was installed successfully (skips the next sync cycle).
+     *
+     * @param string $themeFolder theme folder
+     * @param string $stamp       content stamp of the folder on the source server
+     */
+    public static function markSynced(string $themeFolder, string $stamp): void
+    {
+    }
+    /**
      * Forget the resolved active theme so the next request re-reads it.
      *
-     * Di FPM tidak berdampak (proses mati tiap request); di worker, tanpa ini pergantian tema
-     * di admin baru terlihat setelah worker di-restart.
+     * Harmless in FPM, where the process dies with every request; in a worker,
+     * without this a theme switch in the admin panel only shows up after a
+     * worker restart.
      */
     public static function reset(): void
     {
     }
+    /**
+     * Ask the source server for the content stamp of a theme folder.
+     *
+     * @param string $themeFolder theme folder
+     * @return string|false stamp, '' when nothing needs syncing, false on failure
+     */
+    public static function syncThemeFile(string $themeFolder): string|false
+    {
+    }
 }
-namespace GDPlayer\Service;
+
+namespace GDPlayer\Stream;
 
 /**
- * Upload handler for posters and subtitle files (PSR-7 aware).
+ * Stream handler for serving local files with Range support.
  */
-final class Upload
+final class LocalFile
 {
+    private int $contentLength;
+    private int $end;
+    private string $file;
+    private int $filesize;
+    private ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    private int $start;
+    private string $title = 'video.mp4';
     /**
+     * Resolve the byte range for the request against the file size.
+     *
+     * `filesize()` is only a hint: {@see self::hasPrepared()} re-resolves the range against the size of
+     * the handle that is actually read, so a file replaced between both calls cannot desynchronise
+     * the headers from the body.
+     *
+     * @param string $file absolute path of the local file to serve
+     * @param ServerRequestInterface|null $request PSR-7 request carrying the Range header
+     */
+    public function __construct(string $file, ?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+    /**
+     * Expose the application info block instead of the stream state.
+     *
      * @return array<string, mixed>
      */
     public function __debugInfo(): array
     {
     }
     /**
-     * Determine whether an uploaded file is an accepted subtitle file.
+     * Parse a single-range `Range` header against a file size.
      *
-     * @param string $file temporary file path
-     * @param string $ext  file extension
-     * @param int    $size file size in bytes
-     * @return bool true when the file is a readable, non-PHP subtitle within the size limit
-     */
-    public static function isSubtitleFile(string $file = '', string $ext = '', int $size = 0): bool
-    {
-    }
-    /**
-     * Normalize PSR-7 UploadedFileInterface input into standard file meta array.
+     * Supports `bytes=a-b`, `bytes=a-`, `bytes=-N` (last N bytes) and takes the first range of a
+     * multi-range request (multi-part bodies are not supported).
      *
-     * @param mixed $file
-     * @param string|null $error receives a human-readable reason when the upload is rejected
-     * @return array{
-     * name:string,
-     * type:string,
-     * tmp_name:string,
-     * error:int,
-     * size:int,
-     * psr7:\Psr\Http\Message\UploadedFileInterface
-     * }|null
+     * @param string $rangeHeader raw Range header ('' = whole file)
+     * @param int    $filesize    file size in bytes
+     * @return array{0: int, 1: int}|null [start, end] inclusive, or null when no byte can satisfy it
      */
-    public static function normalizeFile(mixed $file, ?string &$error = null): ?array
+    public static function resolveRange(string $rangeHeader, int $filesize): ?array
     {
     }
     /**
-     * Explain why a PHP upload failed, quoting the effective server limits.
+     * Set the download filename.
      *
-     * @param int $code one of the UPLOAD_ERR_* constants
-     * @return string human-readable reason, safe to show to the user
+     * @param string $title file name to expose
+     * @return self fluent instance
      */
-    public static function uploadErrorMessage(int $code): string
+    public function setTitle(string $title): self
     {
     }
     /**
-     * @param mixed $file
-     * @return string|false
+     * Stream the local file to the client, honoring the Range header.
+     *
+     * @return void
      */
-    public static function uploadPoster(mixed $file = null): string|false
-    {
-    }
-    /**
-     * @param mixed $file
-     * @return string|false
-     */
-    public static function uploadSubtitleFile(mixed $file = null): string|false
+    public function stream(): void
     {
     }
 }
-namespace GDPlayer\Stream;
 
 /**
- * Immutable-style fluent setter base shared by all stream handlers.
- *
- * Holds the request/response headers and playback flags configured by Master.
+ * MP4 stream handler with Range support.
  */
-abstract class Setter
+final class MP4 extends \GDPlayer\Stream\Stream
 {
-    protected string $cacheFile = '';
-    protected bool $isDownload = false;
-    protected bool $isMP4 = false;
-    protected bool $isMPD = false;
-    protected bool $isMaster = false;
-    protected string $rangeBytes = '';
-    /** @var string[] $requestHeaders */
-    protected array $requestHeaders = [];
-    /** @var string[] $responseHeaders */
-    protected array $responseHeaders = [];
+    public bool $isMP4 = true;
+    public bool $isMaster = false;
+    /**
+     * @param string                     $vHost        video host identifier
+     * @param string                     $vID          host-specific media identifier
+     * @param string                     $url          upstream media URL
+     * @param string                     $cacheMode    cache driver mode
+     * @param int                        $cacheTimeout cache lifetime in seconds
+     * @param ServerRequestInterface|null $request      PSR-7 request
+     */
+    public function __construct(string $vHost = '', string $vID = '', string $url = '', string $cacheMode = 'php', int $cacheTimeout = 3600, ?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+}
+
+/**
+ * Front controller for playback, download and master-playlist requests.
+ *
+ * Resolves the request URI into a host/id, loads the resolved sources and
+ * dispatches to the HLS, MPD or MP4 stream handler.
+ */
+final class Master
+{
+    private const BOTS = ['Bingbot', 'YandexBot', 'Googlebot', 'YandexImages', 'msnbot', 'Googlebot-Image', 'YandexBlogs', 'Applebot', 'Googlebot-video', 'YandexMetrika', 'AhrefsBot.Feeds', 'Googlebot-News', 'YandexNews', 'FeedlyBot'];
+    private \GDPlayer\Config\Config $config;
+    /**
+     * @var array{
+     *   scheme?: string, host?: string, port?: int<0,65535>, user?: string,
+     *   pass?: string, path?: string, query?: string, fragment?: string
+     * }|false
+     */
+    private array|false $currentParsedUrl = false;
+    /** @var array<string,mixed> $dataSources */
+    private array $dataSources = [];
+    private \GDPlayer\Stream\StreamFlags $flags;
+    private int $lastModified = 0;
+    private ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    /** @var array<string,mixed> $requestHeaders */
+    private array $requestHeaders = [];
+    private \GDPlayer\Core\Security\Security $security;
+    private string $token = '';
+    private string $url = '';
+    private string $vHost = '';
+    private string $vID = '';
+    private string $vLabel = 'Original';
+    protected string $email = '';
     protected string $title = '';
+    /** @var string[] $uri */
+    protected array $uri = [];
+    protected \GDPlayer\Stream\Playlist\HLS|\GDPlayer\Stream\Playlist\MPD|\GDPlayer\Stream\MP4 $vPlayer;
+    /**
+     * Capture the MP4/master flags and request, then load the stream settings.
+     *
+     * @param bool                        $isMP4    whether this is an MP4 request
+     * @param bool                        $isMaster whether this is a master-playlist request
+     * @param ServerRequestInterface|null $request  PSR-7 request
+     */
+    public function __construct(bool $isMP4 = false, bool $isMaster = false, ?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+    /**
+     * Expose the application environment for debugging output.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Restore the dotted extension when the URL path carries the `_gx_` marker.
+     */
+    protected function changeUrlExtension(): void
+    {
+    }
+    /**
+     * Load the host and host id of a video from its hashed public id.
+     *
+     * @param string $id Hashed video id
+     */
+    protected function getVideoByHashId(string $id): void
+    {
+    }
+    /**
+     * Pick the source whose label matches the requested type.
+     *
+     * @param array<string|int, mixed> $sources
+     */
+    protected function getVideoUrlByLabel(array $sources): string
+    {
+    }
+    /**
+     * Apply the origin and token checks that guard the stream endpoints.
+     *
+     * @return bool True when the request may continue
+     */
+    protected function isValidRequest(): bool
+    {
+    }
+    /**
+     * Serve the request with the player, or fall back to the 403 page when the request is invalid.
+     */
+    protected function load(): void
+    {
+    }
+    /**
+     * Push the cache file, token, flags and headers into the current player.
+     */
+    protected function loadRequest(): void
+    {
+    }
+    /**
+     * Store title, email and referer headers, then resolve the stream URL from the sources.
+     *
+     * @param array<string,mixed> $data
+     * @return void
+     */
+    protected function parseDataSources(array $data = []): void
+    {
+    }
+    /**
+     * Split the request path into host, id and label segments, decrypting the first one.
+     */
+    protected function parseUri(): void
+    {
+    }
+    /**
+     * Rebuild the target URL from the encrypted path segments and the request query string.
+     *
+     * @param string $encryptedUrl decrypted host and video id pair joined by `~`
+     */
+    protected function processEncryptedUrl(string $encryptedUrl): void
+    {
+    }
+    /**
+     * Redirect direct hosts to the original URL, or back when the source keeps failing.
+     */
+    protected function redirectToOriginalUrl(): void
+    {
+    }
+    /**
+     * Handle an HLS request by dispatching to the HLS stream handler.
+     *
+     * @return void
+     */
+    public function loadHLS(): void
+    {
+    }
+    /**
+     * Handle an MP4 request, adding Google Drive authorization when needed.
+     *
+     * @return void
+     */
+    public function loadMP4(): void
+    {
+    }
+    /**
+     * Handle an MPD (DASH) request by dispatching to the MPD stream handler.
+     *
+     * @return void
+     */
+    public function loadMPD(): void
+    {
+    }
+}
+
+/**
+ * Base stream handler that proxies and caches media/playlist responses.
+ *
+ * Implements local-cache lookup, chunked temporary caching, upstream cURL
+ * streaming and circuit-breaker protection shared by HLS, MPD and MP4.
+ */
+abstract class Stream
+{
+    use \GDPlayer\Stream\Cache\StreamCache;
+    use \GDPlayer\Stream\Http\StreamParser;
+    private ?\GDPlayer\Stream\Cache\StreamCacheService $cacheService = null;
+    private ?\GDPlayer\Stream\Http\StreamGuardService $guardService = null;
+    private int $lastModified = 0;
+    /** Bytes actually written to the tmp cache (0 when the request must not be cached). */
+    private int $written = 0;
+    public string $cacheFile = '';
+    public string $cacheMode = 'php';
+    public int $cacheTimeout = 0;
+    public int $contentLength = 0;
+    public int $end = 0;
+    public bool $headersSent = false;
+    public string $ip = '';
+    public bool $isApple = false;
+    public bool $isDownload = false;
+    public bool $isLive = false;
+    public bool $isMP4 = false;
+    public bool $isMPD = false;
+    public bool $isMaster = false;
+    /** Suffix range (`bytes=-N`): a tail slice, not the full entity -> never written to cache. */
+    public bool $isSuffixRange = false;
+    public string $keyTotalLength = '';
+    public bool $productionMode = false;
+    public string $rangeBytes = '';
+    public ?\Psr\Http\Message\ServerRequestInterface $request = null;
+    /** @var string[] $requestHeaders */
+    public array $requestHeaders = [];
+    public int $responseCode = 0;
+    /** @var int[] $responseCodeWithRetry */
+    public array $responseCodeWithRetry = [-1, 0, 408, 429, 500, 501, 502, 503, 504];
+    /** @var string[] $responseHeaders */
+    public array $responseHeaders = [];
+    public bool $sendContentRange = false;
+    public bool $sendHeaders = true;
+    public int $start = 0;
+    public string $title = '';
+    public string $tmpCacheFile = '';
+    public int $totalLength = 0;
+    public string $vUrlHost = '';
+    /**
+     * Normalise the upstream URL and load the cache, range and request settings.
+     *
+     * @param string                     $vHost        video host identifier
+     * @param string                     $vID          host-specific media identifier
+     * @param string                     $url          upstream media URL
+     * @param string                     $cacheMode    cache driver mode
+     * @param int                        $cacheTimeout cache lifetime in seconds
+     * @param ServerRequestInterface|null $request      PSR-7 request
+     */
+    public function __construct(string $vHost = '', string $vID = '', string $url = '', string $cacheMode = 'php', int $cacheTimeout = 3600, ?\Psr\Http\Message\ServerRequestInterface $request = null)
+    {
+    }
+    /**
+     * Promote the temporary chunk cache to the final cache file when complete.
+     */
+    public function __destruct()
+    {
+    }
+    /**
+     * Expose the application info instead of the internal state in var_dump output.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+    }
+    /**
+     * Cache policy of this request.
+     *
+     * @return StreamCacheService
+     */
+    protected function cache(): \GDPlayer\Stream\Cache\StreamCacheService
+    {
+    }
+    /**
+     * Promote or discard the `.tmp` file while the lock is still held.
+     *
+     * rename() used to run in __destruct(), i.e. AFTER the lock was released: a new writer
+     * could truncate the same `.tmp` in the window between unlock and rename. The whole transition
+     * now finishes before LOCK_UN, so a renamed file is always complete.
+     *
+     * @return void
+     */
+    protected function commitCacheFile(): void
+    {
+    }
+    /**
+     * Upstream throttle guard of this request.
+     *
+     * @return StreamGuardService
+     */
+    protected function guard(): \GDPlayer\Stream\Http\StreamGuardService
+    {
+    }
+    /**
+     * Prepare the client IP, the upstream origin and the default request headers.
+     *
+     * @return void
+     */
+    protected function init(): void
+    {
+    }
+    /**
+     * Strip the escape noise from a master playlist, repair the end marker and send it.
+     *
+     * @param string $content raw upstream playlist body
+     * @return void
+     */
+    protected function playlistParser(string $content): void
+    {
+    }
+    /**
+     * Apply entity headers (Content-Length / Content-Range / Last-Modified) to the stream state.
+     *
+     * @param string $header one upstream response header line
+     * @return void
+     */
+    public function applyEntityHeader(string $header): void
+    {
+    }
+    /**
+     * Pick the response MIME type from the playlist/segment mode and request method.
+     *
+     * @return string content type suitable for the current stream kind
+     */
+    public function createContentType(): string
+    {
+    }
+    /**
+     * Prepare the tmp/progress files, request metadata, then build the Fetcher for one upstream.
+     *
+     * @param bool $withResponse true = body held in memory (playlist), false = streamed to the client
+     * @return Fetcher
+     */
+    public function createFetcher(bool $withResponse = true): \GDPlayer\Http\Fetcher\Fetcher
+    {
+    }
+    /**
+     * cURL header callback: feed one upstream header line and abort on failure.
+     *
+     * @param string $header single upstream response header line
+     * @return int bytes consumed, or -1 to make cURL abandon the transfer
+     */
+    public function curlHeaderCallback(string $header): int
+    {
+    }
+    /**
+     * Emit the buffered response headers through the response emitter.
+     *
+     * Cache stays off for live master playlists, pinned-time URLs and aborted transfers,
+     * and the status falls back to 200 for cache hits that never saw cURL.
+     *
+     * @return void
+     */
+    public function defaultResponseHeaders(): void
+    {
+    }
+    /**
+     * Add the range and disposition headers once, then emit the header block.
+     *
+     * @return void
+     */
+    public function ensureHeadersSent(): void
+    {
+    }
+    /**
+     * Parse the Range header into the start/end offsets sent to the upstream.
+     *
+     * @return void
+     */
+    public function getRangeRequest(): void
+    {
+    }
+    /**
+     * Track the status line and entity headers of the upstream response.
+     *
+     * @param string $header single upstream response header line
+     * @return int bytes consumed, or -1 when the upstream status must abort the transfer
+     */
+    public function handleUpstreamHeader(string $header): int
+    {
+    }
     /**
      * Set the download flag for the stream.
      *
@@ -14268,6 +18176,14 @@ abstract class Setter
      * @return self fluent instance
      */
     public function isDownload(bool $isDownload = false): self
+    {
+    }
+    /**
+     * Redirect to another load balancer, or answer 404 once the retry budget is spent.
+     *
+     * @return void
+     */
+    public function retryStream(): void
     {
     }
     /**
@@ -14304,24 +18220,57 @@ abstract class Setter
     public function setTitle(string $title = 'video.mp4'): self
     {
     }
+    /**
+     * Stream the media to the client, serving from cache when available.
+     *
+     * @return void
+     */
+    public function stream(): void
+    {
+    }
 }
+
 /**
- * Cache-file plumbing for {@see Stream}: tmp file creation, promotion policy, cache key.
+ * Request mode flags of a stream request (Sonar php:S1820 for {@see Master}).
+ *
+ * Kept as a mutable value object because the flags are resolved while the request is parsed
+ * (constructor defaults, then `parseDataSources()`); semantics are unchanged from the
+ * individual boolean properties it replaces.
+ */
+final class StreamFlags
+{
+    /** Download page allowed by the settings (dl=1 + enable_download_page). */
+    public bool $isAllowDownload = false;
+    /** `dl=1` in the query string. */
+    public bool $isDownload = false;
+    /** Google Drive HLS source (host-based rule from StreamConfig). */
+    public bool $isGoogleHls = false;
+    /** `gl=1` in the query string (live stream). */
+    public bool $isLive = false;
+    /** Request targets an MP4 label. */
+    public bool $isMP4 = false;
+    /** Request targets the master playlist. */
+    public bool $isMaster = false;
+}
+
+namespace GDPlayer\Stream\Cache;
+
+/**
+ * Cache-file plumbing for {@see Stream}: tmp file creation, promotion policy,
+ * cache key.
  *
  * Split out of Stream so the class stays within the 20-method rule (php:S1448); state
  * stays on Stream (cacheFile, tmpCacheFile, fpChunk).
+ * @property string $tmpCacheFile
  */
 trait StreamCache
 {
-    private function createTmpFile(): void
-    {
-    }
-    /**
-     * Ruang disk bebas untuk direktori cache (di-cache 60 detik di InstanceCache).
-     */
-    private function resolveDiskFreeSpace(): float
-    {
-    }
+    /** @var resource|null */
+    private $fpChunk;
+    public bool $enableCacheFile = false;
+    public string $vHost = '';
+    public string $vID = '';
+    public string $vURL = '';
     /**
      * Whether the tmp cache may be promoted to the final cache file.
      *
@@ -14332,7 +18281,7 @@ trait StreamCache
      * @param int    $written       bytes actually written to the tmp cache
      * @param int    $contentLength Content-Length of the upstream response (0 = unknown)
      * @param int    $totalLength   total entity size from Content-Range (0 = unknown)
-     * @return bool
+     * @return bool true when the tmp cache may replace the final cache file
      */
     public static function isCachePromotable(string $rangeBytes, int $written, int $contentLength, int $totalLength): bool
     {
@@ -14347,28 +18296,37 @@ trait StreamCache
     {
     }
 }
+
 /**
- * Muat dan simpan cache konten stream.
+ * Load and store the stream content cache.
  *
- * Split out of `Stream` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Stream` through this trait.
+ * The request state stays on {@see Stream}; this service only owns the cache policy and the
+ * playlist fetch that fills the cache.
  */
-trait StreamCacheTrait
+final class StreamCacheService
 {
     /**
-     * Cache file sah hanya bila benar-benar berisi byte: sisa 0-byte dari upstream yang
-     * gagal/abort tidak boleh disajikan sebagai `X-Cache: HIT` dengan body kosong.
+     * @param Stream $stream  stream handler that owns the request/response state
+     * @param StreamGuardService $guard upstream throttle guard of that handler
+     * @param null|Closure(string, array<string>):FetchResult $fetcher upstream fetch, defaults to the handler fetcher
      */
-    private function isUsableCacheFile(): bool
+    public function __construct(private readonly \GDPlayer\Stream\Stream $stream, private readonly \GDPlayer\Stream\Http\StreamGuardService $guard, private readonly ?\Closure $fetcher = null)
     {
     }
     /**
      * @return array{cache:bool,content:string}
      */
-    protected function getCacheOrOriginalContent(): array
+    public function getCacheOrOriginalContent(): array
     {
     }
-    protected function getMasterContent(): ?string
+    /**
+     * Fetch the master playlist body and normalise the `sparams` URL artefact.
+     *
+     * Triggers a stream retry for recoverable status codes instead of returning content.
+     *
+     * @return string|null playlist body, or null when the fetch produced nothing usable
+     */
+    public function getMasterContent(): ?string
     {
     }
     /**
@@ -14376,117 +18334,299 @@ trait StreamCacheTrait
      *
      * @return bool true when the request was already served from cache (caller must stop)
      */
-    protected function hasLocalCacheLoaded(): bool
+    public function hasLocalCacheLoaded(): bool
     {
     }
-    protected function loadPhpCache(): void
-    {
-    }
-}
-/**
- * Header respons stream (entity, content type, upstream).
- *
- * Split out of `Stream` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Stream` through this trait.
- */
-trait StreamHeaderTrait
-{
     /**
-     * Terapkan header entitas (Content-Length / Content-Range / Last-Modified) ke state stream.
+     * A cache file is only valid when it really holds bytes: a 0-byte leftover from a failed/
+     * aborted upstream must not be served as `X-Cache: HIT` with an empty body.
      *
-     * @param string $header satu baris header respons upstream
+     * @return bool
      */
-    protected function applyEntityHeader(string $header): void
+    public function isUsableCacheFile(): bool
     {
     }
-    protected function createContentType(): string
+    /**
+     * Emit the cached file for the PHP cache mode, honouring the request byte range.
+     *
+     * @return void
+     */
+    public function loadPhpCache(): void
     {
     }
-    protected function curlHeaderCallback(string $header): int
-    {
-    }
-    protected function defaultResponseHeaders(): void
-    {
-    }
-    protected function ensureHeadersSent(): void
-    {
-    }
-    protected function handleUpstreamHeader(string $header): int
+    /**
+     * Upstream headers for the playlist body. A playlist ignores `Range`: a partial body is not
+     * a manifest, so AVPlayer's `Range: bytes=0-1` must not turn the full playlist into a 404.
+     *
+     * @return string[]
+     */
+    public function playlistRequestHeaders(): array
     {
     }
 }
+
+namespace GDPlayer\Stream\Http;
+
+/**
+ * Retries a playlist upstream through the cURL CLI when PHP cURL produced no usable response.
+ */
+final class CurlCliRunner
+{
+    /** Maximum redirect hops followed by the CLI fallback. */
+    private const MAX_REDIRECTS = 20;
+    /** @var callable(string):void */
+    private $entitySink;
+    /** HTTP status of the finalized CLI response. */
+    private int $status = 0;
+    /**
+     * @param string   $url        upstream URL requested by the fallback
+     * @param string[] $headers    playlist request headers
+     * @param callable(string):void $entitySink receives every entity header of the final hop
+     */
+    public function __construct(private readonly string $url, private readonly array $headers, callable $entitySink)
+    {
+    }
+    /**
+     * Retry the playlist upstream through the cURL CLI.
+     *
+     * The returned body follows the same playlist pipeline as a regular fetch (live check, cache
+     * promotion, URL rewriting, response headers); status <200 or >=400 yields null.
+     *
+     * Redirects are followed manually so every hop passes the SSRF guard before it is requested.
+     *
+     * @return null|string playlist body, null when the CLI transfer failed
+     */
+    public function run(): ?string
+    {
+    }
+    /**
+     * HTTP status of the last finalized CLI response, 0 when the transfer failed.
+     *
+     * @return int
+     */
+    public function status(): int
+    {
+    }
+}
+
+/**
+ * Smart throttle guard for upstream media.
+ *
+ * Throttling is applied per media id, never per host: one rate-limited file must not freeze the
+ * other files of the same host. The host tier is correlation-only telemetry, so a single bad file
+ * can never escalate into a host-wide block.
+ */
+final class StreamGuardService
+{
+    /** @var array<string,string> Throttle-relevant upstream headers collected while the response arrives. */
+    private array $headers = [];
+    /**
+     * @param string $owner   video host identifier
+     * @param string $mediaId host-specific media identifier
+     * @param string $url     upstream media URL
+     */
+    public function __construct(private readonly string $owner, private readonly string $mediaId, private readonly string $url)
+    {
+    }
+    /**
+     * Start (or extend) the cooldown for this media id.
+     *
+     * @param array<string,string> $headers      lowercase response headers
+     * @param string               $upstreamHost origin of the upstream URL (log context only)
+     * @return void
+     */
+    public function cooldownFile(array $headers, string $upstreamHost = ''): void
+    {
+    }
+    /**
+     * Reset the strike memory for this media id after a clean response.
+     *
+     * @return void
+     */
+    public function decay(): void
+    {
+    }
+    /**
+     * Claim the current request chain so a redirect loop cannot add more than one strike.
+     *
+     * @param string $ip client IP of the request chain
+     * @return bool true when this request chain may record a strike
+     */
+    public function hasClaimedWindow(string $ip): bool
+    {
+    }
+    /**
+     * Keep the throttle-relevant part of one upstream header line, then forward it to the
+     * regular header handler.
+     *
+     * @param string $header raw upstream header line
+     * @param callable(string):int $forward regular header handler of the stream
+     * @return int bytes consumed, or -1 to make cURL abandon the transfer
+     */
+    public function header(string $header, callable $forward): int
+    {
+    }
+    /**
+     * Throttle-relevant headers collected so far.
+     *
+     * @return array<string,string>
+     */
+    public function headers(): array
+    {
+    }
+    /**
+     * Report whether upstream must not be contacted for this media id right now.
+     *
+     * @return bool true while the file cooldown is active
+     */
+    public function isBlocked(): bool
+    {
+    }
+    /**
+     * Cache key scoped to the source host, the upstream host and the given scope.
+     *
+     * @param string $prefix key namespace
+     * @param string $scope media id or fixed tier name
+     * @return string cache key
+     */
+    public function key(string $prefix, string $scope): string
+    {
+    }
+    /**
+     * Note this media id in the correlation ledger and report a host that is throttled as a whole.
+     *
+     * @param string $upstreamHost origin of the upstream URL (log context only)
+     * @return void
+     */
+    public function noteCorrelation(string $upstreamHost = ''): void
+    {
+    }
+    /**
+     * Apply the guard policy to a finished upstream response.
+     *
+     * @param int    $status       upstream HTTP status
+     * @param int    $errno        cURL error number
+     * @param string $ip           client IP of the request chain
+     * @param string $upstreamHost origin of the upstream URL (log context only)
+     * @return void
+     */
+    public function record(int $status, int $errno, string $ip, string $upstreamHost = ''): void
+    {
+    }
+    /**
+     * Remaining seconds of a guard entry, 0 when absent or expired.
+     *
+     * @param string $key cache key
+     * @return int seconds left
+     */
+    public function remaining(string $key): int
+    {
+    }
+    /**
+     * Remember the throttle-relevant part of one upstream header line.
+     *
+     * @param string $header raw upstream header line
+     * @return void
+     */
+    public function remember(string $header): void
+    {
+    }
+}
+
 /**
  * Shared stream state and playlist-parsing helpers.
+ *
+ * @method void commitCacheFile()
+ * @property ?ServerRequestInterface $request
+ * @property string $vHost
+ * @property string $vID
+ * @property bool $isLive
+ * @property string $vURL
+ * @property bool $enableCacheFile
  */
 trait StreamParser
 {
+    use \GDPlayer\Stream\Http\StreamParserSupport;
     /** @var resource|null $fpChunk */
     private $fpChunk;
     /** @var resource|null $fpVerbose */
     private $fpVerbose;
-    private ?\Psr\Http\Message\ServerRequestInterface $request = null;
     protected string $ampQry = '&';
     protected string $copyrightText = 'GDPlayer (c) 2020~ | gdplayer.to | @gdplayerto';
-    protected bool $enableCacheFile = false;
     protected string $endChars = " &?#\n\r\t\v\x00\v";
-    protected bool $isLive = false;
-    /** @var array<string,mixed> $parsedUrls */
+    /** @var array<string, array<string, int|string>> $parsedUrls */
     protected array $parsedUrls = [];
     protected string $token = '';
-    protected string $vHost;
-    protected string $vID;
-    protected string $vURL;
     protected string $vUrlOrigin = '';
-    private function closeFopen(): void
-    {
-    }
-    private function getHeaderLine(string $name): string
-    {
-    }
-    private function getMethod(): string
-    {
-    }
-    private function getRequestTarget(): string
-    {
-    }
     /**
-     * @param array<string|int, mixed> $qry
-     * @param \GDPlayer\Core\Security\Security $security
-     * @return array<string, mixed>
+     * Append the `gt` token parameter to a URL query string.
+     *
+     * @param string $url URL to extend
+     * @return string URL carrying the token, trailing delimiters trimmed
      */
-    private function repairUrlQuery(array $qry, \GDPlayer\Core\Security\Security $security): array
-    {
-    }
     protected function addTokenToUrl(string $url = ''): string
     {
     }
+    /**
+     * Rewrite an upstream URL into an encrypted local bypass path.
+     *
+     * Normalises the path, swaps custom extensions back to their originals and keeps the
+     * original query (presigned values encrypted) together with the live flag.
+     *
+     * @param string $val upstream URL or relative path
+     * @param string $separator path separator inserted by the caller
+     * @return string local bypass URL, or an empty string when the input is blank
+     */
     protected function bypassURL(string $val, string $separator): string
     {
     }
     /**
-     * @return array<string, mixed>
+     * Return the current request method.
+     *
+     * @return string HTTP method, defaulting to GET when it cannot be read
      */
-    protected static function getCustomExtensions(): array
+    protected function getMethod(): string
     {
     }
     /**
+     * Parse a URL and memoise the result, keeping at most 50 entries.
+     *
      * @param string $url
-     * @return array<string,mixed>
+     * @return array<string, int|string>
      */
     protected function getParsedUrl(string $url): array
     {
     }
-    protected static function getSecurity(): \GDPlayer\Core\Security\Security
+    /**
+     * Return the raw request target including path and query string.
+     *
+     * @return string request target taken from the PSR-7 request or server vars
+     */
+    protected function getRequestTarget(): string
     {
     }
     /**
-     * @param string[] $pathParts
-     * @return string[]
+     * Resolve a possibly relative URL against the current video origin.
+     *
+     * @param string $val absolute URL, root-relative path, or path relative to the video URL
+     * @return string absolute URL
      */
-    protected function normalizedPathParts(array $pathParts = []): array
+    protected function parseBaseUrl(string $val): string
     {
     }
-    protected function parseBaseUrl(string $val): string
+    /**
+     * Flush the cache file, unlock and close the chunk and verbose handles.
+     */
+    public function closeFopen(): void
+    {
+    }
+    /**
+     * Read a request header from the PSR-7 request, falling back to server vars.
+     *
+     * @param string $name header name
+     * @return string header value, or an empty string when the header is absent
+     */
+    public function getHeaderLine(string $name): string
     {
     }
     /**
@@ -14508,131 +18648,112 @@ trait StreamParser
     {
     }
 }
+
 /**
- * Range request dan pembuatan fetcher upstream.
- *
- * Split out of `Stream` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Stream` through this trait.
+ * URL repair and path normalisation helpers shared by StreamParser consumers.
  */
-trait StreamRequestTrait
+trait StreamParserSupport
 {
     /**
-     * Prepare the tmp/progress files, request metadata, then build the Fetcher for one upstream.
+     * Return the original and custom stream extension maps.
      *
-     * @param bool $withResponse true = body held in memory (playlist), false = streamed to the client
-     */
-    protected function createFetcher(bool $withResponse = true): \GDPlayer\Http\Fetcher\Fetcher
-    {
-    }
-    protected function getRangeRequest(): void
-    {
-    }
-}
-/**
- * Retry dan parsing playlist upstream.
- *
- * Split out of `Stream` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Stream` through this trait.
- */
-trait StreamRetryTrait
-{
-    protected function playlistParser(string $content): void
-    {
-    }
-    protected function retryStream(): never
-    {
-    }
-}
-/**
- * Base stream handler that proxies and caches media/playlist responses.
- *
- * Implements local-cache lookup, chunked temporary caching, upstream cURL
- * streaming and circuit-breaker protection shared by HLS, MPD and MP4.
- */
-abstract class Stream extends \GDPlayer\Stream\Setter
-{
-    use \GDPlayer\Stream\StreamCache;
-    use \GDPlayer\Stream\StreamCacheTrait;
-    use \GDPlayer\Stream\StreamHeaderTrait;
-    use \GDPlayer\Stream\StreamParser;
-    use \GDPlayer\Stream\StreamRequestTrait;
-    use \GDPlayer\Stream\StreamRetryTrait;
-    /** Batas byte per request MP4 (plugin roadrunner memakai 5 MB; seek jadi lebih responsif). */
-    protected const MP4_RANGE_CHUNK = 6291456;
-    protected int $end = 0;
-    protected bool $headersSent = false;
-    /** Suffix range (`bytes=-N`): potongan ekor, bukan entitas penuh -> jangan ditulis ke cache. */
-    protected bool $isSuffixRange = false;
-    protected int $responseCode = 0;
-    /** @var int[] $responseCodeWithRetry */
-    protected array $responseCodeWithRetry = [-1, 0, 408, 429, 500, 501, 502, 503, 504];
-    protected bool $sendContentRange = false;
-    protected int $start = 0;
-    /**
-     * @param string                     $vHost        video host identifier
-     * @param string                     $vID          host-specific media identifier
-     * @param string                     $url          upstream media URL
-     * @param string                     $cacheMode    cache driver mode
-     * @param int                        $cacheTimeout cache lifetime in seconds
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request      PSR-7 request
-     */
-    public function __construct(string $vHost = '', string $vID = '', string $url = '', private string $cacheMode = 'php', private int $cacheTimeout = 3600, ?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-    /**
-     * Promote the temporary chunk cache to the final cache file when complete.
-     */
-    public function __destruct()
-    {
-    }
-    /**
      * @return array<string, mixed>
      */
-    public function __debugInfo(): array
+    protected static function getCustomExtensions(): array
     {
     }
     /**
-     * Promosikan atau buang file `.tmp` selagi lock masih dipegang.
+     * Create the URL encryption helper.
      *
-     * Dulu rename() baru dijalankan di __destruct(), yaitu SETELAH lock dilepas: penulis baru
-     * bisa memotong `.tmp` yang sama di sela unlock -> rename. Kini seluruh transisi selesai
-     * sebelum LOCK_UN sehingga file yang di-rename selalu utuh.
+     * @return Security
      */
-    protected function commitCacheFile(): void
-    {
-    }
-    protected function init(): void
+    protected static function getSecurity(): \GDPlayer\Core\Security\Security
     {
     }
     /**
-     * Stream the media to the client, serving from cache when available.
+     * Resolve `.` and `..` segments and escape encoded slashes in a path.
      *
-     * @return void
+     * @param string[] $pathParts
+     * @return string[]
      */
-    public function stream(): void
+    protected function normalizedPathParts(array $pathParts = []): array
     {
     }
 }
+
+namespace GDPlayer\Stream\Playlist;
+
+/**
+ * HLS (m3u8) playlist stream handler.
+ */
+final class HLS extends \GDPlayer\Stream\Playlist\PlaylistServer
+{
+    use \GDPlayer\Stream\Playlist\HLSParser;
+    public bool $isMP4 = false;
+    public bool $isMPD = false;
+    /**
+     * Live when an EXTINF segment exists but no EXT-X-ENDLIST terminator yet.
+     *
+     * @param string $content playlist contents
+     * @return bool
+     */
+    protected function isPlaylistLive(string $content): bool
+    {
+    }
+    /**
+     * Parse the original playlist; the separator is chosen from the EXTINF marker used upstream.
+     *
+     * @param string $content original playlist
+     * @return string
+     */
+    protected function parseOriginalContent(string $content): string
+    {
+    }
+    /**
+     * Rewrite master playlist URLs before sending them to the client.
+     *
+     * @param string $content playlist contents
+     * @return string
+     */
+    protected function preparePlaylistContent(string $content): string
+    {
+    }
+}
+
 /**
  * HLS playlist parsing and rewriting helpers.
  */
 trait HLSParser
 {
-    use \GDPlayer\Stream\StreamParser;
+    use \GDPlayer\Stream\Http\StreamParser;
+    protected string $copyrightText = 'GDPlayer (c) 2020~ | gdplayer.to | @gdplayerto';
     protected string $extInf = '#EXT-X-STREAM-INF';
     protected string $hlsSeparator = '/hls/';
+    /**
+     * Rewrite the variant URLs of a master playlist so each one carries this instance token.
+     *
+     * @param string $content raw master playlist
+     * @return string rewritten playlist
+     */
     protected function modifyMasterContent(string $content = ''): string
     {
     }
+    /**
+     * Rewrite a media playlist so every segment and key URI is served through this instance.
+     *
+     * @param string $m3u8Content raw media playlist
+     * @param string $separator path prefix used to rebuild segment URLs
+     * @return string rewritten playlist, empty when the input is empty
+     */
     protected function parsePlaylist(string $m3u8Content = '', string $separator = '/hls/'): string
     {
     }
     /**
-     * Separator segmen HLS, mengikuti engine stream yang siap dipakai.
+     * HLS segment separator, following the stream engine that is available.
      *
-     * Playlist ditulis langsung dengan slug engine pada satu lintasan, jadi tidak perlu
-     * `str_replace` susulan atas output buffer: RoadRunner → `/stream-ts3/`,
-     * Swoole → `/stream-ts2/`, jalur PHP → `/stream-ts/`.
+     * The playlist is written with the engine slug in a single pass, so no follow-up
+     * `str_replace` over the output buffer is needed: RoadRunner → `/stream-ts3/`,
+     * Swoole → `/stream-ts2/`, plain PHP → `/stream-ts/`.
      *
      * @return string
      */
@@ -14640,26 +18761,16 @@ trait HLSParser
     {
     }
 }
+
 /**
- * Playlist serving skeleton shared by the HLS and MPD handlers.
- *
- * The live marker MUST be declared by each handler through the abstract hook below:
- * HLS uses the presence of EXTINF segments without EXT-X-ENDLIST, while MPD uses the
- * type="dynamic" attribute on the MPD element. Live is never written to the cache
- * file; VOD is.
+ * MPD (DASH) manifest stream handler.
  */
-trait PlaylistServer
+final class MPD extends \GDPlayer\Stream\Playlist\PlaylistServer
 {
+    use \GDPlayer\Stream\Playlist\MPDParser;
+    public bool $isMPD = true;
     /**
-     * Cached content is used as-is; original content is parsed through the handler hook.
-     *
-     * @return string
-     */
-    private function resolvePlaylistContent(): string
-    {
-    }
-    /**
-     * Query separator in rewritten URLs. MPD uses the XML entity (&amp;).
+     * Pemisah query MPD memakai entitas XML, bukan ampersand mentah.
      *
      * @return string
      */
@@ -14667,30 +18778,28 @@ trait PlaylistServer
     {
     }
     /**
-     * Handler live marker: HLS (EXTINF without EXT-X-ENDLIST) / MPD (type="dynamic").
+     * Live MPD is marked by the type="dynamic" attribute on the MPD element.
      *
      * @param string $content manifest contents
      * @return bool
      */
-    abstract protected function isPlaylistLive(string $content): bool;
+    protected function isPlaylistLive(string $content): bool
+    {
+    }
     /**
-     * Parse a manifest that is not cached yet. Must be implemented by every handler.
+     * Parse the original DASH manifest; only passed through when its content really is MPD.
      *
      * @param string $content original manifest
      * @return string
      */
-    abstract protected function parseOriginalContent(string $content): string;
-    /**
-     * Last transformation before playlistParser(). Default: as-is.
-     *
-     * @param string $content manifest contents
-     * @return string
-     */
-    protected function preparePlaylistContent(string $content): string
+    protected function parseOriginalContent(string $content): string
     {
     }
     /**
-     * Hook for live manifests, run before output. Default: as-is.
+     * Tidy the live manifest before sending it to the client.
+     *
+     * The repairMPD() call is kept exactly as in the previous code, and so is its behavior:
+     * the return value is not used and the content is sent as-is.
      *
      * @param string $content manifest contents
      * @return string
@@ -14698,196 +18807,16 @@ trait PlaylistServer
     protected function repairLivePlaylist(string $content): string
     {
     }
-    /**
-     * Serve the playlist (cached result or parsed result) to the client.
-     *
-     * @return void
-     */
-    protected function servePlaylist(): void
-    {
-    }
 }
-/**
- * HLS (m3u8) playlist stream handler.
- */
-final class HLS extends \GDPlayer\Stream\Stream
-{
-    use \GDPlayer\Stream\HLSParser;
-    use \GDPlayer\Stream\PlaylistServer;
-    /**
-     * Serve the (cached or freshly parsed) HLS playlist to the client.
-     *
-     * @return void
-     */
-    public function playlistStream(): void
-    {
-    }
-}
-/**
- * Stream handler for serving local files with Range support.
- */
-final class LocalFile
-{
-    /**
-     * @param string $file absolute path of the local file to serve
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request PSR-7 request
-     */
-    public function __construct(string $file, ?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-    /**
-     * Parse a single-range `Range` header against a file size.
-     *
-     * Supports `bytes=a-b`, `bytes=a-`, `bytes=-N` (last N bytes) and takes the first range of a
-     * multi-range request (multi-part bodies are not supported).
-     *
-     * @param string $rangeHeader raw Range header ('' = whole file)
-     * @param int    $filesize    file size in bytes
-     * @return array{0: int, 1: int} [start, end] inclusive
-     */
-    public static function resolveRange(string $rangeHeader, int $filesize): array
-    {
-    }
-    /**
-     * Set the download filename.
-     *
-     * @param string $title file name to expose
-     * @return self fluent instance
-     */
-    public function setTitle(string $title): self
-    {
-    }
-    /**
-     * Stream the local file to the client, honoring the Range header.
-     *
-     * @return void
-     */
-    public function stream(): void
-    {
-    }
-}
-/**
- * Pemuatan sumber stream (HLS/MP4/MPD).
- *
- * Split out of `Master` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Master` through this trait.
- */
-trait MasterLoadTrait
-{
-    protected function load(): void
-    {
-    }
-    protected function loadRequest(): void
-    {
-    }
-    /**
-     * Handle an HLS request by dispatching to the HLS stream handler.
-     *
-     * @return void
-     */
-    public function loadHLS(): void
-    {
-    }
-    /**
-     * Handle an MP4 request, adding Google Drive authorization when needed.
-     *
-     * @return void
-     */
-    public function loadMP4(): void
-    {
-    }
-    /**
-     * Handle an MPD (DASH) request by dispatching to the MPD stream handler.
-     *
-     * @return void
-     */
-    public function loadMPD(): void
-    {
-    }
-}
-/**
- * Parsing URI, data source, dan URL terenkripsi.
- *
- * Split out of `Master` (rule php:S2042: at most 150 lines per class).
- * Behaviour is unchanged; the API stays on `Master` through this trait.
- */
-trait MasterParseTrait
-{
-    protected function changeUrlExtension(): void
-    {
-    }
-    /**
-     * @param array<string,mixed> $data
-     * @return void
-     */
-    protected function parseDataSources(array $data = []): void
-    {
-    }
-    protected function parseUri(): void
-    {
-    }
-    protected function processEncryptedUrl(string $encryptedUrl): void
-    {
-    }
-    protected function redirectToOriginalUrl(): void
-    {
-    }
-}
-/**
- * Front controller for playback, download and master-playlist requests.
- *
- * Resolves the request URI into a host/id, loads the resolved sources and
- * dispatches to the HLS, MPD or MP4 stream handler.
- */
-final class Master
-{
-    use \GDPlayer\Stream\MasterLoadTrait;
-    use \GDPlayer\Stream\MasterParseTrait;
-    /**
-     * @param bool                        $isMP4    whether this is an MP4 request
-     * @param bool                        $isMaster whether this is a master-playlist request
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request  PSR-7 request
-     */
-    public function __construct(bool $isMP4 = false, bool $isMaster = false, ?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-    /**
-     * @return array<string, mixed>
-     */
-    public function __debugInfo(): array
-    {
-    }
-}
-/**
- * MP4 stream handler with Range support.
- */
-final class MP4 extends \GDPlayer\Stream\Stream
-{
-    /**
-     * @param string                     $vHost        video host identifier
-     * @param string                     $vID          host-specific media identifier
-     * @param string                     $url          upstream media URL
-     * @param string                     $cacheMode    cache driver mode
-     * @param int                        $cacheTimeout cache lifetime in seconds
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request      PSR-7 request
-     */
-    public function __construct(string $vHost = '', string $vID = '', string $url = '', string $cacheMode = 'php', int $cacheTimeout = 3600, ?\Psr\Http\Message\ServerRequestInterface $request = null)
-    {
-    }
-}
+
 /**
  * MPD (DASH) manifest parsing and rewriting helpers.
  */
 trait MPDParser
 {
-    use \GDPlayer\Stream\StreamParser;
-    /** @var array<string,mixed> $regexCache */
+    use \GDPlayer\Stream\Http\StreamParser;
+    protected string $copyrightText = 'GDPlayer (c) 2020~ | gdplayer.to | @gdplayerto';
+    /** @var array<string, array<int, string>> $regexCache */
     protected array $regexCache = [];
     /**
      * returns the modified $mpdContent
@@ -14948,10 +18877,10 @@ trait MPDParser
     {
     }
     /**
-     * Separator segmen DASH, mengikuti engine stream yang siap dipakai.
+     * DASH segment separator, following the stream engine that is ready for use.
      *
-     * Sama seperti HLS: manifest ditulis langsung dengan slug engine, tanpa
-     * `str_replace` susulan atas output buffer.
+     * Same as HLS: the manifest is written directly with the engine slug, without a
+     * follow-up `str_replace` over the output buffer.
      *
      * @return string
      */
@@ -14959,15 +18888,89 @@ trait MPDParser
     {
     }
 }
+
 /**
- * MPD (DASH) manifest stream handler.
+ * Playlist serving base class shared by the HLS and MPD handlers.
+ *
+ * The live marker MUST be declared by each handler through the abstract hook below:
+ * HLS uses the presence of EXTINF segments without EXT-X-ENDLIST, while MPD uses the
+ * type="dynamic" attribute on the MPD element. Live is never written to the cache
+ * file; VOD is.
  */
-final class MPD extends \GDPlayer\Stream\Stream
+abstract class PlaylistServer extends \GDPlayer\Stream\Stream
 {
-    use \GDPlayer\Stream\MPDParser;
-    use \GDPlayer\Stream\PlaylistServer;
+    protected string $ampQry = '&';
+    /** true when the playlist body being served came from the cache file (read-only request). */
+    protected bool $playlistCacheHit = false;
     /**
-     * Serve the (cached or freshly parsed) MPD manifest to the client.
+     * Query separator in rewritten URLs. MPD uses the XML entity (&amp;).
+     *
+     * @return string
+     */
+    protected function ampQuerySeparator(): string
+    {
+    }
+    /**
+     * Retry the playlist upstream through the cURL CLI when PHP cURL produced no usable response.
+     *
+     * The returned body follows the same playlist pipeline as a regular fetch (live check, cache
+     * promotion, URL rewriting, response headers); status <200 or >=400 yields null.
+     *
+     * @return null|string playlist body, null when the CLI transfer failed
+     */
+    protected function fallbackCurlCli(): ?string
+    {
+    }
+    /**
+     * Handler live marker: HLS (EXTINF without EXT-X-ENDLIST) / MPD (type="dynamic").
+     *
+     * @param string $content manifest contents
+     * @return bool
+     */
+    abstract protected function isPlaylistLive(string $content): bool;
+    /**
+     * Parse a manifest that is not cached yet. Must be implemented by every handler.
+     *
+     * @param string $content original manifest
+     * @return string
+     */
+    abstract protected function parseOriginalContent(string $content): string;
+    /**
+     * Last transformation before playlistParser(). Default: as-is.
+     *
+     * @param string $content manifest contents
+     * @return string
+     */
+    protected function preparePlaylistContent(string $content): string
+    {
+    }
+    /**
+     * Hook for live manifests, run before output. Default: as-is.
+     *
+     * @param string $content manifest contents
+     * @return string
+     */
+    protected function repairLivePlaylist(string $content): string
+    {
+    }
+    /**
+     * Cached content is used as-is; original content is parsed through the handler hook.
+     *
+     * @return string
+     */
+    protected function resolvePlaylistContent(): string
+    {
+    }
+    /**
+     * Serve the playlist (cached result or parsed result) to the client.
+     *
+     * @return void
+     */
+    protected function servePlaylist(): void
+    {
+    }
+    /**
+     * Serve the (cached or freshly parsed) playlist to the client.
      *
      * @return void
      */
@@ -14975,146 +18978,227 @@ final class MPD extends \GDPlayer\Stream\Stream
     {
     }
 }
-/**
- * Request mode flags of a stream request (Sonar php:S1820 for {@see Master}).
- *
- * Kept as a mutable value object because the flags are resolved while the request is parsed
- * (constructor defaults, then `parseDataSources()`); semantics are unchanged from the
- * individual boolean properties it replaces.
- */
-final class StreamFlags
-{
-    /** Download page allowed by the settings (dl=1 + enable_download_page). */
-    public bool $isAllowDownload = false;
-    /** `dl=1` in the query string. */
-    public bool $isDownload = false;
-    /** Google Drive HLS source (host-based rule from StreamConfig). */
-    public bool $isGoogleHls = false;
-    /** `gl=1` in the query string (live stream). */
-    public bool $isLive = false;
-    /** Request targets an MP4 label. */
-    public bool $isMP4 = false;
-    /** Request targets the master playlist. */
-    public bool $isMaster = false;
-}
+
 namespace GDPlayer\Support;
 
 /**
- * Satu-satunya pintu pemanggilan proses eksternal.
+ * The single gateway for starting external processes.
  *
- * Menyalurkan shell_exec(), exec(), popen() dan proc_open() ke satu kelas supaya
- * pemakaian proses sistem mudah diaudit dan diganti di masa depan. Kelas ini tidak
- * menambah logika apa pun: penyusunan command, escaping, dan parsing output tetap
- * tanggung jawab pemanggil, jadi perilaku pemanggil lama tidak berubah.
+ * Routes shell_exec(), exec(), popen() and proc_open() through one class so system
+ * process usage is easy to audit and swap out later. The class adds no logic of its
+ * own: building the command, escaping, and parsing output stay the caller's job, so
+ * existing callers behave exactly as before.
  *
- * Pemanggilan keempat fungsi itu langsung dari luar kelas ini dilarang oleh
+ * Calling those four functions from outside this class is rejected by
  * `disallowed-calls.neon` (PHPStan).
  */
 final class ProcessRunner
 {
     /**
-     * Jalankan command dan kembalikan stdout sebagai baris.
+     * Run a command and return its stdout split into lines.
      *
-     * @param string $command command shell yang sudah di-escape pemanggil
+     * @param string $command shell command, already escaped by the caller
      * @return list<string>
      */
     public static function lines(string $command): array
     {
     }
     /**
-     * Buka proses dengan descriptor custom (proc_open).
+     * Start a process with caller-supplied descriptors (proc_open).
      *
-     * @param string $command command shell yang sudah di-escape pemanggil
-     * @param array<int, array{0: string, 1?: string}> $descriptors descriptor proc_open
-     * @param array<int, resource> $pipes pipe hasil proc_open, diisi by reference
+     * @param string $command shell command, already escaped by the caller
+     * @param array<int, array{0: string, 1?: string}> $descriptors proc_open descriptor spec
+     * @param array<int, resource> $pipes proc_open pipes, filled by reference
      * @return resource|false
      */
     public static function open(string $command, array $descriptors, array &$pipes)
     {
     }
     /**
-     * Jalankan command dan kembalikan seluruh stdout.
+     * Run a command and return its whole stdout.
      *
-     * @param string $command command shell yang sudah di-escape pemanggil
-     * @return string|null null bila shell tidak tersedia atau eksekusi gagal
+     * @param string $command shell command, already escaped by the caller
+     * @return string|null null when no shell is available or the run failed
      */
     public static function output(string $command): ?string
     {
     }
     /**
-     * Buka pipe ke command lalu tutup lagi (cukup untuk melepas proses latar).
+     * Open a pipe to a command and close it again, enough to detach a background job.
      *
-     * @param string $command command shell yang sudah di-escape pemanggil
-     * @param string $mode mode pipe, default 'r'
+     * On Windows the pipe is closed immediately, and cmd.exe prints
+     * "The process tried to write to a nonexistent pipe." when the detached child writes
+     * to the already-closed handle. Sending the output to NUL keeps the handle unused.
+     *
+     * @param string $command shell command, already escaped by the caller
+     * @param string $mode pipe mode, defaults to 'r'
      */
     public static function pipe(string $command, string $mode = 'r'): void
     {
     }
     /**
-     * Jalankan command tanpa memakai output-nya (fire and forget).
+     * Run a command and discard its output (fire and forget).
      *
-     * @param string $command command shell yang sudah di-escape pemanggil
+     * @param string $command shell command, already escaped by the caller
      */
     public static function run(string $command): void
     {
     }
 }
+
 /**
- * Probe port TCP tanpa memicu warning PHP.
+ * Builds a ZIP archive from a directory (used by plugin and theme sync).
  *
- * `socket_connect()` blocking mencetak E_WARNING saat port tertutup, sedangkan connect
- * non-blocking gagal dengan false + EINPROGRESS. Pola di sini: connect non-blocking,
- * tunggu dengan `socket_select()`, lalu periksa SO_ERROR.
- */
-final class TcpProbe
-{
-    public static function isOpen(string $host, int $port, int $timeout = 1): bool
-    {
-    }
-}
-/**
- * Pembuat arsip ZIP dari sebuah direktori (dipakai sinkronisasi plugin & tema).
+ * Files are read up front and written through addFromString(): addFile() would only read
+ * them at close(), so a file that disappears or changes midway raises a "Read error"
+ * warning instead of a return value that can be inspected.
  *
- * Berkas dibaca lebih awal lalu ditulis via addFromString(): addFile() baru membaca
- * saat close(), sehingga berkas yang hilang/berubah di tengah jalan memunculkan
- * warning "Read error" alih-alih nilai balik yang bisa diperiksa.
- *
- * Arsip ditulis ke `<zip>.part` lalu dipindahkan dengan rename(), jadi berkas yang
- * disajikan ke server lain tidak pernah setengah jadi. Nama arsip memuat stamp isi
- * direktori (lihat stamp()), sehingga isi yang tidak berubah tidak dibangun ulang.
+ * The archive is written to `<zip>.part` and then moved with rename(), so the file served
+ * to other servers is never half-written. The archive name carries the content stamp of the
+ * directory (see stamp()), so unchanged content is not rebuilt.
  */
 final class ZipBuilder
 {
     /**
-     * Bangun $zipPath dari isi $sourceDir (tanpa .git/, logs/, dan *.lock).
+     * Artifacts left out of the archive. Tooling and git rewrite all of them without
+     * changing the content used at runtime; if they were counted, the stamp would keep
+     * changing and the archive would be rebuilt on every cycle.
      *
-     * @param string                $sourceDir  direktori sumber
-     * @param string                $zipPath    berkas ZIP tujuan
-     * @param array<string, string> $logContext konteks tambahan untuk log
+     * @var string[] regex patterns matched against the relative path
      */
-    public static function build(string $sourceDir, string $zipPath, array $logContext = []): bool
+    private const EXCLUDED = ['/\.git\//', '/(^|\/)logs\//', '/^\.phpunit\.cache\//', '/^\.scannerwork\//', '/^node_modules\//', '/^\.idea\//', '/^\.vscode\//'];
+    /** Maximum age of a temporary archive (seconds) before prune() removes it. */
+    private const MAX_AGE = 3600;
+    /**
+     * Build $zipPath from the content of $sourceDir (without .git/, logs/ and *.lock).
+     *
+     * @param string                $sourceDir  source directory
+     * @param string                $zipPath    destination ZIP file
+     * @param array<string, string> $logContext extra context for logging
+     * @return bool true when the archive was built and promoted to $zipPath
+     */
+    public static function hasBuiltArchive(string $sourceDir, string $zipPath, array $logContext = []): bool
     {
     }
     /**
-     * Hapus arsip sementara (zip/part) yang lebih tua dari MAX_AGE di $tmpDir.
+     * Delete temporary archives (zip/part) older than MAX_AGE inside $tmpDir.
      *
-     * @param string $tmpDir direktori tmp plugin/tema
-     * @return int jumlah berkas yang dihapus
+     * @param string $tmpDir plugin/theme tmp directory
+     * @return int number of files removed
      */
     public static function prune(string $tmpDir): int
     {
     }
     /**
-     * Sidik isi direktori: sha1 dari path|size|mtime setiap berkas, tanpa membaca isi.
+     * Content fingerprint of a directory: path|size|mtime of every file, without reading bodies.
      *
-     * @param string $sourceDir direktori sumber
-     * @return string 40 karakter hex, atau '' bila direktori tidak ada
+     * @param string $sourceDir source directory
+     * @return string 40 hex characters, or '' when the directory does not exist
      */
     public static function stamp(string $sourceDir): string
     {
     }
 }
+
 namespace GDPlayer\View;
+
+/**
+ * Base class for HTML views.
+ *
+ * Request & response are injected via the constructor (user request). Output from old views that still
+ * use `echo` is captured through the output buffer, so templates do not need to be rewritten; new views
+ * simply `return` a ResponseInterface from {@see render()}.
+ *
+ * Content-Type is deliberately NOT set so PHP uses the same default mimetype+charset as the
+ * old path (byte-for-byte parity).
+ */
+abstract class AbstractView implements \Psr\Http\Server\RequestHandlerInterface
+{
+    /** Response marker: the handler already sent its own output (skip emit). */
+    public const STREAMED_HEADER = 'X-GD-Streamed';
+    /**
+     * @param ServerRequestInterface $request active request
+     * @param ResponseInterface $response response being built (for status/header/cookie)
+     * @param string $action action name for controllers serving several pages
+     */
+    public function __construct(protected \Psr\Http\Message\ServerRequestInterface $request, protected \Psr\Http\Message\ResponseInterface $response, protected readonly string $action = '')
+    {
+    }
+    /**
+     * Apply the default headers (Cache-Control + CORS) to this request's response.
+     *
+     * @param bool $enableCache true for responses that may be cached
+     * @param int $cacheMaxAge max-age when caching is enabled
+     * @return void
+     */
+    protected function applyDefaultHeaders(bool $enableCache = false, int $cacheMaxAge = 3600): void
+    {
+    }
+    /**
+     * Whether view output must be captured by the output buffer (default) or sent directly.
+     *
+     * When false: the string returned by {@see render()} is considered already sent by the
+     * handler (marked with the X-GD-Streamed header, emit is skipped), while a ResponseInterface is still
+     * emitted as usual (used by the redirect/error branch of a streaming handler).
+     *
+     * @return bool
+     */
+    protected function isBufferingOutput(): bool
+    {
+    }
+    /**
+     * Render a Twig template into a string (does not print to the output).
+     *
+     * @param string $template absolute template path
+     * @return string rendered markup
+     */
+    protected function loadTemplate(string $template): string
+    {
+    }
+    /**
+     * View logic. May `echo` (bridge) or return a string/ResponseInterface.
+     *
+     * @return string|ResponseInterface
+     */
+    abstract protected function render(): string|\Psr\Http\Message\ResponseInterface;
+    /**
+     * Render a Twig template into a string (does not print to the output).
+     *
+     * @param string $template absolute template path
+     * @param array<string, mixed> $context template data
+     * @param bool $frontend true for the frontend layout, false for the backend layout
+     * @return string rendered markup
+     */
+    protected function renderTemplate(string $template, array $context = [], bool $frontend = true): string
+    {
+    }
+    /**
+     * Admin guard inside the controller (same semantics as the old Views::adminValidation).
+     *
+     * @return ResponseInterface|null 401/403 response when not allowed, null when allowed to continue
+     */
+    protected function requireAdmin(): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Login guard inside the controller.
+     *
+     * @return ResponseInterface|null 401 response when not logged in, null when allowed to continue
+     */
+    protected function requireLogin(): ?\Psr\Http\Message\ResponseInterface
+    {
+    }
+    /**
+     * Render the view then turn its output into a response.
+     *
+     * @param ServerRequestInterface $request active request from PSR-15 (may differ from the one in the constructor
+     *                                        when middleware replaced it, so the latest version is always used)
+     * @return ResponseInterface response ready to send
+     */
+    final public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
+    {
+    }
+}
 
 /**
  * Static error page (400/401/403/404/500/503).
@@ -15125,6 +19209,8 @@ namespace GDPlayer\View;
  */
 final class ErrorPageView
 {
+    /** @var array<int, array{0: string, 1: string}> status => [title, description] */
+    private const PAGES = [400 => ['400 Bad Request', 'The page is disabled.'], 401 => ['401 Unauthorized', 'You are not allowed to access the page.'], 403 => ['403 Forbidden', 'You are not allowed to access the page.'], 404 => ['404 Page Not Found', 'The page you are looking for was not found.'], 500 => ['500 Internal Server Error', 'Sorry, the server is currently unavailable. Please contact admin.'], 503 => ['503 Service Unavailable', 'Sorry, the server is currently unavailable. Please try again later.']];
     /**
      * Send the error page through ResponseEmitter.
      *
@@ -15138,12 +19224,13 @@ final class ErrorPageView
      * Build the error page response.
      *
      * @param int $status HTTP status (400/401/403/404/500/503)
-     * @return \Psr\Http\Message\ResponseInterface error page response; status stays $status even when the body comes from the theme
+     * @return ResponseInterface error page response; status stays $status even when the body comes from the theme
      */
     public static function forStatus(int $status): \Psr\Http\Message\ResponseInterface
     {
     }
 }
+
 /**
  * Contract for a single theme view.
  *
@@ -15156,11 +19243,12 @@ interface ViewInterface
     /**
      * Render the view for one request.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request active request
-     * @return \Psr\Http\Message\ResponseInterface|string response ready to send, or the HTML body
+     * @param ServerRequestInterface $request active request
+     * @return ResponseInterface|string response ready to send, or the HTML body
      */
     public function render(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface|string;
 }
+
 /**
  * Mapping of `area:page` to the active theme's view class.
  *
@@ -15169,6 +19257,8 @@ interface ViewInterface
  */
 final class ViewResolver
 {
+    /** @var array<string, array<string, class-string<ViewInterface>>> */
+    private static array $maps = [];
     /**
      * @param string $themePath active theme directory
      * @param string $area 'frontend' or 'backend'
@@ -15188,7 +19278,7 @@ final class ViewResolver
     {
     }
     /**
-     * Buang peta view tema agar berkas view yang berubah di path yang sama ikut terbaca ulang.
+     * Drop the theme view map so a changed view file in the same path is read again.
      */
     public static function reset(): void
     {
