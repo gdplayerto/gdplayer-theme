@@ -6070,21 +6070,6 @@ abstract class AjaxHelper implements \Psr\Http\Server\RequestHandlerInterface
 final class FileSystem
 {
     /**
-     * Move a file into place without emitting warnings.
-     *
-     * Promotion is best-effort: Windows refuses the move with `Access is denied` when the
-     * destination or the source is still open in another process (a reader streaming the
-     * same cache file, or a `clear cache` running at the same time), so the warning is
-     * swallowed by a temporary error handler rather than the @ operator.
-     *
-     * @param string $from source path
-     * @param string $to   destination path
-     * @return bool true when the file now sits at the destination
-     */
-    public static function hasRenamed(string $from, string $to): bool
-    {
-    }
-    /**
      * Write content to a file, creating its parent directory first.
      *
      * Writability is not pre-checked because PHP on Windows can report a
@@ -6165,6 +6150,21 @@ final class FileSystem
      * @return bool true when at least one directory was removed
      */
     public static function hasDeletedTemporaryDirs(): bool
+    {
+    }
+    /**
+     * Move a file into place without emitting warnings.
+     *
+     * Promotion is best-effort: Windows refuses the move with `Access is denied` when the
+     * destination or the source is still open in another process (a reader streaming the
+     * same cache file, or a `clear cache` running at the same time), so the warning is
+     * swallowed by a temporary error handler rather than the @ operator.
+     *
+     * @param string $from source path
+     * @param string $to   destination path
+     * @return bool true when the file now sits at the destination
+     */
+    public static function hasRenamed(string $from, string $to): bool
     {
     }
     /**
@@ -14647,11 +14647,14 @@ final class EngineGate
     /** Recognized engine suffixes: Swoole and RoadRunner. */
     private const SUFFIXES = ['2', '3'];
     /**
-     * Engine suffix usable by this install: the first active engine plugin whose
-     * reverse proxy configuration is installed; '' when none.
+     * Engine suffix usable by this install: the first active engine plugin whose process is
+     * alive AND whose reverse proxy configuration is installed; '' when none.
      *
      * Taken from active plugins in the same record order as the legacy view, so
      * installs without a reverse proxy keep using the PHP path with no redirect.
+     * An active plugin whose service worker is stopped must not contribute its suffix:
+     * playlist segment URLs would then point at `stream-*<suffix>` endpoints that cannot
+     * serve, so streaming has to stay on the PHP path.
      *
      * @return string engine suffix ('2' | '3') or '' when none is ready
      */
