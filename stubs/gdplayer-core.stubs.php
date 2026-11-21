@@ -18015,7 +18015,6 @@ abstract class Stream
     use \GDPlayer\Stream\Cache\StreamCache;
     use \GDPlayer\Stream\Http\StreamParser;
     use \GDPlayer\Stream\StreamStateTrait;
-    private ?\GDPlayer\Stream\Cache\StreamCacheService $cacheService = null;
     private ?\GDPlayer\Stream\Http\StreamGuardService $guardService = null;
     /** Bytes actually written to the tmp cache (0 when the request must not be cached). */
     private int $written = 0;
@@ -18065,6 +18064,10 @@ abstract class Stream
     }
     /**
      * Cache policy of this request.
+     *
+     * Deliberately not memoised: the service holds this handler, so storing it back in a property
+     * forms a reference cycle. A cycle defers `__destruct()` to the garbage collector, and the
+     * `.tmp` cache lock (LOCK_EX) then stays held across requests in a long-running worker.
      *
      * @return StreamCacheService
      */
