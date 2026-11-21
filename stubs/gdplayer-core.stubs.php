@@ -17120,6 +17120,12 @@ final class ServerConfigManager
      * @var array<string, int>
      */
     private const DEFAULT_PRIORITIES = ['dlhd_config' => 10, 'dlhd_proxy' => 10, 'swoole_config.dlhd' => 10, 'swoole_proxy.dlhd' => 10, 'litespeed_config' => 20, 'swoole_config' => 50, 'swoole_config.core' => 50, 'swoole_proxy' => 50, 'swoole_proxy.core' => 50, 'roadrunner_nginx_conf' => 60, 'roadrunner_nginx_conf.core' => 60, 'roadrunner_proxy' => 60, 'roadrunner_proxy.core' => 60];
+    /**
+     * Config groups owned by each stream engine plugin.
+     *
+     * @var array<string, string[]>
+     */
+    private const ENGINE_CONFIG_GROUPS = ['swoole' => ['swoole_config', 'swoole_proxy'], 'roadrunner' => ['roadrunner_nginx_conf', 'roadrunner_proxy']];
     private \GDPlayer\Config\Config $config;
     /**
      * Bind the settings store, creating a default one when none is injected.
