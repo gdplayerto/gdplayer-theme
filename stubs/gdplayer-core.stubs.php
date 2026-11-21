@@ -17146,6 +17146,17 @@ final class ServerConfigManager
     private const ENGINE_CONFIG_GROUPS = ['swoole' => ['swoole_config', 'swoole_proxy'], 'roadrunner' => ['roadrunner_nginx_conf', 'roadrunner_proxy']];
     private \GDPlayer\Config\Config $config;
     /**
+     * Signature of the last content this process generated, per setting key.
+     * Primary staleness signal in the request path (no cache I/O on the in-sync path).
+     *
+     * Sealed with the stat of the file it produced: another process rewriting the file
+     * invalidates the memo. A bare signature would keep claiming "in sync" for the whole
+     * worker lifetime (Swoole/RoadRunner) while the file on disk says otherwise.
+     *
+     * @var array<string, array{0: string, 1: int, 2: int}>
+     */
+    private static array $signatures = [];
+    /**
      * Bind the settings store, creating a default one when none is injected.
      *
      * @param null|Config $config optional config instance (a new one is created when omitted)
@@ -17189,6 +17200,18 @@ final class ServerConfigManager
      * @return bool true when the file must be re-rendered
      */
     public static function isRegenerationNeeded(string $signature, string $configFile, string $stampValue): bool
+    {
+    }
+    /**
+     * Is the active request served by nginx?
+     *
+     * `SERVER_SOFTWARE` is empty under CLI, Swoole, RoadRunner and unknown FCGI hosts; those
+     * keep the historical behaviour (render the file) so a proxy setup is never left without
+     * its nginx.conf. A concrete Apache/LiteSpeed banner must never rewrite an nginx config.
+     *
+     * @return bool
+     */
+    public static function isServedByNginx(): bool
     {
     }
     /**
