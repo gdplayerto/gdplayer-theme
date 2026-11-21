@@ -6070,6 +6070,21 @@ abstract class AjaxHelper implements \Psr\Http\Server\RequestHandlerInterface
 final class FileSystem
 {
     /**
+     * Move a file into place without emitting warnings.
+     *
+     * Promotion is best-effort: Windows refuses the move with `Access is denied` when the
+     * destination or the source is still open in another process (a reader streaming the
+     * same cache file, or a `clear cache` running at the same time), so the warning is
+     * swallowed by a temporary error handler rather than the @ operator.
+     *
+     * @param string $from source path
+     * @param string $to   destination path
+     * @return bool true when the file now sits at the destination
+     */
+    public static function hasRenamed(string $from, string $to): bool
+    {
+    }
+    /**
      * Write content to a file, creating its parent directory first.
      *
      * Writability is not pre-checked because PHP on Windows can report a
@@ -18054,11 +18069,12 @@ abstract class Stream
     {
     }
     /**
-     * Promote or discard the `.tmp` file while the lock is still held.
+     * Promote or discard the `.tmp` file after the write handle is closed.
      *
-     * rename() used to run in __destruct(), i.e. AFTER the lock was released: a new writer
-     * could truncate the same `.tmp` in the window between unlock and rename. The whole transition
-     * now finishes before LOCK_UN, so a renamed file is always complete.
+     * The handle is closed first because Windows refuses to move a file this process still has
+     * open (`Access is denied`, code 5); the size is then re-checked, so a writer that truncated
+     * the tmp in that gap cannot land as a complete cache file. Promotion still runs inside
+     * closeFopen()/the destructor, never after the request state is gone.
      *
      * @return void
      */
@@ -18635,6 +18651,9 @@ trait StreamParser
     }
     /**
      * Flush the cache file, unlock and close the chunk and verbose handles.
+     *
+     * The handles are released before the cache promotion: Windows refuses to move a file
+     * that this process still has open (`Access is denied`, code 5).
      */
     public function closeFopen(): void
     {
