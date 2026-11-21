@@ -6,7 +6,7 @@
  * File Created: Thursday, 22nd October 2026 3:39:00 pm
  * Author: GDPlayer Developer (https://t.me/gdplayerto)
  * -----
- * Last Modified: Thursday, 29th October 2026 11:14:42 pm
+ * Last Modified: Saturday, 21st November 2026 4:56:21 pm
  * Modified By: GDPlayer Developer (https://t.me/gdplayerto>)
  * -----
  * Copyright 2020 - 2026 https://github.com/gdplayerto
@@ -28,7 +28,7 @@ final class BuyView extends AbstractPageView
         return $this->renderTemplate('buy.twig', [
             'title' => 'Buy GDPlayer Google Drive Video Player',
             'description' => 'Buy GDPlayer Google Drive Video Player Full Version only on the official site. '
-                . 'Get lifetime update support.',
+                . 'Every license includes 1 year of updates and support.',
         ], $request);
     }
 }
