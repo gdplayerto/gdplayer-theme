@@ -5,410 +5,254 @@
     <h1 class="section-title">Buy GDPlayer <span class="text-gradient">Additional Features</span></h1>
     <p class="section-subtitle">Expand your streaming capabilities with premium add-on hosts and integrations.</p>
     <div class="row justify-content-center form-row text-center">
-        <!-- Single Host Card -->
         <div class="col-12 col-md-6 col-xl-3">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge">Single Add-on</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Single Additional Host</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>10
-                    </p>
-                    <span class="price-period">Per Specific Single Host</span>
-                </div>
-                <p class="text-muted small mt-2">Perfect if you only need one obscure or premium streaming platform integrated into your current engine.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1 Premium/Custom Host Integration
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Seamless Backend Integration
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/7ceda84eff" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Single Add-on',
+                pricing_tracking_wider: 'Single Additional Host',
+                pricing_badge_style: 'background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);',
+                price_amount: '10',
+                price_period: 'Per Specific Single Host',
+                short_desc: 'Perfect if you only need one obscure or premium streaming platform integrated into your current engine.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: '1 Premium/Custom Host Integration' },
+                    { icon: 'fas fa-check-circle', label: 'Seamless Backend Integration' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: 'https://ko-fi.com/s/7ceda84eff',
+                nowpayments_link: ''
+            } only %}
         </div>
 
-        <!-- Additional Hosts Card -->
         <div class="col-12 col-md-6 col-xl-3">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge">Full Add-ons Bundle</h3>
-                <div class="text-uppercase tracking-wider small mb-2">All Premium Hosts</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>50
-                    </p>
-                    <span class="price-period">All Additional Premium Hosts</span>
-                </div>
-                <p class="text-muted small mt-2">Unlock every single premium and obscure streaming host supported by the GDPlayer ecosystem at once.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Access to All Additional Premium Hosts
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Priority Request for Obscure Platforms
-                    </li>
-                    <li>
-                        <i class="fas fa-star text-warning"></i> Best Value for Scaling Networks
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/d9430b55b2" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=5310556485&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Full Add-ons Bundle',
+                pricing_tracking_wider: 'All Premium Hosts',
+                price_amount: '50',
+                price_period: 'All Additional Premium Hosts',
+                short_desc: 'Unlock every single premium and obscure streaming host supported by the GDPlayer ecosystem at once.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Access to All Additional Premium Hosts' },
+                    { icon: 'fas fa-check-circle', label: 'Priority Request for Obscure Platforms' },
+                    { icon: 'fas fa-star text-warning', label: 'Best Value for Scaling Networks' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: 'https://ko-fi.com/s/d9430b55b2',
+                nowpayments_link: 'https://nowpayments.io/payment/?iid=5310556485&source=button'
+            } only %}
         </div>
 
-        <!-- Swoole Integration Card (Recommended) -->
         <div class="col-12 col-md-6 col-xl-3">
-            <div class="pricing-card mt-4 text-white shadow" style="border: 2px solid var(--primary-dark); box-shadow: 0 10px 30px rgba(var(--rgb-color), 0.15) !important;">
-                <h3 class="mb-0 pricing-badge" style="background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);">Recommended Plugin</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Swoole Proxy</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>69
-                    </p>
-                    <span class="price-period">Perpetual License &middot; 1 Year Updates</span>
-                </div>
-                <p class="text-muted small mt-2">Speed up video delivery without replacing your web server. Video streams are served by a long-running Swoole worker while the rest of the site keeps running on nginx, Apache or LiteSpeed.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Long-Running Swoole Worker for Video Streams
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Serves HLS Segments, Live Streams and MP4 Files
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Site Stays on Your Current Web Server
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> One-Time Setup: Install the PHP Extension, Start the Worker
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Highly Recommended for High Traffic
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <div class="text-muted mt-2" style="font-size: 0.70rem; opacity: 0.65; line-height: 1.2;">
-                    * Subsequent years of updates & support optional at $35/year.
-                </div>
-                <a href="https://ko-fi.com/s/b368a8bd99" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=4343044357&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Recommended Plugin',
+                pricing_badge_style: 'background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);',
+                pricing_tracking_wider: 'Swoole Proxy',
+                price_amount: '69',
+                price_period: 'Perpetual License · 1 Year Updates',
+                short_desc: 'Speed up video delivery without replacing your web server. Video streams are served by a long-running Swoole worker while the rest of the site keeps running on nginx, Apache or LiteSpeed.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Long-Running Swoole Worker for Video Streams' },
+                    { icon: 'fas fa-check-circle', label: 'Serves HLS Segments, Live Streams and MP4 Files' },
+                    { icon: 'fas fa-check-circle', label: 'Site Stays on Your Current Web Server' },
+                    { icon: 'fas fa-check-circle', label: 'One-Time Setup: Install the PHP Extension, Start the Worker' },
+                    { icon: 'fas fa-check-circle', label: 'Highly Recommended for High Traffic' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                pricing_note: '* Subsequent years of updates & support optional at $35/year.',
+                pricing_card_style: 'border: 2px solid var(--primary-dark); box-shadow: 0 10px 30px rgba(var(--rgb-color), 0.15) !important;',
+                kofi_link: 'https://ko-fi.com/s/b368a8bd99',
+                nowpayments_link: 'https://nowpayments.io/payment/?iid=4343044357&source=button'
+            } only %}
         </div>
 
-        <!-- RoadRunner Integration Card -->
         <div class="col-12 col-md-6 col-xl-3">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">High Concurrency</h3>
-                <div class="text-uppercase tracking-wider small mb-2">RoadRunner Proxy</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>59
-                    </p>
-                    <span class="price-period">Perpetual License &middot; 1 Year Updates</span>
-                </div>
-                <p class="text-muted small mt-2">A Go-powered engine that keeps video streaming stable under heavy load. Ideal for clusters and load-balanced setups, without migrating the rest of the site.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Go-Powered Worker for Video Streams
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Serves HLS Segments, Live Streams and MP4 Files
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Site Stays on Your Current Web Server
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Automatic Worker Restart if a Process Stops
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <div class="text-muted mt-2" style="font-size: 0.70rem; opacity: 0.65; line-height: 1.2;">
-                    * Subsequent years of updates & support optional at $25/year.
-                </div>
-                <a href="https://ko-fi.com/s/caf2f6bb1b" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=4753896589&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'High Concurrency',
+                pricing_badge_style: 'background: linear-gradient(135deg, #10b981 0%, #047857 100%);',
+                pricing_tracking_wider: 'RoadRunner Proxy',
+                price_amount: '59',
+                price_period: 'Perpetual License · 1 Year Updates',
+                short_desc: 'A Go-powered engine that keeps video streaming stable under heavy load. Ideal for clusters and load-balanced setups, without migrating the rest of the site.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Go-Powered Worker for Video Streams' },
+                    { icon: 'fas fa-check-circle', label: 'Serves HLS Segments, Live Streams and MP4 Files' },
+                    { icon: 'fas fa-check-circle', label: 'Site Stays on Your Current Web Server' },
+                    { icon: 'fas fa-check-circle', label: 'Automatic Worker Restart if a Process Stops' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                pricing_note: '* Subsequent years of updates & support optional at $25/year.',
+                kofi_link: 'https://ko-fi.com/s/caf2f6bb1b',
+                nowpayments_link: 'https://nowpayments.io/payment/?iid=4753896589&source=button'
+            } only %}
         </div>
     </div>
 </section>
 
 <!-- Premium Plugins Section -->
-<section id="pricing2" class="pricing-section py-5 text-center">
+<!-- <section id="pricing2" class="pricing-section py-5 text-center">
     <h2 class="section-title">Premium <span class="text-gradient">Plugins</span></h2>
     <p class="section-subtitle">First-party add-ons that expose the platform over a REST API and manage remote XVS hosts.</p>
-    <div class="row justify-content-center text-center">
-        <!-- API Plugin Card -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge" style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);">Developer API</h3>
-                <div class="text-uppercase tracking-wider small mb-2">API Plugin</div>
-
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>69
-                    </p>
-                    <span class="price-period">Billing Plugin Included</span>
-                </div>
-
-                <p class="text-muted small mt-2">JSON endpoints for the player, external integrations, and downstream services — including a server-side source resolver.</p>
-
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-gift text-warning"></i> Includes Billing Management (Plans, Invoices &amp; Renewals)
-                    </li>
-                    <li>
-                        <i class="fas fa-crown text-warning"></i> Premium Users Get Direct Video URL
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> REST API v1 with OpenAPI Docs
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Bearer Token Create &amp; Revoke
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Source Resolve Endpoint
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Cloudflare Worker Proxy
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> OpenResty Lua Script Proxy
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-
-                <button type="button" class="btn btn-gradient d-flex w-100 my-4" disabled aria-disabled="true">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </button>
-                <button type="button" class="btn btn-gradient d-flex w-100" disabled aria-disabled="true">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </button>
-            </div>
+    <div class="form-row justify-content-center text-center">
+        <div class="col-12 col-md-6 col-lg-3">
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Host Manager',
+                pricing_badge_style: 'background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);',
+                pricing_tracking_wider: 'XVS Plugin',
+                price_amount: '49',
+                price_period: '',
+                short_desc: 'Manage files, folders, uploads, and queues on any XVideoSharing (XVS/SIBSoft) instance from the admin panel.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Multiple Instance Profiles' },
+                    { icon: 'fas fa-check-circle', label: 'Files, Folders & Upload from URL' },
+                    { icon: 'fas fa-check-circle', label: 'Encoding Queue, Trash & DMCA' },
+                    { icon: 'fas fa-check-circle', label: 'Rate-Limit Aware & API-Key Server-Side' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
         </div>
 
-        <!-- XVS Manager Plugin Card -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);">Host Manager</h3>
-                <div class="text-uppercase tracking-wider small mb-2">XVS Plugin</div>
+        <div class="col-12 col-md-6 col-lg-3">
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Developer API',
+                pricing_badge_style: 'background: linear-gradient(135deg, #10b981 0%, #047857 100%);',
+                pricing_tracking_wider: 'API Plugin',
+                price_amount: '59',
+                price_period: '',
+                short_desc: 'JSON endpoints for the player, external integrations, and downstream services — including a server-side source resolver.',
+                pricing_features: [
+                    { icon: 'fas fa-crown text-warning', label: 'Premium Users Get Direct Video URL' },
+                    { icon: 'fas fa-check-circle', label: 'REST API v1 with OpenAPI Docs' },
+                    { icon: 'fas fa-check-circle', label: 'Bearer Token Create & Revoke' },
+                    { icon: 'fas fa-check-circle', label: 'Source Resolve Endpoint' },
+                    { icon: 'fas fa-check-circle', label: 'Cloudflare Worker Proxy' },
+                    { icon: 'fas fa-check-circle', label: 'OpenResty Lua Script Proxy' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
+        </div>
 
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>49
-                    </p>
-                </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Billing Management',
+                pricing_badge_style: 'background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);',
+                pricing_tracking_wider: 'Billing Plugin',
+                price_amount: '69',
+                price_period: '',
+                short_desc: '',
+                pricing_features: [
+                    { icon: 'fas fa-crown text-warning', label: 'Premium Users Get Direct Video URL' },
+                    { icon: 'fas fa-check-circle', label: 'REST API v1 with OpenAPI Docs' },
+                    { icon: 'fas fa-check-circle', label: 'Bearer Token Create & Revoke' },
+                    { icon: 'fas fa-check-circle', label: 'Source Resolve Endpoint' },
+                    { icon: 'fas fa-check-circle', label: 'Cloudflare Worker Proxy' },
+                    { icon: 'fas fa-check-circle', label: 'OpenResty Lua Script Proxy' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
+        </div>
 
-                <p class="text-muted small mt-2">Manage files, folders, uploads, and queues on any XVideoSharing (XVS/SIBSoft) instance from the admin panel.</p>
-
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Multiple Instance Profiles
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Files, Folders &amp; Upload from URL
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Encoding Queue, Trash &amp; DMCA
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Rate-Limit Aware &amp; API-Key Server-Side
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-
-                <button type="button" class="btn btn-gradient d-flex w-100 my-4" disabled aria-disabled="true">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </button>
-                <button type="button" class="btn btn-gradient d-flex w-100" disabled aria-disabled="true">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </button>
-            </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Premium API Bundle',
+                pricing_badge_style: 'background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);',
+                pricing_tracking_wider: 'API + Billing Plugin',
+                price_amount: '99',
+                price_period: '',
+                short_desc: '',
+                pricing_features: [
+                    { icon: 'fas fa-crown text-warning', label: 'Premium Users Get Direct Video URL' },
+                    { icon: 'fas fa-check-circle', label: 'REST API v1 with OpenAPI Docs' },
+                    { icon: 'fas fa-check-circle', label: 'Bearer Token Create & Revoke' },
+                    { icon: 'fas fa-check-circle', label: 'Source Resolve Endpoint' },
+                    { icon: 'fas fa-check-circle', label: 'Cloudflare Worker Proxy' },
+                    { icon: 'fas fa-check-circle', label: 'OpenResty Lua Script Proxy' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
         </div>
     </div>
-</section>
+</section> -->
 
 <!-- Open Source Developer Licenses Section -->
-<section id="pricing3" class="pricing-section py-5 text-center">
+<!-- <section id="pricing3" class="pricing-section py-5 text-center">
     <h2 class="section-title">Open Source <span class="text-gradient">Developer Licenses</span></h2>
     <p class="section-subtitle">Get complete access to the source code for full custom integrations, in-house deployment, and white-label control.</p>
     <div class="row justify-content-center text-center">
-        <!-- Swoole Open Source -->
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge" style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);">Full Source Code</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Swoole Open Source</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>399
-                    </p>
-                    <span class="price-period">Perpetual License &middot; 1 Year Updates</span>
-                </div>
-                <p class="text-muted small mt-2">Get 100% unlocked source code for the Swoole integration. Build custom wrappers, modify logic, and host it independently without constraints.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Unlocked & Unobfuscated Code
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Unlimited Domain Implementations
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> In-House Modifiable Logic
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/00cce2cbea" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=5691067070&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Full Source Code',
+                pricing_badge_style: 'background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);',
+                pricing_tracking_wider: 'Swoole Open Source',
+                price_amount: '399',
+                price_period: 'Perpetual License · 1 Year Updates',
+                short_desc: 'Get 100% unlocked source code for the Swoole integration. Build custom wrappers, modify logic, and host it independently without constraints.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Unlocked & Unobfuscated Code' },
+                    { icon: 'fas fa-check-circle', label: 'Unlimited Domain Implementations' },
+                    { icon: 'fas fa-check-circle', label: 'In-House Modifiable Logic' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
         </div>
 
-        <!-- RoadRunner Open Source -->
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge" style="background: linear-gradient(135deg, #10b981 0%, #065f46 100%);">Developer Friendly</h3>
-                <div class="text-uppercase tracking-wider small mb-2">RoadRunner Open Source</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>299
-                    </p>
-                    <span class="price-period">Perpetual License &middot; 1 Year Updates</span>
-                </div>
-                <p class="text-muted small mt-2">Acquire the full source code for the RoadRunner Go-powered wrapper. Perfect for advanced developer setups, custom builds, and scale tuning.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Unlocked Go/PHP Middleware Code
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Unlimited Domain Implementations
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Cluster-Ready Deployment
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/c7561f301c" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=6373150561&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Developer Friendly',
+                pricing_badge_style: 'background: linear-gradient(135deg, #10b981 0%, #065f46 100%);',
+                pricing_tracking_wider: 'RoadRunner Open Source',
+                price_amount: '299',
+                price_period: 'Perpetual License · 1 Year Updates',
+                short_desc: 'Acquire the full source code for the RoadRunner Go-powered wrapper. Perfect for advanced developer setups, custom builds, and scale tuning.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Unlocked Go/PHP Middleware Code' },
+                    { icon: 'fas fa-check-circle', label: 'Unlimited Domain Implementations' },
+                    { icon: 'fas fa-check-circle', label: 'Cluster-Ready Deployment' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
         </div>
 
-        <!-- Swoole + RoadRunner OS Bundle (Recommended / Best Value) -->
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="pricing-card mt-4 text-white shadow" style="border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(var(--rgb-color), 0.2) !important;">
-                <h3 class="mb-0 pricing-badge">Ultimate OS Bundle</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Swoole + RoadRunner OS</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>499
-                    </p>
-                    <span class="price-period">Save $199 Instantly</span>
-                </div>
-                <p class="text-muted small mt-2">Get both premium integration source codes in one complete package. Enjoy the freedom of open source tuning for all performance profiles.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-star text-warning"></i> Both Swoole & RoadRunner OS Code
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Unlimited Domain Licenses & Deployments
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Complete Customization & White-Labeling
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1st Year Free Updates & Support (Both)
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/ae910677c1" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=6194960044&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Ultimate OS Bundle',
+                pricing_tracking_wider: 'Swoole + RoadRunner OS',
+                price_amount: '499',
+                price_period: 'Save $199 Instantly',
+                short_desc: 'Get both premium integration source codes in one complete package. Enjoy the freedom of open source tuning for all performance profiles.',
+                pricing_features: [
+                    { icon: 'fas fa-star text-warning', label: 'Both Swoole & RoadRunner OS Code' },
+                    { icon: 'fas fa-check-circle', label: 'Unlimited Domain Licenses & Deployments' },
+                    { icon: 'fas fa-check-circle', label: 'Complete Customization & White-Labeling' },
+                    { icon: 'fas fa-check-circle', label: '1st Year Free Updates & Support (Both)' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                pricing_card_style: 'border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(var(--rgb-color), 0.2) !important;',
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
         </div>
     </div>
-</section>
+</section> -->
 
 {% include 'elements/footer.twig' %}
