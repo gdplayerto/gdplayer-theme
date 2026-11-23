@@ -1453,6 +1453,12 @@ final class Kernel
 final class Lifecycle
 {
     private static bool $booted = false;
+    /** Highest PHP memory use seen at a request boundary. */
+    private static int $peakBytes = 0;
+    /** Highest GC root-buffer size seen at a request boundary. */
+    private static int $peakRoots = 0;
+    /** Requests served by this process (always 1 under FPM, where the process dies afterwards). */
+    private static int $requests = 0;
     /**
      * Process-level setup: runs once per process (FPM: once per request, same effect).
      */
@@ -1466,6 +1472,18 @@ final class Lifecycle
      * CLI scripts, where HTTP response handling must not run either.
      */
     public static function isLongRunning(): bool
+    {
+    }
+    /**
+     * GC and memory snapshot of the process that answers this call.
+     *
+     * The numbers belong to one worker, not to the pool: with several workers each request
+     * reports whichever process served it. Use a single worker (RoadRunner `num_workers=1`,
+     * Swoole `worker_num=1`) when the values are read as a trend.
+     *
+     * @return array<string, int> roots, collector activity, requests served, current and peak bytes
+     */
+    public static function memoryStats(): array
     {
     }
     /**
@@ -6213,9 +6231,9 @@ final class GDrive
 final class Platform
 {
     /**
-     * Find a Chromium binary installed on the Unix host.
+     * Find a Chromium binary installed on the current host.
      *
-     * @return null|string name of an available binary, or null when none is found
+     * @return null|string name or path of an available binary, or null when none is found
      */
     public static function findChromiumBinary(): ?string
     {
