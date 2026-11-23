@@ -3464,6 +3464,16 @@ abstract class SecurityBase
      * the server refuses to sign tokens for versions below this.
      */
     private const VERSI_MINIMUM = '5.0.0';
+    /**
+     * Ceiling for how long a cached server token may keep this instance licensed.
+     *
+     * The server still owns the real expiry (`e`); this cap only shortens the local cache
+     * lifetime so the licence server is contacted at least once per window (heartbeat).
+     * The token itself stays valid for its full `e`, so a re-issued long-lived token is
+     * accepted again — only the cache entry is rotated. While the server is unreachable
+     * past this window the instance stays unlicensed (fail-closed).
+     */
+    private const MAX_TOKEN_AGE = 604800;
     protected string $hostname = '';
     protected string $kirimKode = 'license=%s&hostname=%s&ver=%s';
     protected string $kunciPublik = '';
