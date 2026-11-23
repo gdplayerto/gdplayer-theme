@@ -1,0 +1,44 @@
+<div class="pricing-card mt-4 text-white shadow"{% if pricing_card_style is defined and pricing_card_style is not empty %} style="{{ pricing_card_style }}"{% endif %}>
+    <h3 class="mb-0 pricing-badge"{% if pricing_badge_style is defined and pricing_badge_style is not empty %} style="{{ pricing_badge_style }}"{% endif %}>{{ pricing_title }}</h3>
+    <div class="text-uppercase tracking-wider small mb-2">{{ pricing_tracking_wider }}</div>
+    <div class="my-3">
+        {% if price_amount is not empty %}
+            <p class="price-amount">
+                <span class="price-currency">$</span>{{ price_amount }}
+            </p>
+        {% endif %}
+        {% if price_period is not empty %}
+            <span class="price-period">{{ price_period }}</span>
+        {% endif %}
+    </div>
+    {% if short_desc is not empty %}
+        <p class="text-muted small mt-2">{{ short_desc }}</p>
+    {% endif %}
+    {% if pricing_features is not empty %}
+        <ul class="pricing-features">
+            {% for pf in pricing_features %}
+                <li>
+                    <i class="{{ pf.icon }}"></i> {{ pf.label }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if pricing_note is defined and pricing_note is not empty %}
+        <div class="text-muted mt-2" style="font-size: 0.70rem; opacity: 0.65; line-height: 1.2;">{{ pricing_note }}</div>
+    {% endif %}
+    {% if kofi_link is not empty %}
+        <a href="{{ kofi_link }}" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 mt-4">
+            <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
+            <span class="w-100">Pay with PayPal</span>
+        </a>
+    {% endif %}
+    {% if nowpayments_link is not empty %}
+        <a href="{{ nowpayments_link }}" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 mt-4">
+            <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
+            <span class="w-100">Pay with Crypto</span>
+        </a>
+    {% endif %}
+    {% if kofi_link is empty and nowpayments_link is empty %}
+        <a href="#" rel="noreferrer noopener" class="btn btn-gradient w-100 mt-4 disabled">Coming Soon</a>
+    {% endif %}
+</div>
