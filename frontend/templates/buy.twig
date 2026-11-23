@@ -208,185 +208,83 @@
 <section id="pricing" class="pricing-section py-5 text-center">
     <h2 class="section-title">Simple, Direct Licensing</h2>
     <p class="section-subtitle">Get full access to the premium script features. No hidden subscriptions.</p>
-    <div class="row justify-content-center form-row">
+    <div class="form-row justify-content-center">
         <div class="col-12 col-md-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge">Single License</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Perpetual License &middot; 1 Year Updates</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>149
-                    </p>
-                    <span class="price-period">4 Domains/Subdomains (Literal)</span>
-                </div>
-                <p class="text-muted small mt-2">Perfect for independent streaming webmasters looking for elite performance.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Valid for Up to 4 Domains/Subdomains
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Literal Domain Locking (Root & Sub count separately)
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Bypasses Google Drive Quota Limits
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Complete Access to 45+ File Hosts
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> VAST Ads & Anti-Adblock Suite
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> High-Speed Redis/Files Based Cache
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Worker-Safe Core (No Superglobals, No exit/die)
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Runs on nginx, OpenResty, Apache or LiteSpeed
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1 Year Support & Updates
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/3f38af940a" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=5900732380&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Single License',
+                pricing_tracking_wider: 'Perpetual License · 1 Year Updates',
+                price_amount: '149',
+                price_period: '4 Domains/Subdomains (Literal)',
+                short_desc: 'Perfect for independent streaming webmasters looking for elite performance.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Valid for Up to 4 Domains/Subdomains' },
+                    { icon: 'fas fa-check-circle', label: 'Literal Domain Locking (Root & Sub count separately)' },
+                    { icon: 'fas fa-check-circle', label: 'Bypasses Google Drive Quota Limits' },
+                    { icon: 'fas fa-check-circle', label: 'Complete Access to 45+ File Hosts' },
+                    { icon: 'fas fa-check-circle', label: 'VAST Ads & Anti-Adblock Suite' },
+                    { icon: 'fas fa-check-circle', label: 'High-Speed Redis/Files Based Cache' },
+                    { icon: 'fas fa-check-circle', label: 'Worker-Safe Core (No Superglobals, No exit/die)' },
+                    { icon: 'fas fa-check-circle', label: 'Runs on nginx, OpenResty, Apache or LiteSpeed' },
+                    { icon: 'fas fa-check-circle', label: '1 Year Support & Updates' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: 'https://ko-fi.com/s/3f38af940a',
+                nowpayments_link: 'https://nowpayments.io/payment/?iid=5900732380&source=button'
+            } only %}
         </div>
 
-        <div class="col-12 col-md-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge">Runtime Bundle</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Perpetual License &middot; 1 Year Updates</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>249
-                    </p>
-                    <span class="price-period">4 Domains/Subdomains (Literal)</span>
-                </div>
-                <p class="text-muted small mt-2">Single License plus a long-running runtime for the main application — measured up to 8&times; faster average page response than nginx on the same server.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-check-circle"></i> Everything in Single License
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Runtime for the Whole App (RoadRunner or Swoole)
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Up to 27% More Traffic Than nginx, 3&times; More Than Apache
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Average Response 21 ms (nginx 164 ms, Apache 273 ms)
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> No Stalled Requests: Slowest Response 0.3 s (Apache 49 s)
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Workers Stay Warm: No Site Rebuild Per Visitor
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Smooth Seeking and Resuming for Large Videos
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Works With nginx, OpenResty, Apache or LiteSpeed
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Installer Scripts for Windows and Linux
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Optional: Delete the Folder, Site Returns to nginx/Apache
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1 Year Support &amp; Updates
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Stream Proxy Plugin (Swoole/RoadRunner) Not Included
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <div class="text-muted mt-2" style="font-size: 0.70rem; opacity: 0.65; line-height: 1.2;">
-                    * Measured with k6 on the same server: 100 simultaneous visitors for 80 seconds on the embed page. 0 failed requests on the runtime.
-                </div>
-                <a href="https://ko-fi.com/s/bcdbe70d60" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=6175617679&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
-        </div>
+        <!-- <div class="col-12 col-md-4">
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Runtime Bundle',
+                pricing_tracking_wider: 'Perpetual License · 1 Year Updates',
+                price_amount: '249',
+                price_period: '4 Domains/Subdomains (Literal)',
+                short_desc: 'Single License plus a long-running runtime for the main application — measured up to 8× faster average page response than nginx on the same server.',
+                pricing_features: [
+                    { icon: 'fas fa-check-circle', label: 'Everything in Single License' },
+                    { icon: 'fas fa-check-circle', label: 'Runtime for the Whole App (RoadRunner or Swoole)' },
+                    { icon: 'fas fa-check-circle', label: 'Up to 27% More Traffic Than nginx, 3× More Than Apache' },
+                    { icon: 'fas fa-check-circle', label: 'Average Response 21 ms (nginx 164 ms, Apache 273 ms)' },
+                    { icon: 'fas fa-check-circle', label: 'No Stalled Requests: Slowest Response 0.3 s (Apache 49 s)' },
+                    { icon: 'fas fa-check-circle', label: 'Workers Stay Warm: No Site Rebuild Per Visitor' },
+                    { icon: 'fas fa-check-circle', label: 'Smooth Seeking and Resuming for Large Videos' },
+                    { icon: 'fas fa-check-circle', label: 'Works With nginx, OpenResty, Apache or LiteSpeed' },
+                    { icon: 'fas fa-check-circle', label: 'Installer Scripts for Windows and Linux' },
+                    { icon: 'fas fa-check-circle', label: 'Optional: Delete the Folder, Site Returns to nginx/Apache' },
+                    { icon: 'fas fa-check-circle', label: '1 Year Support & Updates' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Stream Proxy Plugin (Swoole/RoadRunner) Not Included' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                pricing_note: '* Measured with k6 on the same server: 100 simultaneous visitors for 80 seconds on the embed page. 0 failed requests on the runtime.',
+                kofi_link: '',
+                nowpayments_link: ''
+            } only %}
+        </div> -->
 
         <div class="col-12 col-md-4">
-            <div class="pricing-card mt-4 text-white shadow">
-                <h3 class="mb-0 pricing-badge">Unlimited License</h3>
-                <div class="text-uppercase tracking-wider small mb-2">Perpetual License &middot; 1 Year Updates</div>
-                <div class="my-3">
-                    <p class="price-amount">
-                        <span class="price-currency">$</span>1499
-                    </p>
-                    <span class="price-period">Unlimited Domains &amp; Source Code Included</span>
-                </div>
-                <p class="text-muted small mt-2">For networks and agencies: no per-domain limit and the full unlocked source code. Support is the same queue as every other license.</p>
-                <ul class="pricing-features">
-                    <li>
-                        <i class="fas fa-gift text-warning"></i> Unlimited Domains &amp; Subdomains
-                    </li>
-                    <li>
-                        <i class="fas fa-crown text-warning"></i> 100% Unobfuscated Source Code
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Unlimited Instances: Deploy as Many Sites as You Need
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> All Additional Hosts Included
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Bypasses Google Drive Quota Limits
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Complete Access to 45+ File Hosts
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> VAST Ads &amp; Anti-Adblock Suite
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Keep Running Without Renewal (Updates Optional)
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> 1 Year Support &amp; Updates
-                    </li>
-                    <li>
-                        <i class="fas fa-check-circle"></i> Bug Fixes and Compatibility Patches
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Engine Plugins Sold Separately (Swoole / RoadRunner)
-                    </li>
-                    <li>
-                        <i class="fas fa-times-circle text-danger"></i> Reselling the script itself is strictly prohibited
-                    </li>
-                </ul>
-                <a href="https://ko-fi.com/s/cb1c4e85bf" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100 my-4">
-                    <span class="flex-shrink-1"><i class="fab fa-paypal fa-xl"></i></span>
-                    <span class="w-100">Pay with PayPal</span>
-                </a>
-                <a href="https://nowpayments.io/payment/?iid=5407728626&amp;source=button" target="_blank" rel="noreferrer noopener" class="btn btn-gradient d-flex w-100">
-                    <span class="flex-shrink-1"><i class="fas fa-coins fa-xl"></i></span>
-                    <span class="w-100">Pay with Crypto</span>
-                </a>
-            </div>
+            {% include 'elements/pricing-card.twig' with {
+                pricing_title: 'Unlimited License',
+                pricing_tracking_wider: 'Perpetual License · 1 Year Updates',
+                price_amount: '1499',
+                price_period: 'Unlimited Domains & Source Code Included',
+                short_desc: 'For networks and agencies: no per-domain limit and the full unlocked source code. Support is the same queue as every other license.',
+                pricing_features: [
+                    { icon: 'fas fa-gift text-warning', label: 'Unlimited Domains & Subdomains' },
+                    { icon: 'fas fa-crown text-warning', label: '100% Unobfuscated Source Code' },
+                    { icon: 'fas fa-check-circle', label: 'Unlimited Instances: Deploy as Many Sites as You Need' },
+                    { icon: 'fas fa-check-circle', label: 'All Additional Hosts Included' },
+                    { icon: 'fas fa-check-circle', label: 'Bypasses Google Drive Quota Limits' },
+                    { icon: 'fas fa-check-circle', label: 'Complete Access to 45+ File Hosts' },
+                    { icon: 'fas fa-check-circle', label: 'VAST Ads & Anti-Adblock Suite' },
+                    { icon: 'fas fa-check-circle', label: 'Keep Running Without Renewal (Updates Optional)' },
+                    { icon: 'fas fa-check-circle', label: '1 Year Support & Updates' },
+                    { icon: 'fas fa-check-circle', label: 'Bug Fixes and Compatibility Patches' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Engine Plugins Sold Separately (Swoole / RoadRunner)' },
+                    { icon: 'fas fa-times-circle text-danger', label: 'Reselling the script itself is strictly prohibited' }
+                ],
+                kofi_link: 'https://ko-fi.com/s/cb1c4e85bf',
+                nowpayments_link: 'https://nowpayments.io/payment/?iid=5407728626&source=button'
+            } only %}
         </div>
     </div>
 </section>
