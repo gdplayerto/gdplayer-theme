@@ -3460,11 +3460,6 @@ final class Security extends \GDPlayer\Core\Security\SecurityBase
 abstract class SecurityBase
 {
     /**
-     * Lowest version the server still serves. Raise it only together with a new release:
-     * the server refuses to sign tokens for versions below this.
-     */
-    private const VERSI_MINIMUM = '5.0.0';
-    /**
      * Ceiling for how long a cached server token may keep this instance licensed.
      *
      * The server still owns the real expiry (`e`); this cap only shortens the local cache
@@ -3474,6 +3469,11 @@ abstract class SecurityBase
      * past this window the instance stays unlicensed (fail-closed).
      */
     private const MAX_TOKEN_AGE = 604800;
+    /**
+     * Lowest version the server still serves. Raise it only together with a new release:
+     * the server refuses to sign tokens for versions below this.
+     */
+    private const VERSI_MINIMUM = '5.0.0';
     protected string $hostname = '';
     protected string $kirimKode = 'license=%s&hostname=%s&ver=%s';
     protected string $kunciPublik = '';
@@ -3646,6 +3646,18 @@ abstract class SecurityBase
      * @return bool true when the plugin is licensed
      */
     public function isPluginValid(string $pluginName = 'swoole'): bool
+    {
+    }
+    /**
+     * Replace the Redis handle, e.g. when a long-running worker reconnects.
+     *
+     * A handle opened at worker start is dead after Redis restarts, and every
+     * read/write on it fails with "existing connection was forcibly closed".
+     *
+     * @param null|Redis $redis verified live handle, or null to use the InstanceCache
+     * @return void
+     */
+    public function refreshRedis(?\Redis $redis): void
     {
     }
 }
