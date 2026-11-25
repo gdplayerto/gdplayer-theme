@@ -1985,7 +1985,7 @@ final class Core
      * } $resultFormat
      */
     private array $resultFormat = ['sources' => [], 'tracks' => [], 'referer' => '', 'title' => '', 'email' => '', 'image' => '', 'cookies' => [], 'filmstrip' => '', 'clientip' => ''];
-    private \GDPlayer\Core\Security\Security $security;
+    private \GDPlayer\Core\Security\SecurityBase $security;
     private ?int $serverId = null;
     private string $serverIp = '';
     private string $userAgent = USER_AGENT;
@@ -1997,9 +1997,10 @@ final class Core
     protected array $criteriaArray = [];
     /**
      * @param array<string,mixed> $query
+     * @param null|SecurityBase $security license checker; tests may inject one
      * @return void
      */
-    public function __construct(array $query = [])
+    public function __construct(array $query = [], ?\GDPlayer\Core\Security\SecurityBase $security = null)
     {
     }
     /**
@@ -6388,7 +6389,7 @@ class SmartTVDetector
      *
      * @return bool true when a Smart TV is detected
      */
-    public function isSmartTV(): bool
+    public function isSmartTv(): bool
     {
     }
 }
@@ -10415,6 +10416,15 @@ trait AjaxBaseTrait
     {
     }
     /**
+     * Drop every cache that could still serve the pre-license state: the instance store
+     * (redis/file driver), the cached HTML pages, and the on-disk files/Twig caches.
+     *
+     * Called right after a license key is stored, so the new license applies at once.
+     */
+    protected function clearLicenseCaches(): void
+    {
+    }
+    /**
      * @param array<int|string, array<string, mixed>> $data
      * @param int $recordsTotal
      * @param int $recordsFiltered
@@ -11202,6 +11212,12 @@ final class ApiController extends \GDPlayer\View\AbstractView
  */
 final class DirectController extends \GDPlayer\View\AbstractView
 {
+    /**
+     * @param null|SecurityBase $security license checker forwarded to Core; injectable for tests
+     */
+    public function __construct(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response, string $action = '', private ?\GDPlayer\Core\Security\SecurityBase $security = null)
+    {
+    }
     /**
      * @return ResponseInterface
      */
@@ -13934,6 +13950,8 @@ namespace GDPlayer\Presentation;
  */
 final class HTML
 {
+    /** Twig namespace exposing every template under BASE_DIR, so fragments cross directories. */
+    private const TEMPLATE_NAMESPACE = 'gdplayer';
     /** @var array<string,Environment> */
     private static array $environments = [];
     /**
@@ -14016,12 +14034,16 @@ final class HTML
     {
     }
     /**
-     * to load a .twig file into a variable so it can be included via a variable inside other .twig files
+     * Resolve a .twig file to the absolute path included via a variable in other .twig files.
+     *
+     * Twig 3.31 rejects a TemplateWrapper that belongs to another Environment, so cross-directory
+     * fragments (widgets, theme elements) are handed over as paths; the page environment loads
+     * them itself through the absolute-path loader built in {@see createEnvironment()}.
      *
      * @param string $template .twig file location
-     * @return null|TemplateWrapper
+     * @return null|string absolute path, or null when the template is missing
      */
-    public static function loadTemplate(string $template): ?\Twig\TemplateWrapper
+    public static function loadTemplate(string $template): ?string
     {
     }
     /**

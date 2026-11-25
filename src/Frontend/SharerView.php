@@ -38,8 +38,10 @@ final class SharerView extends AbstractPageView
 
         return $this->renderTemplate('gdrive-sharer.twig', [
             'title' => 'Google Drive Direct Link Generator & Downloader',
-            'description' => 'Generate direct links and download Google Drive files '
-                . 'without signing in to a Google account.',
+            'description' => \implode(' ', [
+                'Generate direct links and download Google Drive files',
+                'without signing in to a Google account.',
+            ]),
         ], $request);
     }
 }

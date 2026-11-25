@@ -27,8 +27,10 @@ final class BuyView extends AbstractPageView
     {
         return $this->renderTemplate('buy.twig', [
             'title' => 'Buy GDPlayer Google Drive Video Player',
-            'description' => 'Buy GDPlayer Google Drive Video Player Full Version only on the official site. '
-                . 'Every license includes 1 year of updates and support.',
+            'description' => \implode(' ', [
+                'Buy GDPlayer Google Drive Video Player Full Version only on the official site.',
+                'Every license includes 1 year of updates and support.',
+            ]),
         ], $request);
     }
 }

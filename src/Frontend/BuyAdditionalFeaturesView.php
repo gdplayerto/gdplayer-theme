@@ -27,8 +27,10 @@ final class BuyAdditionalFeaturesView extends AbstractPageView
     {
         return $this->renderTemplate('buy-additional-features.twig', [
             'title' => 'Buy GDPlayer Additional Features',
-            'description' => 'Buy GDPlayer Additional Features only on the official site. '
-                . 'Expand your streaming capabilities with premium add-on hosts and integrations.',
+            'description' => \implode(' ', [
+                'Buy GDPlayer Additional Features only on the official site.',
+                'Expand your streaming capabilities with premium add-on hosts and integrations.',
+            ]),
         ], $request);
     }
 }
