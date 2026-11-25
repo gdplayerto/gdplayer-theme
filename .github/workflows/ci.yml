@@ -43,11 +43,11 @@ jobs:
 
       - name: PHPCS
         if: always()
-        run: vendor/bin/phpcs --parallel=8
+        run: vendor/bin/phpcs --parallel=16
 
       - name: PHPStan
         if: always()
-        run: vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit 2G --no-progress
+        run: vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit 16G --no-progress
 
       - name: Gate (superglobal & exit/die)
         if: always()
