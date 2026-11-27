@@ -22,4 +22,5 @@
 
 # artefak cache tool (dihapus, jangan masuk git)
 .phpunit.cache/
+/tmp/
 tests/.sandbox/
