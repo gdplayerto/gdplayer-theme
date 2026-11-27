@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.0.2] - 2026-11-18
+## [0.0.2] - 2026-11-27
 
 ### Added
+- Added a reusable price card used on the buy pages.
 - Added asset cache configuration for the backend and frontend.
 - Added a Swoole Proxy changelog card to the changelog page and updated the navigation links.
 - Added release notes for GDPlayer 5.0.0, Swoole Proxy 0.0.9 and RoadRunner Proxy 0.0.5 to the changelog page.
